@@ -19,6 +19,8 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
   bool _showHeatWarning = false;
   late AnimationController _pulseController;
   late AnimationController _warningController;
+  bool _showCompletionMessage = false;
+  Timer? _completionTimer;
 
   @override
   void initState() {
@@ -39,6 +41,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
   @override
   void dispose() {
     _heatWarningTimer?.cancel();
+    _completionTimer?.cancel();
     _pulseController.dispose();
     _warningController.dispose();
     super.dispose();
@@ -84,6 +87,29 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
           if (_scanStartTime == null) {
             _startHeatWarningTimer();
           }
+          // Убираем сообщение о завершении если началось новое сканирование
+          if (_showCompletionMessage) {
+            setState(() {
+              _showCompletionMessage = false;
+            });
+            _completionTimer?.cancel();
+          }
+        } else if (state is MediaCleanerReady && !state.isScanningInBackground) {
+          // Сканирование завершено - показываем сообщение на 3 секунды
+          _stopHeatWarningTimer();
+          if (!_showCompletionMessage && _scanStartTime != null) {
+            setState(() {
+              _showCompletionMessage = true;
+            });
+            _completionTimer?.cancel();
+            _completionTimer = Timer(const Duration(seconds: 3), () {
+              if (mounted) {
+                setState(() {
+                  _showCompletionMessage = false;
+                });
+              }
+            });
+          }
         } else {
           _stopHeatWarningTimer();
         }
@@ -95,10 +121,16 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
         double? progress;
         bool isError = false;
         bool isPaused = false;
+        bool isCompleted = false;
         int? processedFiles;
         int? totalFiles;
 
-        if (state is MediaCleanerScanning) {
+        if (_showCompletionMessage) {
+          // Показываем сообщение о завершении
+          showBanner = true;
+          message = "Сканирование завершено!";
+          isCompleted = true;
+        } else if (state is MediaCleanerScanning) {
           showBanner = true;
           message = state.scanMessage;
           progress = state.scanProgress;
@@ -161,7 +193,10 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
                     child: Row(
                       children: [
                         // Иконка или индикатор
-                        if (isError)
+                        if (isCompleted)
+                          const Icon(Icons.check_circle,
+                              color: CupertinoColors.systemGreen, size: 24)
+                        else if (isError)
                           const Icon(Icons.error_outline,
                               color: CupertinoColors.systemRed, size: 24)
                         else if (isPaused)
