@@ -8,6 +8,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
 
 @RoutePage()
@@ -19,74 +21,129 @@ class CategoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(categoryName),
-        trailing: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-          builder: (context, state) {
-            if (state is! MediaCleanerReady) return const SizedBox();
-
-            final List<MediaFile> categoryFiles = _getCategoryFiles(state);
-            if (categoryFiles.isEmpty) return const SizedBox();
-
-            final selectedFiles = state.selectedFiles;
-            final selectedIds = selectedFiles.map((file) => file.entity.id).toList();
-            final categoryIds = categoryFiles.map((file) => file.entity.id).toList();
-            final selectedCount = categoryIds.where((id) => selectedIds.contains(id)).length;
-            final allSelected = selectedCount == categoryIds.length && categoryIds.isNotEmpty;
-
-            return CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                if (allSelected) {
-                  for (final id in categoryIds) {
-                    if (selectedIds.contains(id)) {
-                      context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
-                    }
-                  }
-                } else {
-                  for (final id in categoryIds) {
-                    if (!selectedIds.contains(id)) {
-                      context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
-                    }
-                  }
-                }
-              },
-              child: Text(
-                allSelected ? 'Отменить' : 'Выбрать все',
-                style: const TextStyle(fontSize: 16),
-              ),
-            );
-          },
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0E27),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(categoryName, style: const TextStyle(color: Colors.white)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-      ),
-      child: SafeArea(
-        child: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-          builder: (context, state) {
-            if (state is! MediaCleanerReady) {
-              return const Center(child: CupertinoActivityIndicator());
-            }
+        actions: [
+          BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
+            builder: (context, state) {
+              if (state is! MediaCleanerReady) return const SizedBox();
 
-            final List<MediaFile> categoryFiles = _getCategoryFiles(state);
+              final List<MediaFile> categoryFiles = _getCategoryFiles(state);
+              if (categoryFiles.isEmpty) return const SizedBox();
 
-            if (categoryFiles.isEmpty) {
-              return Center(
-                child: Text(
-                  'Нет файлов в категории $categoryName',
-                  style: TextStyle(color: CupertinoColors.secondaryLabel.resolveFrom(context)),
+              final selectedFiles = state.selectedFiles;
+              final selectedIds = selectedFiles.map((file) => file.entity.id).toList();
+              final categoryIds = categoryFiles.map((file) => file.entity.id).toList();
+              final selectedCount = categoryIds.where((id) => selectedIds.contains(id)).length;
+              final allSelected = selectedCount == categoryIds.length && categoryIds.isNotEmpty;
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    if (allSelected) {
+                      for (final id in categoryIds) {
+                        if (selectedIds.contains(id)) {
+                          context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
+                        }
+                      }
+                    } else {
+                      for (final id in categoryIds) {
+                        if (!selectedIds.contains(id)) {
+                          context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
+                        }
+                      }
+                    }
+                  },
+                  child: LiquidGlass(
+                    settings: LiquidGlassSettings(
+                      blur: 3,
+                      ambientStrength: 0.6,
+                      lightAngle: 0.2 * math.pi,
+                      glassColor: Colors.white.withOpacity(0.15),
+                      thickness: 12,
+                    ),
+                    shape: LiquidRoundedSuperellipse(
+                      borderRadius: const Radius.circular(12),
+                    ),
+                    glassContainsChild: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Text(
+                        allSelected ? 'Отменить' : 'Выбрать все',
+                        style: const TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
                 ),
               );
-            }
-
-            return Column(
-              children: [
-                Expanded(child: _buildCategoryContent(context, state)),
-                _buildBottomBar(context, state, categoryFiles),
-              ],
-            );
-          },
-        ),
+            },
+          ),
+        ],
       ),
+      body: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
+        builder: (context, state) {
+          if (state is! MediaCleanerReady) {
+            return const Center(child: CupertinoActivityIndicator());
+          }
+
+          final List<MediaFile> categoryFiles = _getCategoryFiles(state);
+
+          if (categoryFiles.isEmpty) {
+            return const Center(
+              child: Text(
+                'Нет файлов в категории',
+                style: TextStyle(color: Colors.white60),
+              ),
+            );
+          }
+
+          return Stack(
+            children: [
+              // Полноэкранный grid
+              _buildCategoryContent(context, state),
+
+              // Floating banner сверху
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SafeArea(
+                  bottom: false,
+                  child: _buildSwipeBanner(context, categoryFiles),
+                ),
+              ),
+
+              // Floating bottom bar
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: SafeArea(
+                  top: false,
+                  child: _buildBottomBar(context, state, categoryFiles),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSwipeBanner(BuildContext context, List<MediaFile> files) {
+    return SwipeModeBanner(
+      mediaIds: files.map((file) => file.entity.id).toList(),
+      title: categoryName,
     );
   }
 
@@ -105,48 +162,68 @@ class CategoryPage extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemGrey6.resolveFrom(context),
-        border: Border(
-          top: BorderSide(color: CupertinoColors.separator.resolveFrom(context), width: 0.5),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: LiquidGlass(
+        settings: LiquidGlassSettings(
+          blur: 5,
+          ambientStrength: 1.0,
+          lightAngle: 0.25 * math.pi,
+          glassColor: Colors.white.withOpacity(0.12),
+          thickness: 25,
         ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Выбрано: ${selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount}',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 17,
-                  color: CupertinoColors.label.resolveFrom(context),
+        shape: LiquidRoundedSuperellipse(
+          borderRadius: const Radius.circular(20),
+        ),
+        glassContainsChild: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Выбрано: ${selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-            CupertinoButton(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              color: CupertinoColors.systemRed,
-              borderRadius: BorderRadius.circular(12),
-              onPressed: () {
-                _showDeleteConfirmation(
-                  context,
-                  selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount,
-                );
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(CupertinoIcons.trash, size: 18),
-                  SizedBox(width: 6),
-                  Text('Удалить', style: TextStyle(fontWeight: FontWeight.w600)),
-                ],
+              GestureDetector(
+                onTap: () {
+                  _showDeleteConfirmation(
+                    context,
+                    selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount,
+                  );
+                },
+                child: LiquidGlass(
+                  settings: LiquidGlassSettings(
+                    blur: 3,
+                    ambientStrength: 0.6,
+                    lightAngle: 0.2 * math.pi,
+                    glassColor: CupertinoColors.systemRed.withOpacity(0.4),
+                    thickness: 12,
+                  ),
+                  shape: LiquidRoundedSuperellipse(
+                    borderRadius: const Radius.circular(12),
+                  ),
+                  glassContainsChild: false,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(CupertinoIcons.trash, size: 18, color: Colors.white),
+                        SizedBox(width: 6),
+                        Text('Удалить', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -220,38 +297,28 @@ class CategoryPage extends StatelessWidget {
     if (categoryName == 'Размытые') {
       final blurryFiles = state.blurry;
 
-      return Column(
-        children: [
-          SwipeModeBanner(
-            mediaIds: blurryFiles.map((file) => file.entity.id).toList(),
-            title: 'Размытые фото',
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: EdgeInsets.zero,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 1.0,
-                crossAxisSpacing: 1.0,
-                mainAxisSpacing: 1.0,
-              ),
-              itemCount: blurryFiles.length,
-              itemBuilder: (context, index) {
-                return BlurryMediaGridItem(
-                  file: blurryFiles[index],
-                  onTap: () {
-                    context.read<MediaCleanerBloc>().add(
-                      ToggleFileSelection(blurryFiles[index].entity.id),
-                    );
-                  },
-                  onPreview: () {
-                    _showMediaPreview(context, blurryFiles[index]);
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+      return GridView.builder(
+        padding: const EdgeInsets.only(top: 80, bottom: 100), // Отступы для floating элементов
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 1.0,
+          crossAxisSpacing: 1.0,
+          mainAxisSpacing: 1.0,
+        ),
+        itemCount: blurryFiles.length,
+        itemBuilder: (context, index) {
+          return BlurryMediaGridItem(
+            file: blurryFiles[index],
+            onTap: () {
+              context.read<MediaCleanerBloc>().add(
+                ToggleFileSelection(blurryFiles[index].entity.id),
+              );
+            },
+            onPreview: () {
+              _showMediaPreview(context, blurryFiles[index]);
+            },
+          );
+        },
       );
     }
 
@@ -270,67 +337,48 @@ class CategoryPage extends StatelessWidget {
         return Center(child: Text('$categoryName не найдены'));
       }
 
-      return Column(
-        children: [
-          SwipeModeBanner(
-            mediaIds: groups.expand((group) => group.files).map((file) => file.entity.id).toList(),
-            title: categoryName,
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: groups.length,
-              itemBuilder: (context, index) {
-                return SimilarMediaGroup(
-                  group: groups[index],
-                  onFileSelected: (fileId) {
-                    context.read<MediaCleanerBloc>().add(ToggleFileSelection(fileId));
-                  },
-                  onPreviewFile: (file) {
-                    _showMediaPreview(context, file);
-                  },
-                  onSelectAllInGroup: (fileIds) {
-                    context.read<MediaCleanerBloc>().add(SelectAllInGroup(groups[index].id));
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+      return ListView.builder(
+        padding: const EdgeInsets.only(top: 80, bottom: 100), // Отступы для floating элементов
+        itemCount: groups.length,
+        itemBuilder: (context, index) {
+          return SimilarMediaGroup(
+            group: groups[index],
+            onFileSelected: (fileId) {
+              context.read<MediaCleanerBloc>().add(ToggleFileSelection(fileId));
+            },
+            onPreviewFile: (file) {
+              _showMediaPreview(context, file);
+            },
+            onSelectAllInGroup: (fileIds) {
+              context.read<MediaCleanerBloc>().add(SelectAllInGroup(groups[index].id));
+            },
+          );
+        },
       );
     }
 
     final List<MediaFile> files = _getCategoryFiles(state);
 
-    return Column(
-      children: [
-        SwipeModeBanner(
-          mediaIds: files.map((file) => file.entity.id).toList(),
-          title: categoryName,
-        ),
-        Expanded(
-          child: GridView.builder(
-            padding: EdgeInsets.zero,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 1.0,
-              mainAxisSpacing: 1.0,
-            ),
-            itemCount: files.length,
-            itemBuilder: (context, index) {
-              return MediaGridItem(
-                file: files[index],
-                onTap: () {
-                  context.read<MediaCleanerBloc>().add(ToggleFileSelection(files[index].entity.id));
-                },
-                onPreview: () {
-                  _showMediaPreview(context, files[index]);
-                },
-              );
-            },
-          ),
-        ),
-      ],
+    return GridView.builder(
+      padding: const EdgeInsets.only(top: 80, bottom: 100), // Отступы для floating элементов
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1.0,
+        crossAxisSpacing: 1.0,
+        mainAxisSpacing: 1.0,
+      ),
+      itemCount: files.length,
+      itemBuilder: (context, index) {
+        return MediaGridItem(
+          file: files[index],
+          onTap: () {
+            context.read<MediaCleanerBloc>().add(ToggleFileSelection(files[index].entity.id));
+          },
+          onPreview: () {
+            _showMediaPreview(context, files[index]);
+          },
+        );
+      },
     );
   }
 
