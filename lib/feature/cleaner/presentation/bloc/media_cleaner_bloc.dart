@@ -700,9 +700,65 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       // Удаляем выбранные файлы
       await PhotoManager.editor.deleteWithIds(selectedFileIds);
 
-      // Удаляем файлы из списков
+      // Удаляем файлы из всех списков
       final updatedFiles = currentState.allFiles
           .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из скриншотов
+      final updatedScreenshots = currentState.screenshots
+          .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из размытых
+      final updatedBlurry = currentState.blurry
+          .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из записей экрана
+      final updatedScreenRecordings = currentState.screenRecordings
+          .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из коротких видео
+      final updatedShortVideos = currentState.shortVideos
+          .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из групп похожих
+      final updatedSimilarGroups = currentState.similarGroups
+          .map((group) {
+            final updatedGroupFiles = group.files
+                .where((file) => !selectedFileIds.contains(file.entity.id))
+                .toList();
+            return updatedGroupFiles.isEmpty ? null : group.copyWith(files: updatedGroupFiles);
+          })
+          .where((group) => group != null)
+          .cast<MediaGroup>()
+          .toList();
+
+      // Удаляем из групп дубликатов фото
+      final updatedPhotoDuplicateGroups = currentState.photoDuplicateGroups
+          .map((group) {
+            final updatedGroupFiles = group.files
+                .where((file) => !selectedFileIds.contains(file.entity.id))
+                .toList();
+            return updatedGroupFiles.isEmpty ? null : group.copyWith(files: updatedGroupFiles);
+          })
+          .where((group) => group != null)
+          .cast<MediaGroup>()
+          .toList();
+
+      // Удаляем из групп дубликатов видео
+      final updatedVideoDuplicateGroups = currentState.videoDuplicateGroups
+          .map((group) {
+            final updatedGroupFiles = group.files
+                .where((file) => !selectedFileIds.contains(file.entity.id))
+                .toList();
+            return updatedGroupFiles.isEmpty ? null : group.copyWith(files: updatedGroupFiles);
+          })
+          .where((group) => group != null)
+          .cast<MediaGroup>()
           .toList();
 
       emit(
@@ -711,6 +767,13 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
           photoFiles: updatedFiles.where((f) => f.isImage).toList(),
           videoFiles: updatedFiles.where((f) => f.isVideo).toList(),
           selectedFiles: [],
+          screenshots: updatedScreenshots,
+          blurry: updatedBlurry,
+          screenRecordings: updatedScreenRecordings,
+          shortVideos: updatedShortVideos,
+          similarGroups: updatedSimilarGroups,
+          photoDuplicateGroups: updatedPhotoDuplicateGroups,
+          videoDuplicateGroups: updatedVideoDuplicateGroups,
         ),
       );
     } catch (e) {

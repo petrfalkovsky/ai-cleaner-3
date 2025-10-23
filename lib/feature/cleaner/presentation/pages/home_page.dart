@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
 import '../widgets/photo_category_card.dart';
 import '../widgets/video_category_card.dart';
@@ -82,41 +84,136 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 Column(
                   children: [
-                    // Custom Tab Bar в iOS стиле - показываем только после сканирования
+                    // Custom Tab Bar в iOS стиле с liquid glass - показываем только после сканирования
                     if (showTabs)
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: CupertinoColors.systemGrey6.resolveFrom(context),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: CupertinoSlidingSegmentedControl<int>(
-                          backgroundColor: CupertinoColors.systemGrey6.resolveFrom(context),
-                          thumbColor: CupertinoColors.white,
-                          groupValue: _tabController.index,
-                          onValueChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _tabController.animateTo(value);
-                              });
-                            }
-                          },
-                          children: const {
-                            0: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                              child: Text(
-                                'Фото',
-                                style: TextStyle(fontWeight: FontWeight.w600),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: LiquidGlassLayer(
+                          settings: LiquidGlassSettings(
+                            blur: 3,
+                            ambientStrength: 0.5,
+                            lightAngle: 0.2 * math.pi,
+                            glassColor: Colors.white12,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Expanded(
+                                child: LiquidGlass.inLayer(
+                                  shape: LiquidRoundedSuperellipse(
+                                    borderRadius: const Radius.circular(12),
+                                  ),
+                                  glassContainsChild: false,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _tabController.animateTo(0);
+                                              });
+                                            },
+                                            child: _tabController.index == 0
+                                                ? LiquidGlass(
+                                                    settings: LiquidGlassSettings(
+                                                      blur: 8,
+                                                      ambientStrength: 0.5,
+                                                      lightAngle: 0.2 * math.pi,
+                                                      glassColor: Colors.black26,
+                                                      thickness: 10,
+                                                    ),
+                                                    shape: LiquidRoundedSuperellipse(
+                                                      borderRadius: const Radius.circular(10),
+                                                    ),
+                                                    glassContainsChild: false,
+                                                    child: const Padding(
+                                                      padding: EdgeInsets.symmetric(vertical: 8),
+                                                      child: Center(
+                                                        child: Text(
+                                                          'Фото',
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight: FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : const Padding(
+                                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                                    child: Center(
+                                                      child: Text(
+                                                        'Фото',
+                                                        style: TextStyle(
+                                                          color: Colors.white70,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _tabController.animateTo(1);
+                                              });
+                                            },
+                                            child: _tabController.index == 1
+                                                ? LiquidGlass(
+                                                    settings: LiquidGlassSettings(
+                                                      blur: 8,
+                                                      ambientStrength: 0.5,
+                                                      lightAngle: 0.2 * math.pi,
+                                                      glassColor: Colors.black26,
+                                                      thickness: 10,
+                                                    ),
+                                                    shape: LiquidRoundedSuperellipse(
+                                                      borderRadius: const Radius.circular(10),
+                                                    ),
+                                                    glassContainsChild: false,
+                                                    child: const Padding(
+                                                      padding: EdgeInsets.symmetric(vertical: 8),
+                                                      child: Center(
+                                                        child: Text(
+                                                          'Видео',
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight: FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : const Padding(
+                                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                                    child: Center(
+                                                      child: Text(
+                                                        'Видео',
+                                                        style: TextStyle(
+                                                          color: Colors.white70,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                            1: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                              child: Text(
-                                'Видео',
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          },
+                            ],
+                          ),
                         ),
                       ),
 

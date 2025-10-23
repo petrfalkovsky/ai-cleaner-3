@@ -301,7 +301,7 @@ class MediaScanner {
     return screenshots;
   }
 
-  // ОПТИМИЗИРОВАННЫЙ поиск записей экрана - правильные имена iOS
+  // ОПТИМИЗИРОВАННЫЙ поиск записей экрана - поиск по имени файла
   static List<MediaFile> findScreenRecordings(List<MediaFile> files) {
     final screenRecordings = <MediaFile>[];
 
@@ -310,11 +310,11 @@ class MediaScanner {
     for (final file in files) {
       if (!file.isVideo) continue;
 
-      // iOS именует записи экрана как "RPReplay_FinalXXXXXXXXXX.MP4"
+      // Ищем в имени файла "RPReplay" или "ReplayKit" (case-insensitive)
       final title = file.entity.title ?? '';
-
-      // Проверка на префикс RPReplay (как в Swift: hasPrefix("RPReplay"))
-      final isScreenRecording = title.startsWith('RPReplay');
+      final titleLower = title.toLowerCase();
+      final isScreenRecording = titleLower.contains('rpreplay') ||
+                                titleLower.contains('replaykit');
 
       if (isScreenRecording) {
         screenRecordings.add(file.copyWith(category: 'screenRecordings'));
