@@ -5,7 +5,9 @@ import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_button.da
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_status_banner.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selected_files_counter.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../bloc/media_cleaner_bloc.dart';
@@ -22,8 +24,9 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late TabController _tabController;
+  late AnimationController _fabController;
 
   // Для отслеживания категорий, которые уже отображались
   Set<PhotoCategory> _previousPhotoCategories = {};
@@ -32,7 +35,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTabIndex);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
+
+    _fabController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
 
     // При запуске проверяем наличие сохраненных данных или начинаем сканирование
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -44,301 +56,282 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   void dispose() {
     _tabController.dispose();
+    _fabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('AI Cleaner', style: TextStyle(fontWeight: FontWeight.bold)),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Фото'),
-            Tab(text: 'Видео'),
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text(
+          'AI Cleaner',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+        border: null,
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Custom Tab Bar в iOS стиле
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: CupertinoColors.systemGrey6.resolveFrom(context),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: CupertinoSlidingSegmentedControl<int>(
+                backgroundColor: CupertinoColors.systemGrey6.resolveFrom(context),
+                thumbColor: CupertinoColors.white,
+                groupValue: _tabController.index,
+                onValueChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _tabController.animateTo(value);
+                    });
+                  }
+                },
+                children: const {
+                  0: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Text(
+                      'Фото',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  1: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Text(
+                      'Видео',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                },
+              ),
+            ),
+
+            // Баннер статуса сканирования
+            BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
+              builder: (context, state) {
+                return const ScanStatusBanner();
+              },
+            ),
+
+            // Основной контент
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildPhotoTab(),
+                  _buildVideoTab(),
+                ],
+              ),
+            ),
+
+            // Счетчик выбранных файлов
+            const SelectedFilesCounter(),
           ],
-          indicatorColor: Theme.of(context).primaryColor,
-          labelColor: Theme.of(context).primaryColor,
-          unselectedLabelColor: Colors.grey,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      body: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-        builder: (context, state) {
-          return Column(
-            children: [
-              // Показываем статус сканирования всегда сверху
-              const ScanStatusBanner(),
-
-              // Основной контент страницы
-              Expanded(child: _buildMainContent(state)),
-            ],
-          );
-        },
-      ),
-      bottomNavigationBar: SelectedFilesCounter(),
     );
   }
 
-  Widget _buildMainContent(MediaCleanerState state) {
-    // Обработка различных состояний
-    if (state is MediaCleanerInitial || state is MediaCleanerLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state is MediaCleanerError) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
-            const Text('Произошла ошибка при сканировании', style: TextStyle(fontSize: 18)),
-            const SizedBox(height: 8),
-            Text(state.message, style: const TextStyle(color: Colors.grey)),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => context.read<MediaCleanerBloc>().add(LoadMediaFiles()),
-              child: const Text('Попробовать снова'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (state is MediaCleanerEmpty) {
-      return const Center(child: Text('Нет доступных медиафайлов'));
-    }
-
-    // Если это состояние сканирования, но у нас нет категорий (не MediaCleanerReady)
-    if (state is MediaCleanerScanning && !(state is MediaCleanerReady)) {
-      return SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset('assets/images/placeholder.webp', width: 150, height: 150),
-              const SizedBox(height: 16),
-              const Text(
-                'Анализ вашей галереи',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32),
-                child: Text(
-                  'Ai модель ищет похожие фотографии и видео для очистки галереи',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+  Widget _buildPhotoTab() {
+    return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
+      builder: (context, state) {
+        // Обработка состояний
+        if (state is MediaCleanerInitial || state is MediaCleanerLoading) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                CupertinoActivityIndicator(radius: 16),
+                SizedBox(height: 16),
+                Text(
+                  'Загрузка...',
+                  style: TextStyle(fontSize: 16, color: CupertinoColors.secondaryLabel),
                 ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // Если файлы загружены, но еще не просканированы (нет категорий)
-    if (state is MediaCleanerLoaded && !(state is MediaCleanerReady)) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/placeholder.webp', width: 150, height: 150),
-            const SizedBox(height: 16),
-            const Text(
-              'Очистите свою галерею',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ],
             ),
-            const SizedBox(height: 8),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32),
-              child: Text(
-                'Найдите и удалите ненужные фотографии и видео для освобождения места',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
+          );
+        }
+
+        if (state is MediaCleanerError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(CupertinoIcons.exclamationmark_circle, size: 64, color: CupertinoColors.systemRed),
+                const SizedBox(height: 16),
+                const Text(
+                  'Произошла ошибка',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text(
+                    state.message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: CupertinoColors.secondaryLabel),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                CupertinoButton.filled(
+                  onPressed: () => context.read<MediaCleanerBloc>().add(LoadMediaFiles()),
+                  child: const Text('Попробовать снова'),
+                ),
+              ],
             ),
-            const SizedBox(height: 32),
-            // Кнопка запуска сканирования
-            const ScanButton(),
-          ],
-        ),
-      );
-    }
+          );
+        }
 
-    // Когда сканирование завершено и у нас есть результаты (MediaCleanerReady)
-    return TabBarView(
-      controller: _tabController,
-      children: [
-        // Вкладка Фото
-        _buildPhotoTab(state),
+        // Если есть результаты сканирования
+        if (state is MediaCleanerReady) {
+          return _buildPhotoTabContent(state);
+        }
 
-        // Вкладка Видео
-        _buildVideoTab(state),
-      ],
-    );
-  }
+        // Если файлы загружены, но не просканированы
+        if (state is MediaCleanerLoaded && !(state is MediaCleanerReady)) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  CupertinoIcons.photo,
+                  size: 80,
+                  color: CupertinoColors.systemGrey.resolveFrom(context),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Очистите свою галерею',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 12),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 40),
+                  child: Text(
+                    'Найдите и удалите ненужные фотографии для освобождения места',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: CupertinoColors.secondaryLabel),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                const ScanButton(),
+              ],
+            ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.9, 0.9)),
+          );
+        }
 
-  Widget _buildPhotoTab(MediaCleanerState state) {
-    // Если у нас MediaCleanerReady, то показываем категории
-    if (state is MediaCleanerReady) {
-      return _buildPhotoTabContent(state);
-    }
-
-    // Если состояние не Ready, но есть сканирование в фоне
-    if (state is MediaCleanerLoaded && state.isScanningInBackground) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text('Подождите, идет анализ фотографий', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 16),
-            CircularProgressIndicator(),
-          ],
-        ),
-      );
-    }
-
-    // Если ничего не загружено
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.photo_library, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
-          Text(
-            'Категории фото будут доступны после сканирования',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
-          ),
-        ],
-      ),
+        return const SizedBox.shrink();
+      },
     );
   }
 
   Widget _buildPhotoTabContent(MediaCleanerReady state) {
-    // Определяем статус сканирования и время последнего сканирования
     final bool isScanningInBackground = state.isScanningInBackground;
     final DateTime? lastScanTime = state.lastScanTime;
 
-    // Создаем список категорий, которые должны отображаться
     final List<PhotoCategory> currentCategories = [];
     if (state.similarCount > 0) currentCategories.add(PhotoCategory.similar);
     if (state.photoDuplicatesCount > 0) currentCategories.add(PhotoCategory.series);
     if (state.screenshotsCount > 0) currentCategories.add(PhotoCategory.screenshots);
     if (state.blurryCount > 0) currentCategories.add(PhotoCategory.blurry);
 
-    // Получаем статистику для каждой категории
     final Map<PhotoCategory, (int, int)> categoryCounts = {
       PhotoCategory.similar: (
         state.similarGroups.fold<int>(0, (sum, group) => sum + group.files.length),
-        state.similarGroups.fold<int>(
-          0,
-          (sum, group) => sum + group.files.where((f) => f.isSelected).length,
-        ),
+        state.similarGroups.fold<int>(0, (sum, group) => sum + group.files.where((f) => f.isSelected).length),
       ),
       PhotoCategory.series: (
         state.photoDuplicateGroups.fold<int>(0, (sum, group) => sum + group.files.length),
-        state.photoDuplicateGroups.fold<int>(
-          0,
-          (sum, group) => sum + group.files.where((f) => f.isSelected).length,
-        ),
+        state.photoDuplicateGroups.fold<int>(0, (sum, group) => sum + group.files.where((f) => f.isSelected).length),
       ),
-      PhotoCategory.screenshots: (
-        state.screenshots.length,
-        state.screenshots.where((f) => f.isSelected).length,
-      ),
+      PhotoCategory.screenshots: (state.screenshots.length, state.screenshots.where((f) => f.isSelected).length),
       PhotoCategory.blurry: (state.blurry.length, state.blurry.where((f) => f.isSelected).length),
     };
 
-    // Определяем новые категории, которых не было раньше
-    final Set<PhotoCategory> newCategories = currentCategories.toSet().difference(
-      _previousPhotoCategories,
-    );
-
-    // Обновляем предыдущие категории для следующего сравнения
+    final Set<PhotoCategory> newCategories = currentCategories.toSet().difference(_previousPhotoCategories);
     _previousPhotoCategories = currentCategories.toSet();
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    if (currentCategories.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Icon(CupertinoIcons.checkmark_circle, size: 80, color: CupertinoColors.systemGreen.resolveFrom(context)),
+            const SizedBox(height: 16),
+            const Text('Проблем не найдено', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            const Text('Ваша галерея в отличном состоянии!', style: TextStyle(color: CupertinoColors.secondaryLabel)),
+          ],
+        ).animate().fadeIn(duration: 500.ms).scale(),
+      );
+    }
+
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
               children: [
-                const Text(
-                  'Проблемные фото',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                // if (isScanningInBackground) ...[
-                //   const SizedBox(width: 12),
-                //   const SizedBox(
-                //     width: 14,
-                //     height: 14,
-                //     child: CircularProgressIndicator(strokeWidth: 2),
-                //   ),
-                // ],
+                Text('Проблемные фото', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                if (lastScanTime != null && !isScanningInBackground)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      'Обновлено: ${DateFormat('dd.MM HH:mm').format(lastScanTime)}',
+                      style: const TextStyle(fontSize: 13, color: CupertinoColors.secondaryLabel),
+                    ),
+                  ),
               ],
             ),
-
-            // Информация о последнем сканировании
-            if (lastScanTime != null && !isScanningInBackground)
-              Padding(
-                padding: const EdgeInsets.only(top: 4, bottom: 16),
-                child: Text(
-                  'Последнее сканирование: ${DateFormat('dd.MM.yyyy HH:mm').format(lastScanTime)}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-              )
-            else
-              const SizedBox(height: 16),
-          ],
+          ),
         ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final category = currentCategories[index];
+                final (count, selectedCount) = categoryCounts[category]!;
+                final isNew = newCategories.contains(category);
 
-        // Карточки категорий
-        ...currentCategories.asMap().entries.map((entry) {
-          final index = entry.key;
-          final category = entry.value;
-          final (count, selectedCount) = categoryCounts[category]!;
-
-          final isNewCategory = newCategories.contains(category);
-
-          return Column(
-            children: [
-              _buildAnimatedPhotoCard(
-                category: category,
-                count: count,
-                selectedCount: selectedCount,
-                isNew: isNewCategory, // Только для действительно новых категорий
-                index: index,
+                return Padding(
+                  padding: EdgeInsets.only(bottom: index < currentCategories.length - 1 ? 12 : 0),
+                  child: PhotoCategoryCard(
+                    key: ValueKey('photo_${category.name}'),
+                    category: category,
+                    count: count,
+                    selectedCount: selectedCount,
+                    onTap: () => context.router.push(CategoryRoute(categoryType: 'photo', categoryName: category.name)),
+                  )
+                      .animate(key: ValueKey('anim_${category.name}'))
+                      .fadeIn(duration: 300.ms, delay: Duration(milliseconds: index * 50))
+                      .slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOut),
+                );
+              },
+              childCount: currentCategories.length,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: CupertinoButton(
+              color: CupertinoColors.systemGrey6.resolveFrom(context),
+              borderRadius: BorderRadius.circular(12),
+              onPressed: isScanningInBackground ? null : () => context.read<MediaCleanerBloc>().add(ScanForProblematicFiles()),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(CupertinoIcons.refresh, color: CupertinoColors.activeBlue.resolveFrom(context)),
+                  const SizedBox(width: 8),
+                  Text('Повторить сканирование', style: TextStyle(color: CupertinoColors.activeBlue.resolveFrom(context))),
+                ],
               ),
-              if (index < currentCategories.length - 1) const SizedBox(height: 12),
-            ],
-          );
-        }).toList(),
-
-        const SizedBox(height: 24),
-
-        // Кнопка повторного сканирования
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              icon: const Icon(Icons.refresh),
-              label: const Text('Повторить сканирование'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                side: BorderSide(color: Theme.of(context).primaryColor),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: isScanningInBackground
-                  ? null // Отключаем кнопку, если сканирование уже идет
-                  : () => context.read<MediaCleanerBloc>().add(ScanForProblematicFiles()),
             ),
           ),
         ),
@@ -346,250 +339,136 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  // Метод для создания анимированных карточек фото-категорий
-  Widget _buildAnimatedPhotoCard({
-    required PhotoCategory category,
-    required int count,
-    required int selectedCount,
-    required bool isNew,
-    required int index,
-  }) {
-    // Уникальный ключ для категории
-    final keyString = 'photo_${category.name}';
+  Widget _buildVideoTab() {
+    return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
+      builder: (context, state) {
+        if (state is MediaCleanerReady) {
+          return _buildVideoTabContent(state);
+        }
 
-    // Если это новая категория - анимируем ее появление
-    if (isNew) {
-      return AnimatedSlide(
-        duration: Duration(milliseconds: 400 + (index * 100)),
-        offset: const Offset(0, 0),
-        curve: Curves.easeOutCubic,
-        child: AnimatedOpacity(
-          duration: Duration(milliseconds: 400 + (index * 100)),
-          opacity: 1.0,
-          curve: Curves.easeOutCubic,
-          child: PhotoCategoryCard(
-            key: ValueKey(keyString),
-            category: category,
-            count: count,
-            selectedCount: selectedCount,
-            onTap: () => context.router.push(
-              CategoryRoute(categoryType: 'photo', categoryName: category.name),
-            ),
-          ),
-        ),
-      );
-    } else {
-      // Для существующих категорий - просто обновляем без анимации
-      return PhotoCategoryCard(
-        key: ValueKey(keyString),
-        category: category,
-        count: count,
-        selectedCount: selectedCount,
-        onTap: () =>
-            context.router.push(CategoryRoute(categoryType: 'photo', categoryName: category.name)),
-      );
-    }
-  }
+        if (state is MediaCleanerLoaded && !(state is MediaCleanerReady)) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(CupertinoIcons.play_rectangle, size: 80, color: CupertinoColors.systemGrey.resolveFrom(context)),
+                const SizedBox(height: 24),
+                const Text('Очистите видео', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 12),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 40),
+                  child: Text('Найдите дубликаты и ненужные видео', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: CupertinoColors.secondaryLabel)),
+                ),
+                const SizedBox(height: 32),
+                const ScanButton(),
+              ],
+            ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.9, 0.9)),
+          );
+        }
 
-  Widget _buildVideoTab(MediaCleanerState state) {
-    // Если у нас MediaCleanerReady, то показываем категории
-    if (state is MediaCleanerReady) {
-      return _buildVideoTabContent(state);
-    }
-
-    // Если состояние не Ready, но есть сканирование в фоне
-    if (state is MediaCleanerLoaded && state.isScanningInBackground) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text('Подождите, идет анализ видеофайлов', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 16),
-            CircularProgressIndicator(),
-          ],
-        ),
-      );
-    }
-
-    // Если ничего не загружено
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.videocam, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
-          Text(
-            'Категории видео будут доступны после сканирования',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
-          ),
-        ],
-      ),
+        return const Center(child: CupertinoActivityIndicator());
+      },
     );
   }
 
   Widget _buildVideoTabContent(MediaCleanerReady state) {
-    // Определяем статус сканирования и время последнего сканирования
     final bool isScanningInBackground = state.isScanningInBackground;
     final DateTime? lastScanTime = state.lastScanTime;
 
-    // Создаем список категорий, которые должны отображаться
     final List<VideoCategory> currentCategories = [];
     if (state.videoDuplicatesCount > 0) currentCategories.add(VideoCategory.duplicates);
     if (state.screenRecordingsCount > 0) currentCategories.add(VideoCategory.screenRecordings);
     if (state.shortVideosCount > 0) currentCategories.add(VideoCategory.shortVideos);
 
-    // Получаем статистику для каждой категории
     final Map<VideoCategory, (int, int)> categoryCounts = {
       VideoCategory.duplicates: (
         state.videoDuplicateGroups.fold<int>(0, (sum, group) => sum + group.files.length),
-        state.videoDuplicateGroups.fold<int>(
-          0,
-          (sum, group) => sum + group.files.where((f) => f.isSelected).length,
-        ),
+        state.videoDuplicateGroups.fold<int>(0, (sum, group) => sum + group.files.where((f) => f.isSelected).length),
       ),
-      VideoCategory.screenRecordings: (
-        state.screenRecordings.length,
-        state.screenRecordings.where((f) => f.isSelected).length,
-      ),
-      VideoCategory.shortVideos: (
-        state.shortVideos.length,
-        state.shortVideos.where((f) => f.isSelected).length,
-      ),
+      VideoCategory.screenRecordings: (state.screenRecordings.length, state.screenRecordings.where((f) => f.isSelected).length),
+      VideoCategory.shortVideos: (state.shortVideos.length, state.shortVideos.where((f) => f.isSelected).length),
     };
 
-    // Определяем новые категории, которых не было раньше
-    final Set<VideoCategory> newCategories = currentCategories.toSet().difference(
-      _previousVideoCategories,
-    );
-
-    // Обновляем предыдущие категории для следующего сравнения
+    final Set<VideoCategory> newCategories = currentCategories.toSet().difference(_previousVideoCategories);
     _previousVideoCategories = currentCategories.toSet();
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    if (currentCategories.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Icon(CupertinoIcons.checkmark_circle, size: 80, color: CupertinoColors.systemGreen.resolveFrom(context)),
+            const SizedBox(height: 16),
+            const Text('Проблем не найдено', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            const Text('Все видео в порядке!', style: TextStyle(color: CupertinoColors.secondaryLabel)),
+          ],
+        ).animate().fadeIn(duration: 500.ms).scale(),
+      );
+    }
+
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
               children: [
-                const Text(
-                  'Проблемные видео',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                // if (isScanningInBackground) ...[
-                //   const SizedBox(width: 12),
-                //   const SizedBox(
-                //     width: 14,
-                //     height: 14,
-                //     child: CircularProgressIndicator(strokeWidth: 2),
-                //   ),
-                // ],
+                const Text('Проблемные видео', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                if (lastScanTime != null && !isScanningInBackground)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text('Обновлено: ${DateFormat('dd.MM HH:mm').format(lastScanTime)}', style: const TextStyle(fontSize: 13, color: CupertinoColors.secondaryLabel)),
+                  ),
               ],
             ),
-
-            // Информация о последнем сканировании
-            if (lastScanTime != null && !isScanningInBackground)
-              Padding(
-                padding: const EdgeInsets.only(top: 4, bottom: 16),
-                child: Text(
-                  'Последнее сканирование: ${DateFormat('dd.MM.yyyy HH:mm').format(lastScanTime)}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-              )
-            else
-              const SizedBox(height: 16),
-          ],
+          ),
         ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final category = currentCategories[index];
+                final (count, selectedCount) = categoryCounts[category]!;
 
-        // Карточки категорий
-        ...currentCategories.asMap().entries.map((entry) {
-          final index = entry.key;
-          final category = entry.value;
-          final (count, selectedCount) = categoryCounts[category]!;
-
-          final isNewCategory = newCategories.contains(category);
-
-          return Column(
-            children: [
-              _buildAnimatedVideoCard(
-                category: category,
-                count: count,
-                selectedCount: selectedCount,
-                isNew: isNewCategory,
-                index: index,
+                return Padding(
+                  padding: EdgeInsets.only(bottom: index < currentCategories.length - 1 ? 12 : 0),
+                  child: VideoCategoryCard(
+                    key: ValueKey('video_${category.name}'),
+                    category: category,
+                    count: count,
+                    selectedCount: selectedCount,
+                    onTap: () => context.router.push(CategoryRoute(categoryType: 'video', categoryName: category.name)),
+                  )
+                      .animate(key: ValueKey('anim_${category.name}'))
+                      .fadeIn(duration: 300.ms, delay: Duration(milliseconds: index * 50))
+                      .slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOut),
+                );
+              },
+              childCount: currentCategories.length,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: CupertinoButton(
+              color: CupertinoColors.systemGrey6.resolveFrom(context),
+              borderRadius: BorderRadius.circular(12),
+              onPressed: isScanningInBackground ? null : () => context.read<MediaCleanerBloc>().add(ScanForProblematicFiles()),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(CupertinoIcons.refresh, color: CupertinoColors.activeBlue.resolveFrom(context)),
+                  const SizedBox(width: 8),
+                  Text('Повторить сканирование', style: TextStyle(color: CupertinoColors.activeBlue.resolveFrom(context))),
+                ],
               ),
-              if (index < currentCategories.length - 1) const SizedBox(height: 12),
-            ],
-          );
-        }).toList(),
-
-        const SizedBox(height: 24),
-
-        // Кнопка повторного сканирования
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              icon: const Icon(Icons.refresh),
-              label: const Text('Повторить сканирование'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                side: BorderSide(color: Theme.of(context).primaryColor),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: isScanningInBackground
-                  ? null
-                  : () => context.read<MediaCleanerBloc>().add(ScanForProblematicFiles()),
             ),
           ),
         ),
       ],
     );
-  }
-
-  // Метод для создания анимированных карточек видео-категорий
-  Widget _buildAnimatedVideoCard({
-    required VideoCategory category,
-    required int count,
-    required int selectedCount,
-    required bool isNew,
-    required int index,
-  }) {
-    final keyString = 'video_${category.name}';
-
-    if (isNew) {
-      return AnimatedSlide(
-        duration: Duration(milliseconds: 400 + (index * 100)),
-        offset: const Offset(0, 0),
-        curve: Curves.easeOutCubic,
-        child: AnimatedOpacity(
-          duration: Duration(milliseconds: 400 + (index * 100)),
-          opacity: 1.0,
-          curve: Curves.easeOutCubic,
-          child: VideoCategoryCard(
-            key: ValueKey(keyString),
-            category: category,
-            count: count,
-            selectedCount: selectedCount,
-            onTap: () => context.router.push(
-              CategoryRoute(categoryType: 'video', categoryName: category.name),
-            ),
-          ),
-        ),
-      );
-    } else {
-      return VideoCategoryCard(
-        key: ValueKey(keyString),
-        category: category,
-        count: count,
-        selectedCount: selectedCount,
-        onTap: () =>
-            context.router.push(CategoryRoute(categoryType: 'video', categoryName: category.name)),
-      );
-    }
   }
 }
