@@ -101,6 +101,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
     final totalFiles = totalPhotoFiles + totalVideoFiles;
 
     int processedFiles = 0;
+    bool isPaused = false; // Флаг для отслеживания паузы
 
     // Добавляем секундомер для регулярных пауз в обработке
     Stopwatch pauseStopwatch = Stopwatch()..start();
@@ -109,6 +110,12 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
     // Вспомогательная функция для обновления статуса с поддержкой пауз для UI
     Future<void> updateStatus(String message, double progressPercent, {int? currentBatch}) async {
       if (emit.isDone) return; // Проверка перед обновлением
+
+      // Проверяем состояние паузы
+      if (state is MediaCleanerScanning && (state as MediaCleanerScanning).isPaused) {
+        isPaused = true;
+        return;
+      }
 
       // Логирование прогресса
       debugPrint(
@@ -173,7 +180,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       List<MediaGroup> allPhotoDuplicateGroups = [];
 
       for (int i = 0; i < currentState.photoFiles.length; i += photoBatchSize) {
-        if (emit.isDone) break;
+        if (emit.isDone || isPaused) break; // Проверка паузы
 
         final end = (i + photoBatchSize < currentState.photoFiles.length)
             ? i + photoBatchSize
@@ -191,6 +198,8 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
         if (batchDuplicates.isNotEmpty) {
           // Добавляем каждую новую группу и обновляем UI после каждой группы
           for (final group in batchDuplicates) {
+            if (isPaused) break; // Проверка паузы
+
             allPhotoDuplicateGroups.add(group);
 
             // Обновляем текущее состояние после каждой новой группы
@@ -208,6 +217,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
               progress,
               currentBatch: processedFiles,
             );
+            if (isPaused) break; // Проверка после updateStatus
           }
         } else {
           // Если в этой порции ничего не нашли, всё равно обновляем прогресс
@@ -217,10 +227,16 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             progress,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Короткая пауза для отзывчивости UI
         await Future.delayed(const Duration(milliseconds: 10));
+      }
+
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return; // Выходим из функции
       }
 
       final totalDuplicatesCount = allPhotoDuplicateGroups.fold<int>(
