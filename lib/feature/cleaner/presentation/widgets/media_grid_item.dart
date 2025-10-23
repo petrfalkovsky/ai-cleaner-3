@@ -1,5 +1,6 @@
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/bloc/media_cleaner_bloc.dart';
+import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selection_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -97,46 +98,13 @@ class MediaGridItem extends StatelessWidget {
                   ),
                 ),
 
-              // Кнопка выбора (кружок с галочкой, как в iOS Photos)
+              // Кнопка выбора с нумерацией
               Positioned(
                 top: 6,
                 right: 6,
-                child: GestureDetector(
-                  onTap: () {
-                    context.read<MediaCleanerBloc>().add(
-                      ToggleFileSelectionById(file.entity.id),
-                    );
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isSelected
-                          ? CupertinoColors.activeBlue
-                          : Colors.white.withOpacity(0.3),
-                      border: Border.all(
-                        color: isSelected
-                            ? CupertinoColors.activeBlue
-                            : Colors.white,
-                        width: 2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                    child: isSelected
-                        ? const Icon(
-                            CupertinoIcons.check_mark,
-                            size: 14,
-                            color: Colors.white,
-                          )
-                        : null,
-                  ),
+                child: SelectionIndicator(
+                  fileId: file.entity.id,
+                  size: 24,
                 ),
               ),
             ],
