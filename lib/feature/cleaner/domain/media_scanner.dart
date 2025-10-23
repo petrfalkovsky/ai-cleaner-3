@@ -287,21 +287,19 @@ class MediaScanner {
     for (final file in files) {
       if (!file.isImage) continue;
 
-      // iOS помечает скриншоты специальным mediaSubtype
-      // Проверяем имя файла (iOS именует скриншоты как "IMG_XXXX" или начинаются с "Screenshot")
-      final fileName = file.entity.title?.toLowerCase() ?? '';
+      // Проверяем title для iOS скриншотов
+      final title = file.entity.title ?? '';
 
-      // Более точная детекция iOS скриншотов
-      final isScreenshot =
-          fileName.startsWith('screenshot') ||
-          fileName.contains('screen shot') ||
-          fileName.contains('screen_shot') ||
-          fileName.contains('скриншот') ||
-          fileName.contains('снимок экрана') ||
-          fileName.startsWith('снимок');
+      // iOS именует скриншоты: "IMG_XXXX.PNG" (старый формат) или "Screenshot..."
+      final isIOSScreenshot =
+          (title.startsWith('IMG_') && title.toUpperCase().endsWith('.PNG')) ||
+          title.toLowerCase().startsWith('screenshot') ||
+          title.toLowerCase().contains('screen shot') ||
+          title.toLowerCase().contains('screen_shot');
 
-      if (isScreenshot) {
+      if (isIOSScreenshot) {
         screenshots.add(file.copyWith(category: 'screenshots'));
+        debugPrint('Найден скриншот: $title');
       }
     }
 
@@ -318,18 +316,15 @@ class MediaScanner {
     for (final file in files) {
       if (!file.isVideo) continue;
 
-      // iOS именует записи экрана как "RPReplay" или содержат "ReplayKit"
-      final fileName = file.entity.title ?? '';
+      // iOS именует записи экрана как "RPReplay_FinalXXXXXXXXXX.MP4"
+      final title = file.entity.title ?? '';
 
-      final isScreenRecording =
-          fileName.contains('RPReplay') ||
-          fileName.contains('ReplayKit') ||
-          fileName.toLowerCase().contains('rpreplay') ||
-          fileName.toLowerCase().contains('screen recording') ||
-          fileName.toLowerCase().contains('запись экрана');
+      // Проверка на префикс RPReplay (как в Swift: hasPrefix("RPReplay"))
+      final isScreenRecording = title.startsWith('RPReplay');
 
       if (isScreenRecording) {
         screenRecordings.add(file.copyWith(category: 'screenRecordings'));
+        debugPrint('Найдена запись экрана: $title');
       }
     }
 

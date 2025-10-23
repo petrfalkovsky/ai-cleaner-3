@@ -62,78 +62,94 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: const Text(
-          'AI Cleaner',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
-        border: null,
-      ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Custom Tab Bar в iOS стиле
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: CupertinoColors.systemGrey6.resolveFrom(context),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: CupertinoSlidingSegmentedControl<int>(
-                backgroundColor: CupertinoColors.systemGrey6.resolveFrom(context),
-                thumbColor: CupertinoColors.white,
-                groupValue: _tabController.index,
-                onValueChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _tabController.animateTo(value);
-                    });
-                  }
-                },
-                children: const {
-                  0: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Text(
-                      'Фото',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+    return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
+      builder: (context, state) {
+        // Показываем табы только если есть результаты сканирования
+        final showTabs = state is MediaCleanerReady;
+
+        return Scaffold(
+          backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+          appBar: AppBar(
+            title: const Text(
+              'AI Cleaner',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+            elevation: 0,
+          ),
+          body: SafeArea(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    // Custom Tab Bar в iOS стиле - показываем только после сканирования
+                    if (showTabs)
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: CupertinoColors.systemGrey6.resolveFrom(context),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: CupertinoSlidingSegmentedControl<int>(
+                          backgroundColor: CupertinoColors.systemGrey6.resolveFrom(context),
+                          thumbColor: CupertinoColors.white,
+                          groupValue: _tabController.index,
+                          onValueChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _tabController.animateTo(value);
+                              });
+                            }
+                          },
+                          children: const {
+                            0: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                              child: Text(
+                                'Фото',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            1: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                              child: Text(
+                                'Видео',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          },
+                        ),
+                      ),
+
+                    // Баннер статуса сканирования
+                    const ScanStatusBanner(),
+
+                    // Основной контент
+                    Expanded(
+                      child: showTabs
+                          ? TabBarView(
+                              controller: _tabController,
+                              children: [
+                                _buildPhotoTab(),
+                                _buildVideoTab(),
+                              ],
+                            )
+                          : _buildPhotoTab(), // До завершения показываем только фото вкладку
                     ),
-                  ),
-                  1: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Text(
-                      'Видео',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                },
-              ),
-            ),
+                  ],
+                ),
 
-            // Баннер статуса сканирования
-            BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-              builder: (context, state) {
-                return const ScanStatusBanner();
-              },
+                // Floating счетчик выбранных файлов (всегда поверх контента)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: const SelectedFilesCounter(),
+                ),
+              ],
             ),
-
-            // Основной контент
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildPhotoTab(),
-                  _buildVideoTab(),
-                ],
-              ),
-            ),
-
-            // Счетчик выбранных файлов
-            const SelectedFilesCounter(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
