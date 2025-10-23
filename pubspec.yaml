@@ -1,0 +1,114 @@
+name: "ai_cleaner_2"
+description: "AI Cleaner 2 - Clean Up Your Storage"
+publish_to: "none"
+version: "1.0.0+1"
+scripts:
+  gen: "dart run build_runner watch"
+  build: "flutter build ipa --obfuscate --split-debug-info=debug-info --target=lib/main_production.dart"
+
+environment:
+  sdk: ^3.9.2
+
+# Основные зависимости Flutter
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  intl: ^0.20.2
+  collection: ^1.19.0
+  path: ^1.9.0
+  timezone: ^0.10.0
+
+  # Управление состоянием и хранилища
+  flutter_bloc: ^9.1.1
+  bloc: ^9.0.0
+  hydrated_bloc: ^10.0.0
+  get_it: ^8.0.3
+  mutex: ^3.1.0
+  rate_limiter: ^1.0.0
+  equatable: ^2.0.7
+
+  # Генерация кода и аннотации
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  auto_route: ^9.2.2
+
+  # Интерфейс и анимации
+  flutter_animate: ^4.5.2
+  auto_size_text: ^3.0.0
+  auto_size_text_field: ^2.2.4
+  gap: ^3.0.1
+  flip_card: ^0.7.0
+  fading_edge_scrollview: ^4.1.1
+  smooth_sheets: ^0.10.2
+  table_calendar: ^3.2.0
+  visibility_detector: ^0.4.0+2
+  flutter_shaders: ^0.1.3
+  simple_shadow: ^0.3.1
+  widget_zoom: ^0.0.4
+  toastification: ^2.3.0
+
+  # Иконки и шрифты
+  google_fonts: ^6.2.1
+  flutter_feather_icons: ^2.0.0+1
+  pixelarticons: ^0.4.0
+  flutter_launcher_icons: ^0.14.4
+
+  # Мультимедиа и работа с файлами
+  photo_manager: ^3.6.4
+  photo_manager_image_provider: ^2.2.0
+  photo_view: ^0.15.0
+  video_player: ^2.9.5
+  widgets_to_image: ^1.0.0
+  dart_geohash: ^2.1.0
+  path_provider: ^2.1.5
+
+  # Анализ фото
+  tflite_flutter: ^0.11.0
+  image: ^4.5.4
+  blurhash_dart: ^1.2.1
+  image_hash: ^1.0.9
+
+  # Разрешения и доступ
+  permission_handler: ^12.0.0+1
+  app_links: ^6.3.3
+  url_launcher: ^6.3.1
+  mailto: ^2.0.0
+
+  # Сервисы и интеграции
+  appinio_swiper: ^2.1.1
+  appinio_social_share: ^0.3.2
+  package_info_plus: ^8.1.2
+  flutter_markdown: ^0.7.7+1
+  flutter_dotenv: ^5.2.1
+
+  # Сплэш и инициализация
+  flutter_native_splash: 2.4.4
+
+# Инструменты разработки
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+  # Генерация кода
+  build_runner: ^2.4.9
+  freezed: ^2.4.7
+  json_serializable: ^6.7.1
+  auto_route_generator: ^9.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - ".env"
+    - assets/
+    # - assets/fonts/
+    - assets/images/
+    # - assets/vectors/
+    # - assets/lottie/
+    - assets/models/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
