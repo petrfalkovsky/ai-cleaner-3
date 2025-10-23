@@ -63,8 +63,8 @@ dependencies:
   dart_geohash: ^2.1.0
   path_provider: ^2.1.5
 
-  # Анализ фото
-  tflite_flutter: ^0.11.0
+  # Анализ фото (оптимизировано - используем нативные алгоритмы)
+  # tflite_flutter: ^0.11.0  # Убрано - используем DCT и Laplacian вместо ML
   image: ^4.5.4
   blurhash_dart: ^1.2.1
   image_hash: ^1.0.9

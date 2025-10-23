@@ -1,9 +1,8 @@
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/bloc/media_cleaner_bloc.dart';
-import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selection_indicator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 class MediaGridItem extends StatelessWidget {
@@ -21,14 +20,9 @@ class MediaGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // Переключаем выбор файла напрямую
-        context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(file.entity.id));
-      },
-      onLongPress: onPreview,
+      onTap: onPreview, // Тап на превью = полноэкранный просмотр
       child: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
         builder: (context, state) {
-          // Проверяем, выбран ли файл в текущем состоянии
           bool isSelected = false;
           if (state is MediaCleanerLoaded) {
             isSelected = state.selectedFiles.any((f) => f.entity.id == file.entity.id);
@@ -37,64 +31,112 @@ class MediaGridItem extends StatelessWidget {
           return Stack(
             fit: StackFit.expand,
             children: [
-              // Миниатюра файла
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: AssetEntityImage(
-                  file.entity,
-                  isOriginal: false,
-                  thumbnailSize: const ThumbnailSize.square(200),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey.shade200,
-                      child: const Icon(Icons.broken_image, color: Colors.grey),
-                    );
-                  },
-                ),
+              // Изображение БЕЗ скругления (как в iOS Photos или Telegram)
+              AssetEntityImage(
+                file.entity,
+                isOriginal: false,
+                thumbnailSize: const ThumbnailSize.square(300),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: CupertinoColors.systemGrey5,
+                    child: const Icon(
+                      CupertinoIcons.photo,
+                      color: CupertinoColors.systemGrey3,
+                    ),
+                  );
+                },
               ),
 
-              // Индикатор видео
+              // Индикатор видео (в правом нижнем углу)
               if (file.isVideo)
                 Positioned(
-                  right: 8,
-                  bottom: 8,
+                  right: 4,
+                  bottom: 4,
                   child: Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
+                      color: Colors.black.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.play_arrow, color: Colors.white, size: 12),
-                        if (file.entity.duration != null && file.entity.duration! > 0)
+                        const Icon(
+                          CupertinoIcons.play_fill,
+                          color: Colors.white,
+                          size: 10,
+                        ),
+                        if (file.entity.duration != null && file.entity.duration! > 0) ...[
+                          const SizedBox(width: 2),
                           Text(
                             _formatDuration(file.entity.duration!),
-                            style: const TextStyle(color: Colors.white, fontSize: 10),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
+                        ],
                       ],
                     ),
                   ),
                 ),
 
-              // Рамка выделения
+              // Рамка выделения (как в iOS)
               if (isSelected)
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue, width: 2),
+                      border: Border.all(
+                        color: CupertinoColors.activeBlue,
+                        width: 3,
+                      ),
                     ),
                   ),
                 ),
 
-              // Индикатор выбора
+              // Кнопка выбора (кружок с галочкой, как в iOS Photos)
               Positioned(
-                top: 4,
-                right: 4,
-                child: SelectionIndicator(fileId: file.entity.id, size: 24),
+                top: 6,
+                right: 6,
+                child: GestureDetector(
+                  onTap: () {
+                    context.read<MediaCleanerBloc>().add(
+                      ToggleFileSelectionById(file.entity.id),
+                    );
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected
+                          ? CupertinoColors.activeBlue
+                          : Colors.white.withOpacity(0.3),
+                      border: Border.all(
+                        color: isSelected
+                            ? CupertinoColors.activeBlue
+                            : Colors.white,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: isSelected
+                        ? const Icon(
+                            CupertinoIcons.check_mark,
+                            size: 14,
+                            color: Colors.white,
+                          )
+                        : null,
+                  ),
+                ),
               ),
             ],
           );
@@ -105,7 +147,7 @@ class MediaGridItem extends StatelessWidget {
 
   String _formatDuration(int durationInSeconds) {
     final duration = Duration(seconds: durationInSeconds);
-    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final minutes = duration.inMinutes.toString();
     final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }

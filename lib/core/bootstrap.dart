@@ -47,11 +47,11 @@ class Bootstrap {
     HydratedBloc.storage = storage;
     await AppInfo.instance.loadAppInfo();
 
-    // Инициализируем модели TFLite заранее
+    // Инициализируем MediaScanner (очистка кэшей)
     try {
       await MediaScanner.initModels();
     } catch (e) {
-      debugPrint('Error initializing TFLite models: $e');
+      debugPrint('Error initializing MediaScanner: $e');
     }
 
     _initialized = true;
