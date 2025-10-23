@@ -145,14 +145,19 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
 
                 const SizedBox(width: 12),
 
-                // Текст "Выбрано"
+                // Текст "Выбрано" с tap gesture для очистки выбора
                 Expanded(
-                  child: Text(
-                    'Выбрано',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: CupertinoColors.label.resolveFrom(context),
-                      fontSize: 17,
+                  child: GestureDetector(
+                    onTap: () {
+                      context.read<MediaCleanerBloc>().add(UnselectAllFiles());
+                    },
+                    child: Text(
+                      'Выбрано',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: CupertinoColors.label.resolveFrom(context),
+                        fontSize: 17,
+                      ),
                     ),
                   ),
                 ),

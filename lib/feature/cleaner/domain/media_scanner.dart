@@ -287,19 +287,13 @@ class MediaScanner {
     for (final file in files) {
       if (!file.isImage) continue;
 
-      // Проверяем title для iOS скриншотов
-      final title = file.entity.title ?? '';
-
-      // iOS именует скриншоты: "IMG_XXXX.PNG" (старый формат) или "Screenshot..."
-      final isIOSScreenshot =
-          (title.startsWith('IMG_') && title.toUpperCase().endsWith('.PNG')) ||
-          title.toLowerCase().startsWith('screenshot') ||
-          title.toLowerCase().contains('screen shot') ||
-          title.toLowerCase().contains('screen_shot');
+      // iOS помечает скриншоты через PHAssetMediaSubtype.screenshot (бит 4 = 1 << 2)
+      // В photo_manager это доступно через entity.subtype
+      final isIOSScreenshot = (file.entity.subtype & 4) != 0;
 
       if (isIOSScreenshot) {
         screenshots.add(file.copyWith(category: 'screenshots'));
-        debugPrint('Найден скриншот: $title');
+        debugPrint('Найден скриншот (iOS metadata): ${file.entity.title}');
       }
     }
 

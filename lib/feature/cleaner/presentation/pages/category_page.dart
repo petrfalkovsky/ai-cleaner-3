@@ -95,7 +95,10 @@ class CategoryPage extends StatelessWidget {
     MediaCleanerReady state,
     List<MediaFile> categoryFiles,
   ) {
-    final selectedCategoryCount = categoryFiles.where((f) => f.isSelected).length;
+    // Правильная проверка: сравниваем ID файлов категории с ID выбранных файлов из state
+    final categoryIds = categoryFiles.map((f) => f.entity.id).toSet();
+    final selectedIds = state.selectedFiles.map((f) => f.entity.id).toSet();
+    final selectedCategoryCount = categoryIds.intersection(selectedIds).length;
     final totalSelectedCount = state.selectedFiles.length;
 
     if (selectedCategoryCount == 0 && totalSelectedCount == 0) {

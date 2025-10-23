@@ -130,15 +130,21 @@ class SimilarMediaGroup extends StatelessWidget {
 
   // Миниатюра медиафайла в группе
   Widget _buildMediaItem(BuildContext context, MediaFile file) {
-    return Container(
-      width: 100,
-      margin: const EdgeInsets.only(right: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: file.isSelected
-            ? Border.all(color: Colors.blue, width: 2)
-            : Border.all(color: Colors.transparent),
-      ),
+    return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
+      builder: (context, state) {
+        // Правильная проверка: используем state.selectedFiles вместо file.isSelected
+        final isSelected = state is MediaCleanerLoaded &&
+            state.selectedFiles.any((f) => f.entity.id == file.entity.id);
+
+        return Container(
+          width: 100,
+          margin: const EdgeInsets.only(right: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: isSelected
+                ? Border.all(color: Colors.blue, width: 2)
+                : Border.all(color: Colors.transparent),
+          ),
       child: Stack(
         children: [
           // Основное изображение с возможностью просмотра
@@ -185,6 +191,8 @@ class SimilarMediaGroup extends StatelessWidget {
             ),
         ],
       ),
+        );
+      },
     );
   }
 }
