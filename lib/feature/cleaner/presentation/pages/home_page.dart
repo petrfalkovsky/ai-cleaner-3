@@ -4,6 +4,7 @@ import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_button.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_status_banner.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selected_files_counter.dart';
+import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/animated_background.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -70,18 +71,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         final showTabs = state is MediaCleanerReady;
 
         return Scaffold(
-          backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+          backgroundColor: const Color(0xFF0A0E27), // Темный фон для контраста
           appBar: AppBar(
             title: const Text(
               'AI Cleaner',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
             ),
-            backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+            backgroundColor: Colors.transparent,
             elevation: 0,
           ),
           body: SafeArea(
             child: Stack(
               children: [
+                // Анимированный фон с паттернами
+                const Positioned.fill(
+                  child: AnimatedBackground(),
+                ),
                 Column(
                   children: [
                     // Custom Tab Bar в iOS стиле с liquid glass - показываем только после сканирования
