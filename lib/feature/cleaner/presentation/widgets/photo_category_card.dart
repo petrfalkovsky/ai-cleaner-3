@@ -50,9 +50,7 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
             glassColor: Colors.white.withOpacity(0.15),
             thickness: 20,
           ),
-          shape: LiquidRoundedSuperellipse(
-            borderRadius: const Radius.circular(20),
-          ),
+          shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(20)),
           glassContainsChild: false,
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -67,18 +65,12 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
                     glassColor: Colors.white.withOpacity(0.2),
                     thickness: 15,
                   ),
-                  shape: LiquidRoundedSuperellipse(
-                    borderRadius: const Radius.circular(16),
-                  ),
+                  shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(16)),
                   glassContainsChild: false,
                   child: SizedBox(
                     width: 56,
                     height: 56,
-                    child: Icon(
-                      widget.category.icon,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+                    child: Icon(widget.category.icon, color: Colors.white, size: 28),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -99,10 +91,7 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
                       const SizedBox(height: 4),
                       Text(
                         widget.category.description,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -137,15 +126,10 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
                             glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
                             thickness: 8,
                           ),
-                          shape: LiquidRoundedSuperellipse(
-                            borderRadius: const Radius.circular(12),
-                          ),
+                          shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(12)),
                           glassContainsChild: false,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             child: CategoryAnimatedCounter(
                               targetValue: widget.selectedCount,
                               counterKey: selectedCountKey,
@@ -166,11 +150,7 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
 
                 // Chevron
                 const SizedBox(width: 8),
-                const Icon(
-                  CupertinoIcons.chevron_right,
-                  size: 18,
-                  color: Colors.white60,
-                ),
+                const Icon(CupertinoIcons.chevron_right, size: 18, color: Colors.white60),
               ],
             ),
           ),

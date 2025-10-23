@@ -44,11 +44,11 @@ class _VideoCategoryCardState extends State<VideoCategoryCard> {
         duration: const Duration(milliseconds: 100),
         child: LiquidGlass(
           settings: LiquidGlassSettings(
-            blur: 4,
-            ambientStrength: 0.8,
+            blur: 8,
+            ambientStrength: 2.0,
             lightAngle: 0.3 * math.pi,
-            glassColor: Colors.white.withOpacity(0.15),
-            thickness: 20,
+            glassColor: Colors.white.withOpacity(0.08),
+            thickness: 30,
           ),
           shape: LiquidRoundedSuperellipse(
             borderRadius: const Radius.circular(20),

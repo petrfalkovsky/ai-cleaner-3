@@ -85,16 +85,11 @@ class MediaGridItem extends StatelessWidget {
                   ),
                 ),
 
-              // Рамка выделения (как в iOS)
+              // Затемнение выделенного фото
               if (isSelected)
                 Positioned.fill(
                   child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: CupertinoColors.activeBlue,
-                        width: 3,
-                      ),
-                    ),
+                    color: Colors.black.withOpacity(0.5),
                   ),
                 ),
 
