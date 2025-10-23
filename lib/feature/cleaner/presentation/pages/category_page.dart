@@ -90,7 +90,11 @@ class CategoryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomBar(BuildContext context, MediaCleanerReady state, List<MediaFile> categoryFiles) {
+  Widget _buildBottomBar(
+    BuildContext context,
+    MediaCleanerReady state,
+    List<MediaFile> categoryFiles,
+  ) {
     final selectedCategoryCount = categoryFiles.where((f) => f.isSelected).length;
     final totalSelectedCount = state.selectedFiles.length;
 
@@ -103,10 +107,7 @@ class CategoryPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: CupertinoColors.systemGrey6.resolveFrom(context),
         border: Border(
-          top: BorderSide(
-            color: CupertinoColors.separator.resolveFrom(context),
-            width: 0.5,
-          ),
+          top: BorderSide(color: CupertinoColors.separator.resolveFrom(context), width: 0.5),
         ),
       ),
       child: SafeArea(
@@ -128,7 +129,10 @@ class CategoryPage extends StatelessWidget {
               color: CupertinoColors.systemRed,
               borderRadius: BorderRadius.circular(12),
               onPressed: () {
-                _showDeleteConfirmation(context, selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount);
+                _showDeleteConfirmation(
+                  context,
+                  selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount,
+                );
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -180,206 +184,6 @@ class CategoryPage extends StatelessWidget {
     }
   }
 
-  // Старый код AppBar actions
-  Widget _oldActions(BuildContext context) {
-    return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-      builder: (context, state) {
-        if (state is! MediaCleanerReady) return const SizedBox();
-
-        final List<MediaFile> categoryFiles = _getCategoryFiles(state);
-          // Выбрать все/Отменить
-          BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-            builder: (context, state) {
-              if (state is! MediaCleanerReady) return const SizedBox();
-
-              final List<MediaFile> categoryFiles = _getCategoryFiles(state);
-
-              // Пропускаем, если нет файлов в категории
-              if (categoryFiles.isEmpty) {
-                return const SizedBox();
-              }
-
-              // Получаем текущие выбранные файлы и их ID
-              final selectedFiles = state.selectedFiles;
-              final selectedIds = selectedFiles.map((file) => file.entity.id).toList();
-
-              // Получаем ID всех файлов в категории
-              final categoryIds = categoryFiles.map((file) => file.entity.id).toList();
-
-              // Проверяем, сколько файлов из категории выбрано
-              final selectedCount = categoryIds.where((id) => selectedIds.contains(id)).length;
-              final allSelected = selectedCount == categoryIds.length && categoryIds.isNotEmpty;
-
-              return TextButton.icon(
-                onPressed: () {
-                  if (allSelected) {
-                    // Если все выбраны - снимаем выбор со всех файлов категории
-                    for (final id in categoryIds) {
-                      if (selectedIds.contains(id)) {
-                        context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
-                      }
-                    }
-                  } else {
-                    // Иначе выбираем все невыбранные файлы в категории
-                    for (final id in categoryIds) {
-                      if (!selectedIds.contains(id)) {
-                        context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
-                      }
-                    }
-                  }
-                },
-                icon: Icon(
-                  allSelected ? Icons.check_circle : Icons.check_circle_outline,
-                  color: Colors.white,
-                ),
-                label: Text(
-                  allSelected ? "Отменить выбор" : "Выбрать все",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-        builder: (context, state) {
-          if (state is! MediaCleanerReady) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final List<MediaFile> categoryFiles = _getCategoryFiles(state);
-
-          if (categoryFiles.isEmpty) {
-            return Center(child: Text('Нет файлов в категории $categoryName'));
-          }
-
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Найдено ${categoryFiles.length} ${categoryType == "photo" ? "фото" : "видео"}',
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ),
-
-              Expanded(child: _buildCategoryContent(context, state)),
-            ],
-          );
-        },
-      ),
-      bottomNavigationBar: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-        builder: (context, state) {
-          if (state is! MediaCleanerReady) return SizedBox();
-
-          // Получаем файлы категории и общее количество выбранных файлов
-          final categoryFiles = _getCategoryFiles(state);
-          final selectedCategoryCount = categoryFiles.where((f) => f.isSelected).length;
-          final totalSelectedCount = state.selectedFiles.length;
-
-          // Показываем либо оригинальную панель для категории, либо общий счетчик выбранных
-          if (selectedCategoryCount > 0) {
-            // Старая нижняя панель с акцентом на выбранные в этой категории
-            return Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
-              ),
-              child: SafeArea(
-                top: false,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.arrow_back),
-                        label: const Text('Назад'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: selectedCategoryCount > 0
-                            ? () => context.read<MediaCleanerBloc>().add(DeleteSelectedFiles())
-                            : null,
-                        icon: const Icon(Icons.delete_outline),
-                        label: Text('Удалить ($selectedCategoryCount)'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          disabledBackgroundColor: Colors.grey.shade300,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          } else if (totalSelectedCount > 0) {
-            // Показываем счетчик всех выбранных файлов, если в этой категории ничего не выбрано
-            return Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
-                border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
-              ),
-              child: SafeArea(
-                top: false,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Выбрано: $totalSelectedCount',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        context.read<MediaCleanerBloc>().add(DeleteSelectedFiles());
-                      },
-                      icon: const Icon(Icons.delete_outline),
-                      label: const Text('Удалить'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          return SizedBox(); // Не показываем нижнюю панель, если нет выбранных файлов
-        },
-      ),
-    );
-  }
-
   // Получает файлы для выбранной категории
   List<MediaFile> _getCategoryFiles(MediaCleanerReady state) {
     if (categoryType == 'photo') {
@@ -396,7 +200,6 @@ class CategoryPage extends StatelessWidget {
           return [];
       }
     } else {
-      // video
       switch (categoryName) {
         case 'Дубликаты':
           return state.videoDuplicateGroups.expand((group) => group.files).toList();
@@ -410,9 +213,7 @@ class CategoryPage extends StatelessWidget {
     }
   }
 
-  // Строит содержимое категории в зависимости от типа (iOS/Telegram стиль)
   Widget _buildCategoryContent(BuildContext context, MediaCleanerReady state) {
-    // Для категории размытых фотографий используем специальную сетку
     if (categoryName == 'Размытые') {
       final blurryFiles = state.blurry;
 
@@ -422,14 +223,13 @@ class CategoryPage extends StatelessWidget {
             mediaIds: blurryFiles.map((file) => file.entity.id).toList(),
             title: 'Размытые фото',
           ),
-
           Expanded(
             child: GridView.builder(
-              padding: EdgeInsets.zero, // Убираем отступы
+              padding: EdgeInsets.zero,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 childAspectRatio: 1.0,
-                crossAxisSpacing: 1.0, // Минимальные отступы как в iOS/Telegram
+                crossAxisSpacing: 1.0,
                 mainAxisSpacing: 1.0,
               ),
               itemCount: blurryFiles.length,
@@ -452,7 +252,6 @@ class CategoryPage extends StatelessWidget {
       );
     }
 
-    // Для категорий с группировкой (похожие и Серии снимков)
     if (categoryName == 'Похожие' || categoryName == 'Серии снимков') {
       final List<MediaGroup> groups;
 
@@ -465,17 +264,15 @@ class CategoryPage extends StatelessWidget {
       }
 
       if (groups.isEmpty) {
-        return Center(child: Text('${categoryName} не найдены'));
+        return Center(child: Text('$categoryName не найдены'));
       }
 
       return Column(
         children: [
-          // Добавляем баннер сверху
           SwipeModeBanner(
             mediaIds: groups.expand((group) => group.files).map((file) => file.entity.id).toList(),
             title: categoryName,
           ),
-
           Expanded(
             child: ListView.builder(
               itemCount: groups.length,
@@ -499,24 +296,21 @@ class CategoryPage extends StatelessWidget {
       );
     }
 
-    // Для остальных категорий - простая сетка в стиле iOS/Telegram
     final List<MediaFile> files = _getCategoryFiles(state);
 
     return Column(
       children: [
-        // Добавляем баннер сверху
         SwipeModeBanner(
           mediaIds: files.map((file) => file.entity.id).toList(),
           title: categoryName,
         ),
-
         Expanded(
           child: GridView.builder(
-            padding: EdgeInsets.zero, // Убираем отступы как в iOS Photos
+            padding: EdgeInsets.zero,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               childAspectRatio: 1.0,
-              crossAxisSpacing: 1.0, // Минимальные отступы
+              crossAxisSpacing: 1.0,
               mainAxisSpacing: 1.0,
             ),
             itemCount: files.length,
@@ -537,7 +331,6 @@ class CategoryPage extends StatelessWidget {
     );
   }
 
-  // Показывает превью медиафайла
   void _showMediaPreview(BuildContext context, MediaFile file) {
     Navigator.of(context).push(
       MaterialPageRoute(fullscreenDialog: true, builder: (context) => MediaPreviewPage(file: file)),

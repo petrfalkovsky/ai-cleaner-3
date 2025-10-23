@@ -250,7 +250,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
                                             .resolveFrom(context),
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
-                                          progress > 0.9
+                                          progress! > 0.9
                                               ? CupertinoColors.systemGreen
                                               : CupertinoColors.activeBlue,
                                         ),
