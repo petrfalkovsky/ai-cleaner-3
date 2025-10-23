@@ -55,7 +55,7 @@ class SelectionIndicator extends StatelessWidget {
                       ),
                     ),
                   )
-                : Icon(Icons.add, color: Colors.white, size: size * 0.6),
+                : SizedBox(),
           ),
         );
       },

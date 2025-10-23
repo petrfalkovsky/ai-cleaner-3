@@ -262,7 +262,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       List<MediaGroup> allSimilarGroups = [];
 
       for (int i = 0; i < currentState.photoFiles.length; i += similarBatchSize) {
-        if (emit.isDone) break;
+        if (emit.isDone || isPaused) break; // Проверка паузы
 
         final end = (i + similarBatchSize < currentState.photoFiles.length)
             ? i + similarBatchSize
@@ -280,6 +280,8 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
         if (similarGroupsMap.isNotEmpty) {
           // Для каждой найденной группы сразу обновляем UI
           for (final entry in similarGroupsMap.entries) {
+            if (isPaused) break; // Проверка паузы
+
             final newGroup = MediaGroup(
               id: '${entry.key}_${i ~/ similarBatchSize}_${allSimilarGroups.length}',
               name: 'Похожие фото ${entry.key.split('_').last}',
@@ -302,6 +304,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
               progress,
               currentBatch: processedFiles,
             );
+            if (isPaused) break; // Проверка после updateStatus
           }
         } else {
           // Даже если не нашли группы в порции, всё равно обновляем прогресс
@@ -311,10 +314,16 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             progress,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Пауза между порциями для отзывчивости UI
         await Future.delayed(const Duration(milliseconds: 20));
+      }
+
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return;
       }
 
       final totalSimilarCount = allSimilarGroups.fold<int>(
@@ -337,7 +346,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       int lastBlurryCount = 0;
 
       for (int i = 0; i < currentState.photoFiles.length; i += blurryBatchSize) {
-        if (emit.isDone) break;
+        if (emit.isDone || isPaused) break; // Проверка паузы
 
         final end = (i + blurryBatchSize < currentState.photoFiles.length)
             ? i + blurryBatchSize
@@ -372,6 +381,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             progressValue,
             currentBatch: processedFiles,
           );
+          if (isPaused) break; // Проверка после updateStatus
         } else {
           // Даже без новых находок обновляем прогресс
           final progressValue = 0.55 + (0.15 * end / currentState.photoFiles.length);
@@ -381,10 +391,16 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             progressValue,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Еще более короткая пауза
         await Future.delayed(const Duration(milliseconds: 10));
+      }
+
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return;
       }
 
       // 5. Обрабатываем видео - обновляем после каждой находки
@@ -397,7 +413,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       List<MediaFile> allShortVideos = [];
 
       for (int i = 0; i < currentState.videoFiles.length; i += videoBatchSize) {
-        if (emit.isDone) break;
+        if (emit.isDone || isPaused) break; // Проверка паузы
 
         final end = (i + videoBatchSize < currentState.videoFiles.length)
             ? i + videoBatchSize
@@ -432,6 +448,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             progress,
             currentBatch: processedFiles,
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Находим записи экрана
@@ -450,6 +467,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             progress,
             currentBatch: processedFiles,
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Находим короткие видео
@@ -468,6 +486,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             progress,
             currentBatch: processedFiles,
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Если в этой порции ничего не нашли, всё равно обновляем прогресс
@@ -480,10 +499,16 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             progress,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы к счетчику
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Пауза для отзывчивости
         await Future.delayed(const Duration(milliseconds: 10));
+      }
+
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return;
       }
 
       // Завершающая стадия - финальное обновление
