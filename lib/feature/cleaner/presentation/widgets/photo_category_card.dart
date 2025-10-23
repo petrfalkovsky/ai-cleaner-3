@@ -1,8 +1,10 @@
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/feature/categories/presentation/widgets/animated_counter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class PhotoCategoryCard extends StatefulWidget {
   final PhotoCategory category;
@@ -40,204 +42,140 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
       child: AnimatedScale(
         scale: _isPressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                CupertinoColors.systemGrey6.resolveFrom(context),
-                CupertinoColors.systemGrey5.resolveFrom(context),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.06),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+        child: LiquidGlass(
+          settings: LiquidGlassSettings(
+            blur: 4,
+            ambientStrength: 0.8,
+            lightAngle: 0.3 * math.pi,
+            glassColor: Colors.white.withOpacity(0.15),
+            thickness: 20,
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.white.withOpacity(0.8),
-                      Colors.white.withOpacity(0.6),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+          shape: LiquidRoundedSuperellipse(
+            borderRadius: const Radius.circular(20),
+          ),
+          glassContainsChild: false,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Иконка - белая на матовом фоне
+                LiquidGlass(
+                  settings: LiquidGlassSettings(
+                    blur: 3,
+                    ambientStrength: 0.5,
+                    lightAngle: 0.2 * math.pi,
+                    glassColor: Colors.white.withOpacity(0.2),
+                    thickness: 15,
                   ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                    width: 1.5,
+                  shape: LiquidRoundedSuperellipse(
+                    borderRadius: const Radius.circular(16),
+                  ),
+                  glassContainsChild: false,
+                  child: SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: Icon(
+                      widget.category.icon,
+                      color: Colors.white,
+                      size: 28,
+                    ),
                   ),
                 ),
-                child: Row(
+                const SizedBox(width: 16),
+
+                // Информация
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.category.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.category.description,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Счетчики
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    // Иконка с градиентом
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: _getGradientColors(),
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _getIconColor().withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        widget.category.icon,
+                    CategoryAnimatedCounter(
+                      targetValue: widget.count,
+                      counterKey: countKey,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
                         color: Colors.white,
-                        size: 28,
                       ),
+                      animationDuration: const Duration(milliseconds: 1200),
+                      minIncrement: 1,
+                      maxIncrement: 3,
                     ),
-                    const SizedBox(width: 16),
-
-                    // Информация
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.category.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 17,
-                              color: CupertinoColors.label.resolveFrom(context),
+                    if (widget.selectedCount > 0)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: LiquidGlass(
+                          settings: LiquidGlassSettings(
+                            blur: 2,
+                            ambientStrength: 0.3,
+                            lightAngle: 0.1 * math.pi,
+                            glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
+                            thickness: 8,
+                          ),
+                          shape: LiquidRoundedSuperellipse(
+                            borderRadius: const Radius.circular(12),
+                          ),
+                          glassContainsChild: false,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            child: CategoryAnimatedCounter(
+                              targetValue: widget.selectedCount,
+                              counterKey: selectedCountKey,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              animationDuration: const Duration(milliseconds: 800),
+                              minIncrement: 1,
+                              maxIncrement: 1,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.category.description,
-                            style: TextStyle(
-                              color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                              fontSize: 14,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Счетчики
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        CategoryAnimatedCounter(
-                          targetValue: widget.count,
-                          counterKey: countKey,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: CupertinoColors.label.resolveFrom(context),
-                          ),
-                          animationDuration: const Duration(milliseconds: 1200),
-                          minIncrement: 1,
-                          maxIncrement: 3,
                         ),
-                        if (widget.selectedCount > 0)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    CupertinoColors.activeBlue,
-                                    CupertinoColors.systemBlue,
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: CategoryAnimatedCounter(
-                                targetValue: widget.selectedCount,
-                                counterKey: selectedCountKey,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                animationDuration: const Duration(milliseconds: 800),
-                                minIncrement: 1,
-                                maxIncrement: 1,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    // Chevron
-                    const SizedBox(width: 8),
-                    Icon(
-                      CupertinoIcons.chevron_right,
-                      size: 18,
-                      color: CupertinoColors.tertiaryLabel.resolveFrom(context),
-                    ),
+                      ),
                   ],
                 ),
-              ),
+
+                // Chevron
+                const SizedBox(width: 8),
+                const Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 18,
+                  color: Colors.white60,
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
-  }
-
-  Color _getIconColor() {
-    switch (widget.category) {
-      case PhotoCategory.similar:
-        return CupertinoColors.systemGreen;
-      case PhotoCategory.series:
-        return CupertinoColors.systemOrange;
-      case PhotoCategory.screenshots:
-        return CupertinoColors.systemTeal;
-      case PhotoCategory.blurry:
-        return CupertinoColors.systemPurple;
-    }
-  }
-
-  List<Color> _getGradientColors() {
-    switch (widget.category) {
-      case PhotoCategory.similar:
-        return [
-          CupertinoColors.systemGreen.withOpacity(0.9),
-          CupertinoColors.systemGreen.darkColor,
-        ];
-      case PhotoCategory.series:
-        return [
-          CupertinoColors.systemOrange.withOpacity(0.9),
-          CupertinoColors.systemOrange.darkColor,
-        ];
-      case PhotoCategory.screenshots:
-        return [
-          CupertinoColors.systemTeal.withOpacity(0.9),
-          CupertinoColors.systemTeal.darkColor,
-        ];
-      case PhotoCategory.blurry:
-        return [
-          CupertinoColors.systemPurple.withOpacity(0.9),
-          CupertinoColors.systemPurple.darkColor,
-        ];
-    }
   }
 }
