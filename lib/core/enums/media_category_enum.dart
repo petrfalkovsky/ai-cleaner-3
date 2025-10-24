@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-
 enum PhotoCategory {
   similar,
   series,
   screenshots,
   blurry;
-
   String get name {
     switch (this) {
       case PhotoCategory.similar:
@@ -18,7 +16,6 @@ enum PhotoCategory {
         return 'Размытые';
     }
   }
-
   String get description {
     switch (this) {
       case PhotoCategory.similar:
@@ -31,7 +28,6 @@ enum PhotoCategory {
         return 'Нечеткие и размытые фотографии';
     }
   }
-
   IconData get icon {
     switch (this) {
       case PhotoCategory.similar:
@@ -45,12 +41,10 @@ enum PhotoCategory {
     }
   }
 }
-
 enum VideoCategory {
   duplicates,
   screenRecordings,
   shortVideos;
-
   String get name {
     switch (this) {
       case VideoCategory.duplicates:
@@ -61,7 +55,6 @@ enum VideoCategory {
         return 'Короткие записи';
     }
   }
-
   String get description {
     switch (this) {
       case VideoCategory.duplicates:
@@ -72,7 +65,6 @@ enum VideoCategory {
         return 'Короткие видеофрагменты';
     }
   }
-
   IconData get icon {
     switch (this) {
       case VideoCategory.duplicates:

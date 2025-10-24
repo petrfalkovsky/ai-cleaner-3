@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
-
 Route<T> modalSheetBuilder<T>(
         BuildContext context, Widget child, AutoRoutePage<T> page) =>
     CupertinoModalSheetRoute(
@@ -14,7 +13,6 @@ Route<T> modalSheetBuilder<T>(
       ),
       builder: (context) => child,
     );
-
 Route<T> transparentRouteBuilder<T>(
   BuildContext context,
   Widget child,
@@ -30,7 +28,6 @@ Route<T> transparentRouteBuilder<T>(
       const end = 1.0;
       var tween = Tween(begin: begin, end: end);
       var fadeAnimation = animation.drive(tween);
-
       return FadeTransition(
         opacity: fadeAnimation,
         child: child,

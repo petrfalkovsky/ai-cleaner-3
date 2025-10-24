@@ -5,12 +5,9 @@ import '../../../theme/text_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 class ContextMenuPage extends StatelessWidget {
   const ContextMenuPage({super.key, required this.items});
-
   final List<MenuItem> items;
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -25,17 +22,14 @@ class ContextMenuPage extends StatelessWidget {
     );
   }
 }
-
 class ContextMenuList extends StatelessWidget {
   const ContextMenuList({
     super.key,
     required this.items,
     this.automaticallyImplyClose = true,
   });
-
   final List<MenuItem> items;
   final bool automaticallyImplyClose;
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -102,13 +96,11 @@ class ContextMenuList extends StatelessWidget {
     );
   }
 }
-
 class MenuItem {
   final String title;
   final IconData icon;
   final bool destructive;
   final void Function() onTap;
-
   MenuItem({
     required this.title,
     required this.icon,

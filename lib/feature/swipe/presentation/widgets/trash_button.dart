@@ -8,12 +8,9 @@ import '../../../../core/theme/button.dart';
 import '../../../../core/widgets/common/widgets/text_swapper.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:pixelarticons/pixel.dart';
-
 class TrashButton extends StatelessWidget {
   const TrashButton({super.key, this.onDelete});
-
   final Function(List<String>)? onDelete;
-
   @override
   Widget build(BuildContext context) {
     final selectedAssets = context.watch<ImageDeleteCubit>().state.entities;
@@ -38,7 +35,6 @@ class TrashButton extends StatelessWidget {
             }
           },
         ),
-
         Positioned(
               right: -6,
               top: -6,

@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 class TextSwapper extends StatefulWidget {
   const TextSwapper(this.text, {super.key, this.textAlign, this.style});
-
   final TextAlign? textAlign;
   final String text;
   final TextStyle? style;
-
   @override
   State<TextSwapper> createState() => _TextSwapperState();
 }
-
 class _TextSwapperState extends State<TextSwapper> {
   late String text = widget.text;
   String? incomingText;
-
   @override
   void didUpdateWidget(TextSwapper oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -24,7 +19,6 @@ class _TextSwapperState extends State<TextSwapper> {
       incomingText = widget.text;
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(

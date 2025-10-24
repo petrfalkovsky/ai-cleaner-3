@@ -6,13 +6,10 @@ import '../theme/text_extension.dart';
 import '../widgets/alert_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-
 @RoutePage()
 class PermissionRequestPage extends StatelessWidget {
   const PermissionRequestPage({super.key, required this.type});
-
   final PermissionType type;
-
   String get infoText {
     switch (type) {
       case PermissionType.notification:
@@ -23,7 +20,6 @@ class PermissionRequestPage extends StatelessWidget {
         return 'drift requires access to your gallery to save your drifts.';
     }
   }
-
   String get requestPermissiontext {
     switch (type) {
       case PermissionType.notification:
@@ -34,7 +30,6 @@ class PermissionRequestPage extends StatelessWidget {
         return 'tap to give gallery access';
     }
   }
-
   IconData get icon {
     switch (type) {
       case PermissionType.notification:
@@ -45,7 +40,6 @@ class PermissionRequestPage extends StatelessWidget {
         return FeatherIcons.image;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return ScrollableSheetPage(
@@ -61,7 +55,6 @@ class PermissionRequestPage extends StatelessWidget {
                 title: requestPermissiontext,
                 onPressed: () async {
                   final isGranted = await PermissionHandler.of(type).request();
-
                   if (context.mounted) {
                     context.router.maybePop(isGranted);
                   }

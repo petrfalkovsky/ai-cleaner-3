@@ -4,12 +4,9 @@ import 'package:flutter/services.dart';
 import '../extensions/core_extensions.dart';
 import '../theme/text_extension.dart';
 import 'package:pixelarticons/pixel.dart';
-
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppbar({super.key, this.title});
-
   final String? title;
-
   @override
   Widget build(BuildContext context) {
     final widget = Container(
@@ -44,10 +41,8 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
     );
-
     return widget;
   }
-
   @override
   Size get preferredSize => const Size.fromHeight(55);
 }

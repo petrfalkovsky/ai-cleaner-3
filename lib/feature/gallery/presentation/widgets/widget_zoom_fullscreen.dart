@@ -1,8 +1,5 @@
 // ignore_for_file: unused_field
-// from apinio widget_zoom
-
 import 'package:flutter/material.dart';
-
 class WidgetZoomFullscreen extends StatefulWidget {
   final Widget zoomWidget;
   final double minScale;
@@ -19,19 +16,16 @@ class WidgetZoomFullscreen extends StatefulWidget {
     this.fullScreenDoubleTapZoomScale,
     this.withDoubleTapZoom = true,
   });
-
   @override
   State<WidgetZoomFullscreen> createState() => _ImageZoomFullscreenState();
 }
-
 class _ImageZoomFullscreenState extends State<WidgetZoomFullscreen>
     with SingleTickerProviderStateMixin {
   final TransformationController _transformationController =
       TransformationController();
   late AnimationController _animationController;
   late double closingTreshold = MediaQuery.of(context).size.height /
-      24; //the higher you set the last value the earlier the full screen gets closed
-
+      24;
   Animation<Matrix4>? _animation;
   double _opacity = 1;
   double _imagePosition = 0;
@@ -39,7 +33,6 @@ class _ImageZoomFullscreenState extends State<WidgetZoomFullscreen>
   Duration _opacityDuration = Duration.zero;
   late double _currentScale = widget.minScale;
   TapDownDetails? _doubleTapDownDetails;
-
   @override
   void initState() {
     super.initState();
@@ -48,14 +41,12 @@ class _ImageZoomFullscreenState extends State<WidgetZoomFullscreen>
       duration: const Duration(milliseconds: 200),
     )..addListener(() => _transformationController.value = _animation!.value);
   }
-
   @override
   void dispose() {
     _transformationController.dispose();
     _animationController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -76,7 +67,6 @@ class _ImageZoomFullscreenState extends State<WidgetZoomFullscreen>
               onInteractionUpdate: _onInteractionUpdate,
               onInteractionEnd: _onInteractionEnd,
               child: GestureDetector(
-                // need to have both methods, otherwise the zoom will be triggered before the second tap releases the screen
                 onDoubleTapDown: widget.withDoubleTapZoom
                     ? (details) => _doubleTapDownDetails = details
                     : null,
@@ -92,39 +82,31 @@ class _ImageZoomFullscreenState extends State<WidgetZoomFullscreen>
       ],
     );
   }
-
   void _zoomInOut() {
     final Offset tapPosition = _doubleTapDownDetails!.localPosition;
     final double zoomScale =
         widget.fullScreenDoubleTapZoomScale ?? widget.maxScale;
-
     final double x = -tapPosition.dx * (zoomScale - 1);
     final double y = -tapPosition.dy * (zoomScale - 1);
-
     final Matrix4 zoomedMatrix = Matrix4.identity()
       ..translate(x, y)
       ..scale(zoomScale);
-
     final Matrix4 widgetMatrix = _transformationController.value.isIdentity()
         ? zoomedMatrix
         : Matrix4.identity();
-
     _animation = Matrix4Tween(
       begin: _transformationController.value,
       end: widgetMatrix,
     ).animate(CurveTween(curve: Curves.easeOut).animate(_animationController));
-
     _animationController.forward(from: 0);
     _currentScale = _transformationController.value.isIdentity()
         ? zoomScale
         : widget.minScale;
   }
-
   void _onInteractionStart(ScaleStartDetails details) {
     _animationDuration = Duration.zero;
     _opacityDuration = Duration.zero;
   }
-
   void _onInteractionEnd(ScaleEndDetails details) async {
     _currentScale = _transformationController.value.getMaxScaleOnAxis();
     setState(() {
@@ -132,7 +114,7 @@ class _ImageZoomFullscreenState extends State<WidgetZoomFullscreen>
     });
     if (_imagePosition > closingTreshold) {
       setState(() {
-        _imagePosition = MediaQuery.of(context).size.height; // move image down
+        _imagePosition = MediaQuery.of(context).size.height;
       });
       Navigator.of(context).pop();
     } else {
@@ -143,9 +125,7 @@ class _ImageZoomFullscreenState extends State<WidgetZoomFullscreen>
       });
     }
   }
-
   void _onInteractionUpdate(ScaleUpdateDetails details) async {
-    // chose 1.05 because maybe the image was not fully zoomed back but it almost looks like that
     if (details.pointerCount == 1 && _currentScale <= 1.05) {
       setState(() {
         _imagePosition += details.focalPointDelta.dy;

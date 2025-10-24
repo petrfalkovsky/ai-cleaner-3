@@ -1,5 +1,4 @@
 import 'package:rate_limiter/rate_limiter.dart';
-
 class Debouncer {
   Debouncer(this.duration);
   final Duration duration;
@@ -9,7 +8,6 @@ class Debouncer {
     },
     duration,
   );
-
   void run(void Function() action) {
     _debounce([action]);
   }

@@ -1,24 +1,18 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/limiters/debouncer.dart';
 import '../../core/limiters/throttler.dart';
-
 class CustomSwiperController extends AppinioSwiperController {
   CustomSwiperController() : super();
-
   bool _isControlledSwiping = false;
-
   int get safeIndex {
     return max(cardIndex ?? 0, 0);
   }
-
   bool get isControlledSwiping => _isControlledSwiping;
   final debouncer = Debouncer(750.ms);
   final throttler = Throttler(550.ms);
-
   void setControlledSwiping(bool value) async {
     if (value) {
       _isControlledSwiping = true;
@@ -28,7 +22,6 @@ class CustomSwiperController extends AppinioSwiperController {
       _isControlledSwiping = false;
     });
   }
-
   @override
   Future<void> unswipe() async {
     if (cardIndex == 0) {
@@ -38,14 +31,12 @@ class CustomSwiperController extends AppinioSwiperController {
     await super.unswipe();
     setControlledSwiping(false);
   }
-
   @override
   Future<void> swipeLeft() async {
     setControlledSwiping(true);
     await super.swipeLeft();
     setControlledSwiping(false);
   }
-
   @override
   Future<void> swipeRight() async {
     setControlledSwiping(true);

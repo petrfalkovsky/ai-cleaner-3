@@ -5,7 +5,6 @@ import '../../../theme/text_extension.dart';
 import '../../alert_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-
 @RoutePage()
 class AlertDialogPage extends StatelessWidget {
   const AlertDialogPage({
@@ -20,7 +19,6 @@ class AlertDialogPage extends StatelessWidget {
     this.level = AlertLevel.warning,
     this.autoPop = false,
   });
-
   final String title;
   final String? subtitle;
   final Widget? leading;
@@ -30,7 +28,6 @@ class AlertDialogPage extends StatelessWidget {
   final bool withEasterEgg;
   final AlertLevel level;
   final bool autoPop;
-
   @override
   Widget build(BuildContext context) {
     return StyledAlertDialog(
@@ -46,7 +43,6 @@ class AlertDialogPage extends StatelessWidget {
     );
   }
 }
-
 class StyledAlertDialog extends StatelessWidget {
   const StyledAlertDialog({
     super.key,
@@ -60,7 +56,6 @@ class StyledAlertDialog extends StatelessWidget {
     this.level = AlertLevel.warning,
     this.autoPop = false,
   });
-
   final Widget? leading;
   final Widget? trailing;
   final String title;
@@ -70,7 +65,6 @@ class StyledAlertDialog extends StatelessWidget {
   final void Function(BuildContext)? onAccept;
   final void Function(BuildContext)? onCancel;
   final bool autoPop;
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -142,7 +136,6 @@ class StyledAlertDialog extends StatelessWidget {
                                   await context.router.maybePop(true);
                                 }
                                 if (!context.mounted) return;
-
                                 return onAccept!(context);
                               }
                               context.router.maybePop(true);

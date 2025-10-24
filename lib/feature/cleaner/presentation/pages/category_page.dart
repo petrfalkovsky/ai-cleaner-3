@@ -12,14 +12,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
-
 @RoutePage()
 class CategoryPage extends StatelessWidget {
-  final String categoryType; // 'photo' или 'video'
+  final String categoryType;
   final String categoryName;
-
   const CategoryPage({super.key, required this.categoryType, required this.categoryName});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,16 +34,13 @@ class CategoryPage extends StatelessWidget {
           BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
             builder: (context, state) {
               if (state is! MediaCleanerReady) return const SizedBox();
-
               final List<MediaFile> categoryFiles = _getCategoryFiles(state);
               if (categoryFiles.isEmpty) return const SizedBox();
-
               final selectedFiles = state.selectedFiles;
               final selectedIds = selectedFiles.map((file) => file.entity.id).toList();
               final categoryIds = categoryFiles.map((file) => file.entity.id).toList();
               final selectedCount = categoryIds.where((id) => selectedIds.contains(id)).length;
               final allSelected = selectedCount == categoryIds.length && categoryIds.isNotEmpty;
-
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: GestureDetector(
@@ -94,33 +88,23 @@ class CategoryPage extends StatelessWidget {
           if (state is! MediaCleanerReady) {
             return const Center(child: CupertinoActivityIndicator());
           }
-
           final List<MediaFile> categoryFiles = _getCategoryFiles(state);
-
           if (categoryFiles.isEmpty) {
             return const Center(
               child: Text('Нет файлов в категории', style: TextStyle(color: Colors.white60)),
             );
           }
-
           return Stack(
             children: [
-              // Градиентный фон для похожих фото
               if (categoryName == 'Похожие' || categoryName == 'Серии снимков')
                 const Positioned.fill(child: AnimatedBackground()),
-
-              // Полноэкранный grid
               _buildCategoryContent(context, state),
-
-              // Floating banner сверху
               Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
                 child: SafeArea(bottom: false, child: _buildSwipeBanner(context, categoryFiles)),
               ),
-
-              // Floating bottom bar
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -133,33 +117,27 @@ class CategoryPage extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildSwipeBanner(BuildContext context, List<MediaFile> files) {
     return SwipeModeBanner(
       mediaIds: files.map((file) => file.entity.id).toList(),
       title: categoryName,
     );
   }
-
   Widget _buildBottomBar(
     BuildContext context,
     MediaCleanerReady state,
     List<MediaFile> categoryFiles,
   ) {
-    // Правильная проверка: сравниваем ID файлов категории с ID выбранных файлов из state
     final categoryIds = categoryFiles.map((f) => f.entity.id).toSet();
     final selectedIds = state.selectedFiles.map((f) => f.entity.id).toSet();
     final selectedCategoryCount = categoryIds.intersection(selectedIds).length;
     final totalSelectedCount = state.selectedFiles.length;
-
     if (selectedCategoryCount == 0 && totalSelectedCount == 0) {
       return const SizedBox.shrink();
     }
-
     final displayCount = selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount;
     final countText = displayCount.toString();
     final needsExpansion = countText.length >= 2;
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: LiquidGlass(
@@ -176,7 +154,6 @@ class CategoryPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: Row(
             children: [
-              // Badge с числом
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
@@ -209,11 +186,9 @@ class CategoryPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              // Текст "Выбрано" с tap для очистки
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // Очищаем только выбранные файлы из текущей категории
                     final categorySelectedIds = categoryIds.intersection(selectedIds).toList();
                     for (final id in categorySelectedIds) {
                       context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
@@ -267,7 +242,6 @@ class CategoryPage extends StatelessWidget {
       ),
     );
   }
-
   void _showDeleteConfirmation(BuildContext context, int count) {
     showCupertinoDialog(
       context: context,
@@ -292,7 +266,6 @@ class CategoryPage extends StatelessWidget {
       ),
     );
   }
-
   String _getFileWord(int count) {
     if (count % 10 == 1 && count % 100 != 11) {
       return 'файл';
@@ -302,8 +275,6 @@ class CategoryPage extends StatelessWidget {
       return 'файлов';
     }
   }
-
-  // Получает файлы для выбранной категории
   List<MediaFile> _getCategoryFiles(MediaCleanerReady state) {
     if (categoryType == 'photo') {
       switch (categoryName) {
@@ -331,13 +302,11 @@ class CategoryPage extends StatelessWidget {
       }
     }
   }
-
   Widget _buildCategoryContent(BuildContext context, MediaCleanerReady state) {
     if (categoryName == 'Размытые') {
       final blurryFiles = state.blurry;
-
       return GridView.builder(
-        padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
+        padding: const EdgeInsets.only(top: 180, bottom: 100),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           childAspectRatio: 1.0,
@@ -360,10 +329,8 @@ class CategoryPage extends StatelessWidget {
         },
       );
     }
-
     if (categoryName == 'Похожие' || categoryName == 'Серии снимков') {
       final List<MediaGroup> groups;
-
       if (categoryName == 'Похожие') {
         groups = state.similarGroups;
       } else if (categoryType == 'photo') {
@@ -371,13 +338,11 @@ class CategoryPage extends StatelessWidget {
       } else {
         groups = state.videoDuplicateGroups;
       }
-
       if (groups.isEmpty) {
         return Center(child: Text('$categoryName не найдены'));
       }
-
       return ListView.builder(
-        padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
+        padding: const EdgeInsets.only(top: 180, bottom: 100),
         itemCount: groups.length,
         itemBuilder: (context, index) {
           return SimilarMediaGroup(
@@ -395,11 +360,9 @@ class CategoryPage extends StatelessWidget {
         },
       );
     }
-
     final List<MediaFile> files = _getCategoryFiles(state);
-
     return GridView.builder(
-      padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
+      padding: const EdgeInsets.only(top: 180, bottom: 100),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         childAspectRatio: 1.0,
@@ -420,7 +383,6 @@ class CategoryPage extends StatelessWidget {
       },
     );
   }
-
   void _showMediaPreview(BuildContext context, MediaFile file) {
     Navigator.of(context).push(
       MaterialPageRoute(fullscreenDialog: true, builder: (context) => MediaPreviewPage(file: file)),

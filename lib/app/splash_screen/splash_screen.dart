@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -9,15 +8,12 @@ import '../../core/bootstrap.dart';
 import '../../core/router/router.gr.dart';
 import '../../core/widgets/common/type_write_text.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 @RoutePage()
 class SplashScreenPage extends StatefulWidget {
   const SplashScreenPage({super.key});
-
   @override
   State<SplashScreenPage> createState() => _SplashScreenPageState();
 }
-
 class _SplashScreenPageState extends State<SplashScreenPage> {
   @override
   void initState() {
@@ -26,7 +22,6 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
       await Bootstrap.instance.initialize();
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

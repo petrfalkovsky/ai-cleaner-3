@@ -1,14 +1,10 @@
 import 'package:appinio_social_share/appinio_social_share.dart';
 import '../di/service_locator.dart';
-
 enum InstalledApps { instagram, facebook, whatsapp, telegram }
-
 class InstalledAppsRepository {
   final _appinioSocialShare = AppinioSocialShare();
   List<String>? _installedApps;
-
   static final instance = sl<InstalledAppsRepository>();
-
   List<String> get installedApps {
     assert(
       _installedApps != null,
@@ -16,7 +12,6 @@ class InstalledAppsRepository {
     );
     return _installedApps!;
   }
-
   void loadInstalledApps() async {
     final apps = await _appinioSocialShare.getInstalledApps();
     final installedApps =

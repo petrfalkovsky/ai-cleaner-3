@@ -3,14 +3,11 @@ import '../glitched_shader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_shaders/flutter_shaders.dart';
-
 class SunShaderWidget extends StatefulWidget {
   const SunShaderWidget({super.key});
-
   @override
   State<SunShaderWidget> createState() => _SunShaderWidgetState();
 }
-
 class _SunShaderWidgetState extends State<SunShaderWidget> {
   int tappedCounter = 0;
   bool get warning => tappedCounter > 12;
@@ -21,7 +18,6 @@ class _SunShaderWidgetState extends State<SunShaderWidget> {
     }
     return 'stop tapping you gonna break it';
   }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -51,9 +47,9 @@ class _SunShaderWidgetState extends State<SunShaderWidget> {
                       (context, shader, child) {
                         return AnimatedSampler((image, size, canvas) {
                           shader
-                            ..setFloat(0, size.width) // iResolution.x
-                            ..setFloat(1, size.height) // iResolution.y
-                            ..setFloat(2, time); // iTime
+                            ..setFloat(0, size.width)
+                            ..setFloat(1, size.height)
+                            ..setFloat(2, time);
                           canvas.drawRect(
                             Rect.fromLTWH(0, 0, size.width, size.height),
                             Paint()..shader = shader,

@@ -3,18 +3,14 @@ import '../../modals/scrollable_sheet_page.dart';
 import '../../theme/button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:gap/gap.dart';
-
 @RoutePage()
 class DateTimePickerBottomSheetPage extends StatefulWidget {
   const DateTimePickerBottomSheetPage({super.key, this.initialDate});
-
   final DateTime? initialDate;
-
   @override
   State<DateTimePickerBottomSheetPage> createState() =>
       _DateTimePickerBottomSheetPageState();
 }
-
 class _DateTimePickerBottomSheetPageState
     extends State<DateTimePickerBottomSheetPage> {
   DateTime _selectedDate = DateTime.now();

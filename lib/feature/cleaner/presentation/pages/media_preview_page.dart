@@ -7,13 +7,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import '../bloc/media_cleaner_bloc.dart';
-
 @RoutePage()
 class MediaPreviewPage extends StatelessWidget {
   final MediaFile file;
-
   const MediaPreviewPage({super.key, required this.file});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +20,6 @@ class MediaPreviewPage extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(file.entity.title ?? 'Просмотр', style: const TextStyle(color: Colors.white)),
         actions: [
-          // Заменяем кнопку на полях на наш индикатор
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: SelectionIndicator(fileId: file.entity.id, size: 32),
@@ -32,10 +28,7 @@ class MediaPreviewPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Основной контент - фото или видео
           Expanded(child: file.isVideo ? _buildVideoPlayer() : _buildPhotoViewer()),
-
-          // Информация о файле
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.black,
@@ -75,38 +68,10 @@ class MediaPreviewPage extends StatelessWidget {
               ],
             ),
           ),
-
-          // // Кнопка выбора/отмены выбора
-          // SafeArea(
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(16.0),
-          //     child: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-          //       builder: (context, state) {
-          //         final isSelected =
-          //             (state is MediaCleanerLoaded) &&
-          //             state.selectedFiles.any((f) => f.entity.id == file.entity.id);
-
-          //         return ElevatedButton.icon(
-          //           onPressed: () {
-          //             context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(file.entity.id));
-          //           },
-          //           icon: Icon(isSelected ? Icons.check_circle : Icons.check_circle_outline),
-          //           label: Text(isSelected ? 'Снять выделение' : 'Выбрать файл'),
-          //           style: ElevatedButton.styleFrom(
-          //             backgroundColor: isSelected ? Colors.green : Colors.blue,
-          //             foregroundColor: Colors.white,
-          //             minimumSize: const Size(double.infinity, 50),
-          //           ),
-          //         );
-          //       },
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );
   }
-
   Widget _buildPhotoViewer() {
     return Center(
       child: InteractiveViewer(
@@ -144,11 +109,9 @@ class MediaPreviewPage extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildVideoPlayer() {
     return VideoPlayerWidget(entity: file.entity);
   }
-
   Widget _buildInfoChip({required IconData icon, required String label}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -166,7 +129,6 @@ class MediaPreviewPage extends StatelessWidget {
       ),
     );
   }
-
   String _formatDuration(int durationInSeconds) {
     final duration = Duration(seconds: durationInSeconds);
     final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');

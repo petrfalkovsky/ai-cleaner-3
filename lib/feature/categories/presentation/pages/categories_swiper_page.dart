@@ -9,7 +9,6 @@ import '../../../../app/swiper/custom_controller.dart';
 import '../../../../app/swiper/swiper.dart';
 import '../../../cleaner/presentation/widgets/animated_background.dart';
 import 'package:photo_manager/photo_manager.dart';
-
 @RoutePage()
 class CategoriesSwiperPage extends StatefulWidget {
   const CategoriesSwiperPage({
@@ -17,17 +16,13 @@ class CategoriesSwiperPage extends StatefulWidget {
     required this.ids,
     required this.title,
   });
-
   final String title;
   final List<String> ids;
-
   @override
   State<CategoriesSwiperPage> createState() => _CategoriesSwipertate();
 }
-
 class _CategoriesSwipertate extends State<CategoriesSwiperPage> {
   final controller = CustomSwiperController();
-
   @override
   Widget build(BuildContext context) {
     final allAssets = context.watch<GalleryAssetsCubit>().state.assets;

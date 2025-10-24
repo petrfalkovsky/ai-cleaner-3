@@ -16,58 +16,44 @@ import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
 import '../widgets/photo_category_card.dart';
 import '../widgets/video_category_card.dart';
-
 @RoutePage()
 class HomePage extends StatefulWidget {
   final int initialTabIndex;
-
   const HomePage({super.key, this.initialTabIndex = 0});
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late TabController _tabController;
   late AnimationController _fabController;
-
-  // Для отслеживания категорий, которые уже отображались
   Set<PhotoCategory> _previousPhotoCategories = {};
   Set<VideoCategory> _previousVideoCategories = {};
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTabIndex);
     _tabController.addListener(() {
-      setState(() {}); // Обновляем UI при изменении таба
+      setState(() {});
     });
-
     _fabController = AnimationController(duration: const Duration(milliseconds: 200), vsync: this);
-
-    // При запуске проверяем наличие сохраненных данных или начинаем сканирование
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final bloc = context.read<MediaCleanerBloc>();
       bloc.add(LoadMediaFiles());
     });
   }
-
   @override
   void dispose() {
     _tabController.dispose();
     _fabController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
       builder: (context, state) {
-        // Показываем табы только если есть результаты сканирования
         final showTabs = state is MediaCleanerReady;
-
         return Scaffold(
-          backgroundColor: const Color(0xFF0A0E27), // Темный фон для контраста
+          backgroundColor: const Color(0xFF0A0E27),
           appBar: AppBar(
             title: const Text(
               'AI Cleaner',
@@ -79,11 +65,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           body: SafeArea(
             child: Stack(
               children: [
-                // Анимированный фон с паттернами
                 const Positioned.fill(child: AnimatedBackground()),
                 Column(
                   children: [
-                    // Custom Tab Bar в iOS стиле с liquid glass - показываем только после сканирования
                     if (showTabs)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -213,11 +197,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-
-                    // Баннер статуса сканирования
                     const ScanStatusBanner(),
-
-                    // Основной контент
                     Expanded(
                       child: showTabs
                           ? TabBarView(
@@ -227,12 +207,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 KeepAliveWrapper(child: _buildVideoTab()),
                               ],
                             )
-                          : _buildPhotoTab(), // До завершения показываем только фото вкладку
+                          : _buildPhotoTab(),
                     ),
                   ],
                 ),
-
-                // Floating счетчик выбранных файлов (всегда поверх контента)
                 Positioned(left: 0, right: 0, bottom: 0, child: const SelectedFilesCounter()),
               ],
             ),
@@ -241,11 +219,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       },
     );
   }
-
   Widget _buildPhotoTab() {
     return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
       builder: (context, state) {
-        // Обработка состояний
         if (state is MediaCleanerInitial || state is MediaCleanerLoading) {
           return Center(
             child: Column(
@@ -261,7 +237,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           );
         }
-
         if (state is MediaCleanerError) {
           return Center(
             child: Column(
@@ -295,13 +270,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           );
         }
-
-        // Если есть результаты сканирования
         if (state is MediaCleanerReady) {
           return _buildPhotoTabContent(state);
         }
-
-        // Если файлы загружены, но не просканированы
         if (state is MediaCleanerLoaded && !(state is MediaCleanerReady)) {
           return Center(
             child: Column(
@@ -332,22 +303,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.9, 0.9)),
           );
         }
-
         return const SizedBox.shrink();
       },
     );
   }
-
   Widget _buildPhotoTabContent(MediaCleanerReady state) {
     final bool isScanningInBackground = state.isScanningInBackground;
     final DateTime? lastScanTime = state.lastScanTime;
-
     final List<PhotoCategory> currentCategories = [];
     if (state.similarCount > 0) currentCategories.add(PhotoCategory.similar);
     if (state.photoDuplicatesCount > 0) currentCategories.add(PhotoCategory.series);
     if (state.screenshotsCount > 0) currentCategories.add(PhotoCategory.screenshots);
     if (state.blurryCount > 0) currentCategories.add(PhotoCategory.blurry);
-
     final Map<PhotoCategory, (int, int)> categoryCounts = {
       PhotoCategory.similar: (
         state.similarGroups.fold<int>(0, (sum, group) => sum + group.files.length),
@@ -369,12 +336,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       PhotoCategory.blurry: (state.blurry.length, state.blurry.where((f) => f.isSelected).length),
     };
-
     final Set<PhotoCategory> newCategories = currentCategories.toSet().difference(
       _previousPhotoCategories,
     );
     _previousPhotoCategories = currentCategories.toSet();
-
     if (currentCategories.isEmpty) {
       return Center(
         child: Column(
@@ -399,7 +364,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ).animate().fadeIn(duration: 500.ms).scale(),
       );
     }
-
     return CustomScrollView(
       key: const PageStorageKey('photo_tab'),
       slivers: [
@@ -431,7 +395,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               final category = currentCategories[index];
               final (count, selectedCount) = categoryCounts[category]!;
               final isNew = newCategories.contains(category);
-
               return Padding(
                 padding: EdgeInsets.only(bottom: index < currentCategories.length - 1 ? 12 : 0),
                 child:
@@ -489,14 +452,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ],
     );
   }
-
   Widget _buildVideoTab() {
     return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
       builder: (context, state) {
         if (state is MediaCleanerReady) {
           return _buildVideoTabContent(state);
         }
-
         if (state is MediaCleanerLoaded && !(state is MediaCleanerReady)) {
           return Center(
             child: Column(
@@ -527,21 +488,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.9, 0.9)),
           );
         }
-
         return const Center(child: CupertinoActivityIndicator());
       },
     );
   }
-
   Widget _buildVideoTabContent(MediaCleanerReady state) {
     final bool isScanningInBackground = state.isScanningInBackground;
     final DateTime? lastScanTime = state.lastScanTime;
-
     final List<VideoCategory> currentCategories = [];
     if (state.videoDuplicatesCount > 0) currentCategories.add(VideoCategory.duplicates);
     if (state.screenRecordingsCount > 0) currentCategories.add(VideoCategory.screenRecordings);
     if (state.shortVideosCount > 0) currentCategories.add(VideoCategory.shortVideos);
-
     final Map<VideoCategory, (int, int)> categoryCounts = {
       VideoCategory.duplicates: (
         state.videoDuplicateGroups.fold<int>(0, (sum, group) => sum + group.files.length),
@@ -559,12 +516,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         state.shortVideos.where((f) => f.isSelected).length,
       ),
     };
-
     final Set<VideoCategory> newCategories = currentCategories.toSet().difference(
       _previousVideoCategories,
     );
     _previousVideoCategories = currentCategories.toSet();
-
     if (currentCategories.isEmpty) {
       return Center(
         child: Column(
@@ -586,7 +541,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ).animate().fadeIn(duration: 500.ms).scale(),
       );
     }
-
     return CustomScrollView(
       key: const PageStorageKey('video_tab'),
       slivers: [
@@ -617,7 +571,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             delegate: SliverChildBuilderDelegate((context, index) {
               final category = currentCategories[index];
               final (count, selectedCount) = categoryCounts[category]!;
-
               return Padding(
                 padding: EdgeInsets.only(bottom: index < currentCategories.length - 1 ? 12 : 0),
                 child:
@@ -676,24 +629,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 }
-
-// Wrapper для сохранения состояния вкладок при переключении
 class KeepAliveWrapper extends StatefulWidget {
   final Widget child;
-
   const KeepAliveWrapper({Key? key, required this.child}) : super(key: key);
-
   @override
   State<KeepAliveWrapper> createState() => _KeepAliveWrapperState();
 }
-
 class _KeepAliveWrapperState extends State<KeepAliveWrapper> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Обязательно вызываем super.build для AutomaticKeepAliveClientMixin
+    super.build(context);
     return widget.child;
   }
 }

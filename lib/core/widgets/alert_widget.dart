@@ -2,9 +2,7 @@ import '../extensions/core_extensions.dart';
 import '../theme/text_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-
 enum AlertLevel { info, success, warning, error }
-
 class Alert extends StatelessWidget {
   const Alert({
     super.key,
@@ -12,11 +10,9 @@ class Alert extends StatelessWidget {
     required this.level,
     this.secondaryMessage,
   });
-
   final String message;
   final String? secondaryMessage;
   final AlertLevel level;
-
   factory Alert.info(String message, {String? secondaryMessage}) {
     return Alert(
       message: message,
@@ -24,7 +20,6 @@ class Alert extends StatelessWidget {
       secondaryMessage: secondaryMessage,
     );
   }
-
   factory Alert.success(String message, {String? secondaryMessage}) {
     return Alert(
       message: message,
@@ -32,7 +27,6 @@ class Alert extends StatelessWidget {
       secondaryMessage: secondaryMessage,
     );
   }
-
   factory Alert.warning(String message, {String? secondaryMessage}) {
     return Alert(
       message: message,
@@ -40,7 +34,6 @@ class Alert extends StatelessWidget {
       secondaryMessage: secondaryMessage,
     );
   }
-
   factory Alert.error(String message, {String? secondaryMessage}) {
     return Alert(
       message: message,
@@ -48,7 +41,6 @@ class Alert extends StatelessWidget {
       secondaryMessage: secondaryMessage,
     );
   }
-
   Color get color {
     switch (level) {
       case AlertLevel.info:
@@ -61,7 +53,6 @@ class Alert extends StatelessWidget {
         return Colors.red.shade400;
     }
   }
-
   Color get tileColor {
     switch (level) {
       case AlertLevel.info:
@@ -74,7 +65,6 @@ class Alert extends StatelessWidget {
         return Colors.red.withValues(alpha: 0.1);
     }
   }
-
   IconData get icon {
     switch (level) {
       case AlertLevel.info:
@@ -87,7 +77,6 @@ class Alert extends StatelessWidget {
         return FeatherIcons.alertCircle;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Material(

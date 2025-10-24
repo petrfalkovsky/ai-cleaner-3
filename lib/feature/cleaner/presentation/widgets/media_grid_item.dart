@@ -6,34 +6,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
-
 class MediaGridItem extends StatelessWidget {
   final MediaFile file;
   final VoidCallback onTap;
   final VoidCallback onPreview;
-
   const MediaGridItem({
     super.key,
     required this.file,
     required this.onTap,
     required this.onPreview,
   });
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onPreview, // Тап на превью = полноэкранный просмотр
+      onTap: onPreview,
       child: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
         builder: (context, state) {
           bool isSelected = false;
           if (state is MediaCleanerLoaded) {
             isSelected = state.selectedFiles.any((f) => f.entity.id == file.entity.id);
           }
-
           return Stack(
             fit: StackFit.expand,
             children: [
-              // Изображение БЕЗ скругления (как в iOS Photos или Telegram)
               AssetEntityImage(
                 file.entity,
                 isOriginal: false,
@@ -49,8 +44,6 @@ class MediaGridItem extends StatelessWidget {
                   );
                 },
               ),
-
-              // Индикатор видео (в правом нижнем углу)
               if (file.isVideo)
                 Positioned(
                   right: 4,
@@ -84,16 +77,12 @@ class MediaGridItem extends StatelessWidget {
                     ),
                   ),
                 ),
-
-              // Затемнение выделенного фото
               if (isSelected)
                 Positioned.fill(
                   child: Container(
                     color: Colors.black.withOpacity(0.5),
                   ),
                 ),
-
-              // Кнопка выбора с нумерацией
               Positioned(
                 top: 6,
                 right: 6,
@@ -108,7 +97,6 @@ class MediaGridItem extends StatelessWidget {
       ),
     );
   }
-
   String _formatDuration(int durationInSeconds) {
     final duration = Duration(seconds: durationInSeconds);
     final minutes = duration.inMinutes.toString();

@@ -5,54 +5,40 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../feature/gallery/presentation/cubit/gallery_assets/gallery_assets_cubit.dart';
 import '../../core/limiters/throttler.dart';
-
 @RoutePage()
 class AppRootPage extends StatefulWidget {
   AppRootPage({super.key});
-  
   @override
   State<AppRootPage> createState() => _AppRootPageState();
 }
-
 class _AppRootPageState extends State<AppRootPage> with WidgetsBindingObserver {
   final throttler = Throttler(3.seconds);
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
-
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final mediaBloc = context.read<MediaCleanerBloc>();
-    
     if (state == AppLifecycleState.paused) {
-      // Приложение ушло в фон
       debugPrint('Приложение ушло в фон, приостанавливаем сканирование');
-      
-      // Приостанавливаем сканирование
       if (mediaBloc.state is MediaCleanerScanning) {
         mediaBloc.add(PauseScanningEvent());
       }
     } else if (state == AppLifecycleState.resumed) {
-      // Приложение вернулось на передний план
       debugPrint('Приложение вернулось на передний план, возобновляем сканирование');
-      
-      // Возобновляем сканирование, если оно было приостановлено
       if (mediaBloc.state is MediaCleanerScanning && 
           (mediaBloc.state as MediaCleanerScanning).isPaused) {
         mediaBloc.add(ResumeScanningEvent());
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(

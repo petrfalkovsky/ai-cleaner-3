@@ -12,21 +12,16 @@ import 'custom_controller.dart';
 import '../../feature/gallery/domain/asset_entity_image.dart';
 import '../../core/extensions/core_extensions.dart';
 import '../../core/limiters/throttler.dart';
-
 class AssetSwiper extends StatefulWidget {
   const AssetSwiper({super.key, required this.assets, required this.controller});
-
   final List<AssetEntity> assets;
   final CustomSwiperController controller;
-
   @override
   State<AssetSwiper> createState() => _AssetSwiperState();
 }
-
 class _AssetSwiperState extends State<AssetSwiper> {
   final throttler = Throttler(225.ms);
   bool _deleting = false;
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -47,27 +42,22 @@ class _AssetSwiperState extends State<AssetSwiper> {
                       if (activity.end != null && activity.end!.dx != 0) {
                         final MediaCleanerBloc cleanerBloc = context.read<MediaCleanerBloc>();
                         final currentAsset = widget.assets[targetIndex];
-
                         if (activity.direction == AxisDirection.left) {
-                          // Смахивание влево (удаление)
                           final state = cleanerBloc.state;
                           if (state is MediaCleanerLoaded) {
                             final isAlreadySelected = state.selectedFiles.any(
                               (file) => file.entity.id == currentAsset.id,
                             );
-
                             if (!isAlreadySelected) {
                               cleanerBloc.add(ToggleFileSelectionById(currentAsset.id));
                             }
                           }
                         } else if (activity.direction == AxisDirection.right) {
-                          // Смахивание вправо (оставить)
                           final state = cleanerBloc.state;
                           if (state is MediaCleanerLoaded) {
                             final isAlreadySelected = state.selectedFiles.any(
                               (file) => file.entity.id == currentAsset.id,
                             );
-
                             if (isAlreadySelected) {
                               cleanerBloc.add(ToggleFileSelectionById(currentAsset.id));
                             }
@@ -79,7 +69,6 @@ class _AssetSwiperState extends State<AssetSwiper> {
                     backgroundCardOffset: const Offset(25, 25),
                     cardBuilder: (BuildContext context, int index) {
                       final asset = widget.assets[index % widget.assets.length];
-
                       return ImageItemWidget(
                         entity: asset,
                         index: index,
@@ -94,14 +83,12 @@ class _AssetSwiperState extends State<AssetSwiper> {
                   spacing: 24,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Кнопка "Выбрать" с liquid glass
                     Flexible(
                       child: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
                         builder: (context, state) {
                           final selectedCount = state is MediaCleanerLoaded
                               ? state.selectedFiles.length
                               : 0;
-
                           return Stack(
                             clipBehavior: Clip.none,
                             children: [
@@ -151,7 +138,6 @@ class _AssetSwiperState extends State<AssetSwiper> {
                                   ),
                                 ),
                               ),
-                              // Badge с количеством
                               if (selectedCount > 0)
                                 Positioned(
                                   right: -6,
@@ -192,8 +178,6 @@ class _AssetSwiperState extends State<AssetSwiper> {
                         },
                       ),
                     ),
-
-                    // Кнопка откатить
                     GestureDetector(
                       onTap: () {
                         throttler.run(() async {
@@ -227,8 +211,6 @@ class _AssetSwiperState extends State<AssetSwiper> {
                         ),
                       ),
                     ),
-
-                    // Кнопка "Оставить"
                     Flexible(
                       child: GestureDetector(
                         onTap: () {

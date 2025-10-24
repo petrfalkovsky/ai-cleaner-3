@@ -5,13 +5,11 @@ import 'package:ai_cleaner_2/feature/categories/presentation/widgets/animated_co
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
-
 class PhotoCategoryCard extends StatefulWidget {
   final PhotoCategory category;
   final int count;
   final int selectedCount;
   final VoidCallback onTap;
-
   const PhotoCategoryCard({
     super.key,
     required this.category,
@@ -19,19 +17,15 @@ class PhotoCategoryCard extends StatefulWidget {
     required this.selectedCount,
     required this.onTap,
   });
-
   @override
   State<PhotoCategoryCard> createState() => _PhotoCategoryCardState();
 }
-
 class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
   bool _isPressed = false;
-
   @override
   Widget build(BuildContext context) {
     final countKey = 'photo_category_${widget.category.name}_count';
     final selectedCountKey = 'photo_category_${widget.category.name}_selected';
-
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -60,7 +54,6 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  // Иконка
                   LiquidGlass(
                     settings: LiquidGlassSettings(
                       blur: 3,
@@ -78,8 +71,6 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
                     ),
                   ),
                   const SizedBox(width: 16),
-
-                  // Информация
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,8 +93,6 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
                       ],
                     ),
                   ),
-
-                  // Счётчики
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -153,7 +142,6 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
                         ),
                     ],
                   ),
-
                   const SizedBox(width: 8),
                   const Icon(CupertinoIcons.chevron_right, size: 18, color: Colors.white60),
                 ],

@@ -2,11 +2,8 @@ import '../extensions/core_extensions.dart';
 import '../theme/button.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
-
 const _padding = EdgeInsets.only(left: 12, right: 12, top: 0);
-
 enum ButtonVariant { primary, secondary, secondaryContained }
-
 class ScrollableSheetPage extends StatelessWidget {
   const ScrollableSheetPage({
     super.key,
@@ -22,7 +19,6 @@ class ScrollableSheetPage extends StatelessWidget {
     this.leading,
     this.trailling,
   });
-
   final String? title;
   final SheetAnchor? minExtent;
   final SheetAnchor? initialExtent;
@@ -30,12 +26,10 @@ class ScrollableSheetPage extends StatelessWidget {
   final Widget child;
   final Widget? leading;
   final Widget? trailling;
-
   final String? buttonText;
   final void Function()? onButtonPressed;
   final bool isButtonDisabled;
   final bool isButtonLoading;
-
   @override
   Widget build(BuildContext context) {
     return SheetKeyboardDismissible(
@@ -80,7 +74,6 @@ class ScrollableSheetPage extends StatelessWidget {
     );
   }
 }
-
 class ScrollableSheetAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   const ScrollableSheetAppBar({
@@ -89,14 +82,11 @@ class ScrollableSheetAppBar extends StatelessWidget
     this.trailling,
     this.title,
   });
-
   final Widget? leading;
   final Widget? trailling;
   final String? title;
-
   @override
   final Size preferredSize = const Size.fromHeight(50);
-
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -118,10 +108,8 @@ class ScrollableSheetAppBar extends StatelessWidget
     );
   }
 }
-
 class DragHandle extends StatelessWidget {
   const DragHandle({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Container(

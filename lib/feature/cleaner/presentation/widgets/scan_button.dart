@@ -8,14 +8,11 @@ import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
 import 'scan_progress.dart';
-
 class ScanButton extends StatefulWidget {
   const ScanButton({Key? key}) : super(key: key);
-
   @override
   State<ScanButton> createState() => _ScanButtonState();
 }
-
 class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateMixin {
   bool _isStarting = false;
   double _startProgress = 0.0;
@@ -23,7 +20,6 @@ class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateM
   late AnimationController _dropController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
-
   @override
   void initState() {
     super.initState();
@@ -31,14 +27,12 @@ class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateM
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _dropController,
         curve: Curves.easeInBack,
       ),
     );
-
     _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _dropController,
@@ -46,41 +40,30 @@ class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateM
       ),
     );
   }
-
   void _startScan() {
     HapticFeedback.mediumImpact();
-
     setState(() {
       _isStarting = true;
       _startProgress = 0.0;
     });
-
-    // Запускаем анимацию капли
     _dropController.forward();
-
-    // Симулируем небольшую задержку с прогресс-баром
     _progressTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
       setState(() {
-        // Ускоряющийся прогресс-бар для имитации подготовки
         _startProgress += 0.05 * (1.0 - _startProgress);
-
         if (_startProgress >= 0.95) {
           _progressTimer?.cancel();
           _isStarting = false;
-          // Запускаем реальное сканирование
           context.read<MediaCleanerBloc>().add(ScanForProblematicFiles());
         }
       });
     });
   }
-
   @override
   void dispose() {
     _progressTimer?.cancel();
     _dropController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return _isStarting

@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 class StyledButton extends StatefulWidget {
   const StyledButton._({
     required this.title,
@@ -21,7 +20,6 @@ class StyledButton extends StatefulWidget {
     this.fontSize,
     this.icon,
   });
-
   final void Function()? onPressed;
   final Widget? leading;
   final Widget? trailing;
@@ -37,7 +35,6 @@ class StyledButton extends StatefulWidget {
   final BorderRadius? borderRadius;
   final Color? backgroundColor;
   final double? fontSize;
-
   factory StyledButton.filled({
     required String title,
     required void Function()? onPressed,
@@ -64,7 +61,6 @@ class StyledButton extends StatefulWidget {
       backgroundColor: backgroundColor,
     );
   }
-
   factory StyledButton.text({
     required String title,
     required void Function()? onPressed,
@@ -93,7 +89,6 @@ class StyledButton extends StatefulWidget {
       fontSize: fontSize,
     );
   }
-
   factory StyledButton.icon({
     required IconData icon,
     required void Function()? onPressed,
@@ -118,16 +113,12 @@ class StyledButton extends StatefulWidget {
       icon: icon,
     );
   }
-
   @override
   State<StyledButton> createState() => _StyledButtonState();
 }
-
 class _StyledButtonState extends State<StyledButton> {
   final padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8);
-
   var disabledColor = CupertinoColors.white.withValues(alpha: 0.7);
-
   @override
   Widget build(BuildContext context) {
     final child = Builder(
@@ -162,7 +153,6 @@ class _StyledButtonState extends State<StyledButton> {
         );
       },
     );
-
     if (widget.iconButton) {
       return Container(
         decoration: BoxDecoration(
@@ -193,7 +183,6 @@ class _StyledButtonState extends State<StyledButton> {
         ),
       );
     }
-
     if (widget.filled) {
       return Container(
         decoration: BoxDecoration(

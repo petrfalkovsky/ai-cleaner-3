@@ -1,7 +1,6 @@
 import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 class CoolTextField extends StatefulWidget {
   const CoolTextField({
     required this.placeholder,
@@ -16,7 +15,6 @@ class CoolTextField extends StatefulWidget {
     this.errorMessage,
     super.key,
   });
-
   final FocusNode focusNode;
   final bool isPassword;
   final String placeholder;
@@ -27,20 +25,16 @@ class CoolTextField extends StatefulWidget {
   final String? errorMessage;
   final void Function(String)? onDone;
   final void Function(String)? onChanged;
-
   @override
   State<CoolTextField> createState() => _CoolTextFieldState();
 }
-
 class _CoolTextFieldState extends State<CoolTextField> {
   late final TextEditingController controller;
   bool isFocused = false;
-
   String text = "";
   String? errorMessage;
   bool validateOnChange = false;
   bool showPassword = false;
-
   @override
   void initState() {
     super.initState();
@@ -59,20 +53,16 @@ class _CoolTextFieldState extends State<CoolTextField> {
       });
     });
   }
-
   String? validate(String? value) {
     if (widget.validator != null) {
       final res = widget.validator!(value);
-
       setState(() {
         errorMessage = res;
       });
-
       return res;
     }
     return null;
   }
-
   @override
   Widget build(BuildContext context) {
     return AutoSizeTextField(
@@ -95,13 +85,11 @@ class _CoolTextFieldState extends State<CoolTextField> {
       onEditingComplete: () {
         widget.focusNode.unfocus();
         final res = validate(text);
-
         if (res != null) {
           setState(() {
             validateOnChange = true;
           });
         }
-
         if (text != "" && res == null) {
           widget.onDone?.call(text);
         }

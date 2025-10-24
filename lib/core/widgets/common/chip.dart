@@ -3,7 +3,6 @@ import '../../theme/text_extension.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-
 class DriftChip extends StatelessWidget {
   const DriftChip({
     super.key,
@@ -17,7 +16,6 @@ class DriftChip extends StatelessWidget {
     this.loading = false,
     this.error = false,
   });
-
   final String text;
   final IconData icon;
   final double scaleFactor;
@@ -27,7 +25,6 @@ class DriftChip extends StatelessWidget {
   final void Function()? onRetry;
   final bool loading;
   final bool error;
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

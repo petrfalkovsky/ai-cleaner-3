@@ -5,19 +5,15 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
-
 class SelectedFilesCounter extends StatefulWidget {
   const SelectedFilesCounter({Key? key}) : super(key: key);
-
   @override
   State<SelectedFilesCounter> createState() => _SelectedFilesCounterState();
 }
-
 class _SelectedFilesCounterState extends State<SelectedFilesCounter>
     with SingleTickerProviderStateMixin {
   late AnimationController _scaleController;
   int _previousCount = 0;
-
   @override
   void initState() {
     super.initState();
@@ -26,20 +22,17 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
       vsync: this,
     );
   }
-
   @override
   void dispose() {
     _scaleController.dispose();
     super.dispose();
   }
-
   void _onCountChanged(int newCount) {
     if (newCount != _previousCount) {
       _scaleController.forward(from: 0);
       _previousCount = newCount;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
@@ -47,19 +40,13 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
         if (state is! MediaCleanerLoaded) {
           return const SizedBox.shrink();
         }
-
         final selectedCount = state.selectedFiles.length;
-
         if (selectedCount == 0) {
           return const SizedBox.shrink();
         }
-
         _onCountChanged(selectedCount);
-
-        // Вычисляем размер текста для определения необходимости расширения
         final countText = selectedCount.toString();
         final needsExpansion = countText.length >= 2;
-
         return LiquidGlass(
               settings: LiquidGlassSettings(
                 blur: 5,
@@ -76,7 +63,6 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
                   top: false,
                   child: Row(
                     children: [
-                      // Анимированный счетчик
                       AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
@@ -128,10 +114,7 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
                             duration: 200.ms,
                             curve: Curves.elasticOut,
                           ),
-
                       const SizedBox(width: 12),
-
-                      // Текст "Выбрано" с tap gesture для очистки выбора
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
@@ -147,8 +130,6 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
                           ),
                         ),
                       ),
-
-                      // Кнопка удаления с анимацией
                       GestureDetector(
                         onTap: () {
                           _showDeleteConfirmation(context);
@@ -211,12 +192,10 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
       },
     );
   }
-
   void _showDeleteConfirmation(BuildContext context) {
     final selectedCount = context.read<MediaCleanerBloc>().state is MediaCleanerLoaded
         ? (context.read<MediaCleanerBloc>().state as MediaCleanerLoaded).selectedFiles.length
         : 0;
-
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(
@@ -244,7 +223,6 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
       ),
     );
   }
-
   String _getFileWord(int count) {
     if (count % 10 == 1 && count % 100 != 11) {
       return 'файл';
