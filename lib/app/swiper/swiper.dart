@@ -1,17 +1,17 @@
 import 'package:ai_cleaner_2/feature/cleaner/presentation/bloc/media_cleaner_bloc.dart';
 import 'package:appinio_swiper/appinio_swiper.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:pixelarticons/pixel.dart';
+import 'dart:math' as math;
 import 'custom_controller.dart';
 import '../../feature/gallery/domain/asset_entity_image.dart';
 import '../../core/extensions/core_extensions.dart';
 import '../../core/limiters/throttler.dart';
-import '../../core/theme/button.dart';
-import '../../core/widgets/common/widgets/text_swapper.dart';
 
 class AssetSwiper extends StatefulWidget {
   const AssetSwiper({super.key, required this.assets, required this.controller});
@@ -50,29 +50,24 @@ class _AssetSwiperState extends State<AssetSwiper> {
 
                         if (activity.direction == AxisDirection.left) {
                           // Смахивание влево (удаление)
-                          // Только добавляем в выбранные, если еще не выбран
                           final state = cleanerBloc.state;
                           if (state is MediaCleanerLoaded) {
                             final isAlreadySelected = state.selectedFiles.any(
                               (file) => file.entity.id == currentAsset.id,
                             );
 
-                            // Если файл еще не выбран, выбираем его
                             if (!isAlreadySelected) {
                               cleanerBloc.add(ToggleFileSelectionById(currentAsset.id));
                             }
-                            // Если уже выбран, ничего не делаем - сохраняем выбор
                           }
                         } else if (activity.direction == AxisDirection.right) {
                           // Смахивание вправо (оставить)
-                          // Убираем из выбранных, если был выбран
                           final state = cleanerBloc.state;
                           if (state is MediaCleanerLoaded) {
                             final isAlreadySelected = state.selectedFiles.any(
                               (file) => file.entity.id == currentAsset.id,
                             );
 
-                            // Если файл был выбран, снимаем выбор
                             if (isAlreadySelected) {
                               cleanerBloc.add(ToggleFileSelectionById(currentAsset.id));
                             }
@@ -99,6 +94,7 @@ class _AssetSwiperState extends State<AssetSwiper> {
                   spacing: 24,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Кнопка "Выбрать" с liquid glass
                     Flexible(
                       child: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
                         builder: (context, state) {
@@ -110,6 +106,9 @@ class _AssetSwiperState extends State<AssetSwiper> {
                             clipBehavior: Clip.none,
                             children: [
                               GestureDetector(
+                                onTap: () {
+                                  widget.controller.swipeLeft();
+                                },
                                 onLongPress: () async {
                                   if (_deleting ||
                                       state is! MediaCleanerLoaded ||
@@ -124,75 +123,150 @@ class _AssetSwiperState extends State<AssetSwiper> {
                                     _deleting = false;
                                   });
                                 },
-                                child: StyledButton.filled(
-                                  title: "Выбрать",
-                                  isLoading: _deleting,
-                                  fullWidth: true,
-                                  onPressed: () {
-                                    widget.controller.swipeLeft();
-                                  },
+                                child: LiquidGlass(
+                                  settings: LiquidGlassSettings(
+                                    blur: 5,
+                                    ambientStrength: 0.8,
+                                    lightAngle: 0.2 * math.pi,
+                                    glassColor: CupertinoColors.systemRed.withOpacity(0.3),
+                                    thickness: 15,
+                                  ),
+                                  shape: const LiquidRoundedSuperellipse(
+                                    borderRadius: Radius.circular(16),
+                                  ),
+                                  glassContainsChild: false,
+                                  child: Container(
+                                    height: 52,
+                                    alignment: Alignment.center,
+                                    child: _deleting
+                                        ? const CupertinoActivityIndicator(
+                                            color: Colors.white,
+                                          )
+                                        : Text(
+                                            selectedCount > 0
+                                                ? 'Выбрать ($selectedCount)'
+                                                : 'Выбрать',
+                                            style: const TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                  ),
                                 ),
                               ),
-                              Positioned(
-                                    right: -6,
-                                    top: -6,
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      padding: const EdgeInsets.all(2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        border: Border.all(color: Colors.white, width: 1),
+                              // Badge с количеством
+                              if (selectedCount > 0)
+                                Positioned(
+                                  right: -6,
+                                  top: -6,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: CupertinoColors.systemRed,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 2,
                                       ),
-                                      child: Row(
-                                        children: [
-                                          ...selectedCount.toString().padLeft(2, '0').split('').map(
-                                            (char) {
-                                              return TextSwapper(
-                                                char,
-                                                style: const TextStyle(fontSize: 8),
-                                              );
-                                            },
-                                          ),
-                                        ],
+                                    ),
+                                    child: Text(
+                                      selectedCount.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   )
-                                  .animate(target: selectedCount > 0 ? 1 : 0)
-                                  .moveY(curve: Curves.fastOutSlowIn, begin: -20, end: 0)
-                                  .fadeIn(curve: Curves.fastOutSlowIn),
+                                      .animate(target: selectedCount > 0 ? 1 : 0)
+                                      .scale(
+                                        begin: const Offset(0.5, 0.5),
+                                        end: const Offset(1.0, 1.0),
+                                        duration: 200.ms,
+                                        curve: Curves.easeOutBack,
+                                      )
+                                      .fadeIn(curve: Curves.fastOutSlowIn),
+                                ),
                             ],
                           );
                         },
                       ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        border: Border.all(color: Colors.white, width: 2),
-                        boxShadow: [const BoxShadow(color: Colors.white, offset: Offset(3, 3))],
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Pixel.cornerdownright, color: Colors.white),
-                        onPressed: () {
-                          throttler.run(() async {
-                            HapticFeedback.selectionClick();
-                            if (widget.controller.cardIndex == null) {
-                              return;
-                            }
-                            if (widget.controller.cardIndex! == 0) return;
-                            await widget.controller.unswipe();
-                          });
-                        },
+
+                    // Кнопка откатить
+                    GestureDetector(
+                      onTap: () {
+                        throttler.run(() async {
+                          HapticFeedback.selectionClick();
+                          if (widget.controller.cardIndex == null) {
+                            return;
+                          }
+                          if (widget.controller.cardIndex! == 0) return;
+                          await widget.controller.unswipe();
+                        });
+                      },
+                      child: LiquidGlass(
+                        settings: LiquidGlassSettings(
+                          blur: 5,
+                          ambientStrength: 0.8,
+                          lightAngle: 0.2 * math.pi,
+                          glassColor: Colors.white.withOpacity(0.15),
+                          thickness: 15,
+                        ),
+                        shape: const LiquidRoundedSuperellipse(
+                          borderRadius: Radius.circular(16),
+                        ),
+                        glassContainsChild: false,
+                        child: Container(
+                          width: 52,
+                          height: 52,
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            CupertinoIcons.arrow_uturn_left,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
                       ),
                     ),
 
+                    // Кнопка "Оставить"
                     Flexible(
-                      child: StyledButton.filled(
-                        title: "Оставить",
-                        fullWidth: true,
-                        onPressed: () {
+                      child: GestureDetector(
+                        onTap: () {
                           widget.controller.swipeRight();
                         },
+                        child: LiquidGlass(
+                          settings: LiquidGlassSettings(
+                            blur: 5,
+                            ambientStrength: 0.8,
+                            lightAngle: 0.2 * math.pi,
+                            glassColor: CupertinoColors.systemGreen.withOpacity(0.3),
+                            thickness: 15,
+                          ),
+                          shape: const LiquidRoundedSuperellipse(
+                            borderRadius: Radius.circular(16),
+                          ),
+                          glassContainsChild: false,
+                          child: Container(
+                            height: 52,
+                            alignment: Alignment.center,
+                            child: const Text(
+                              'Оставить',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
