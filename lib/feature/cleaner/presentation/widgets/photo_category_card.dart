@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
-class PhotoCategoryCard extends StatelessWidget {
+class PhotoCategoryCard extends StatefulWidget {
   final PhotoCategory category;
   final int count;
   final int selectedCount;
@@ -21,24 +21,37 @@ class PhotoCategoryCard extends StatelessWidget {
   });
 
   @override
+  State<PhotoCategoryCard> createState() => _PhotoCategoryCardState();
+}
+
+class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
+  bool _isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    final countKey = 'photo_category_${category.name}_count';
-    final selectedCountKey = 'photo_category_${category.name}_selected';
+    final countKey = 'photo_category_${widget.category.name}_count';
+    final selectedCountKey = 'photo_category_${widget.category.name}_selected';
 
     return GestureDetector(
-      onTap: onTap,
-      child: LiquidGlass(
-        settings: LiquidGlassSettings(
-          blur: 8,
-          ambientStrength: 2.0,
-          lightAngle: 0.3 * math.pi,
-          glassColor: Colors.white.withOpacity(0.08),
-          thickness: 30,
-        ),
-        shape: LiquidRoundedSuperellipse(
-          borderRadius: const Radius.circular(20),
-        ),
-        glassContainsChild: false,
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        child: LiquidGlass(
+          settings: LiquidGlassSettings(
+            blur: 4,
+            ambientStrength: 0.8,
+            lightAngle: 0.3 * math.pi,
+            glassColor: Colors.white.withOpacity(0.15),
+            thickness: 20,
+          ),
+          shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(20)),
+          glassContainsChild: false,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -57,11 +70,7 @@ class PhotoCategoryCard extends StatelessWidget {
                   child: SizedBox(
                     width: 56,
                     height: 56,
-                    child: Icon(
-                      category.icon,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+                    child: Icon(widget.category.icon, color: Colors.white, size: 28),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -72,7 +81,7 @@ class PhotoCategoryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        category.name,
+                        widget.category.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 17,
@@ -81,11 +90,8 @@ class PhotoCategoryCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        category.description,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
+                        widget.category.description,
+                        style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -98,7 +104,7 @@ class PhotoCategoryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     CategoryAnimatedCounter(
-                      targetValue: count,
+                      targetValue: widget.count,
                       counterKey: countKey,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
@@ -109,7 +115,7 @@ class PhotoCategoryCard extends StatelessWidget {
                       minIncrement: 1,
                       maxIncrement: 3,
                     ),
-                    if (selectedCount > 0)
+                    if (widget.selectedCount > 0)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: LiquidGlass(
@@ -125,7 +131,7 @@ class PhotoCategoryCard extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             child: CategoryAnimatedCounter(
-                              targetValue: selectedCount,
+                              targetValue: widget.selectedCount,
                               counterKey: selectedCountKey,
                               style: const TextStyle(
                                 color: Colors.white,
