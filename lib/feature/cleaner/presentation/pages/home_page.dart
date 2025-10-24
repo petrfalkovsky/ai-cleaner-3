@@ -412,7 +412,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
                       'Обновлено: ${DateFormat('dd.MM HH:mm').format(lastScanTime)}',
-                      style: const TextStyle(fontSize: 13, color: CupertinoColors.secondaryLabel),
+                      style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.5)),
                     ),
                   ),
               ],
@@ -463,12 +463,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 children: [
                   Icon(
                     CupertinoIcons.refresh,
-                    color: CupertinoColors.activeBlue.resolveFrom(context),
+                    color: isScanningInBackground
+                        ? Colors.white.withOpacity(0.3)
+                        : CupertinoColors.activeBlue.resolveFrom(context),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Повторить сканирование',
-                    style: TextStyle(color: CupertinoColors.activeBlue.resolveFrom(context)),
+                    style: TextStyle(
+                      color: isScanningInBackground
+                          ? Colors.white.withOpacity(0.3)
+                          : CupertinoColors.activeBlue.resolveFrom(context),
+                    ),
                   ),
                 ],
               ),
@@ -561,19 +567,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           children: [
             Icon(
               CupertinoIcons.checkmark_circle,
-              size: 80,
+              size: 60,
               color: CupertinoColors.systemGreen.resolveFrom(context),
             ),
             const SizedBox(height: 16),
             const Text(
-              'Проблем не найдено',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+              'Проблем пока не найдено',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Все видео в порядке!',
-              style: TextStyle(color: CupertinoColors.secondaryLabel),
-            ),
+            Text('Все видео в порядке!', style: TextStyle(color: Colors.white.withOpacity(0.5))),
           ],
         ).animate().fadeIn(duration: 500.ms).scale(),
       );
@@ -645,12 +648,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 children: [
                   Icon(
                     CupertinoIcons.refresh,
-                    color: CupertinoColors.activeBlue.resolveFrom(context),
+                    color: isScanningInBackground
+                        ? Colors.white.withOpacity(0.3)
+                        : CupertinoColors.activeBlue.resolveFrom(context),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Повторить сканирование',
-                    style: TextStyle(color: CupertinoColors.activeBlue.resolveFrom(context)),
+                    style: TextStyle(
+                      color: isScanningInBackground
+                          ? Colors.white.withOpacity(0.3)
+                          : CupertinoColors.activeBlue.resolveFrom(context),
+                    ),
                   ),
                 ],
               ),
