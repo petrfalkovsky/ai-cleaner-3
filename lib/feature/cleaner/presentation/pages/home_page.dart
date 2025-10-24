@@ -401,6 +401,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
 
     return CustomScrollView(
+      key: const PageStorageKey('photo_tab'),
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
@@ -584,6 +585,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
 
     return CustomScrollView(
+      key: const PageStorageKey('video_tab'),
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
