@@ -162,6 +162,10 @@ class CategoryPage extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final displayCount = selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount;
+    final countText = displayCount.toString();
+    final needsExpansion = countText.length >= 2;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: LiquidGlass(
@@ -180,22 +184,68 @@ class CategoryPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: Row(
             children: [
+              // Badge с числом
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                constraints: BoxConstraints(
+                  minWidth: needsExpansion ? 44 : 40,
+                  minHeight: 40,
+                ),
+                child: LiquidGlass(
+                  settings: LiquidGlassSettings(
+                    blur: 3,
+                    ambientStrength: 0.6,
+                    lightAngle: 0.2 * math.pi,
+                    glassColor: CupertinoColors.activeBlue.withOpacity(0.4),
+                    thickness: 12,
+                  ),
+                  shape: LiquidRoundedSuperellipse(
+                    borderRadius: Radius.circular(needsExpansion ? 20 : 100),
+                  ),
+                  glassContainsChild: false,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: needsExpansion ? 12 : 0,
+                      vertical: 6,
+                    ),
+                    child: Center(
+                      child: Text(
+                        countText,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Текст "Выбрано" с tap для очистки
               Expanded(
-                child: Text(
-                  'Выбрано: ${selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 17,
-                    color: Colors.white,
+                child: GestureDetector(
+                  onTap: () {
+                    // Очищаем только выбранные файлы из текущей категории
+                    final categorySelectedIds = categoryIds.intersection(selectedIds).toList();
+                    for (final id in categorySelectedIds) {
+                      context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
+                    }
+                  },
+                  child: const Text(
+                    'Выбрано',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
               GestureDetector(
                 onTap: () {
-                  _showDeleteConfirmation(
-                    context,
-                    selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount,
-                  );
+                  _showDeleteConfirmation(context, displayCount);
                 },
                 child: LiquidGlass(
                   settings: LiquidGlassSettings(
@@ -206,7 +256,7 @@ class CategoryPage extends StatelessWidget {
                     thickness: 12,
                   ),
                   shape: LiquidRoundedSuperellipse(
-                    borderRadius: const Radius.circular(12),
+                    borderRadius: const Radius.circular(16),
                   ),
                   glassContainsChild: false,
                   child: const Padding(
@@ -216,7 +266,14 @@ class CategoryPage extends StatelessWidget {
                       children: [
                         Icon(CupertinoIcons.trash, size: 18, color: Colors.white),
                         SizedBox(width: 6),
-                        Text('Удалить', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                        Text(
+                          'Удалить',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -298,7 +355,7 @@ class CategoryPage extends StatelessWidget {
       final blurryFiles = state.blurry;
 
       return GridView.builder(
-        padding: const EdgeInsets.only(top: 80, bottom: 100), // Отступы для floating элементов
+        padding: const EdgeInsets.only(top: 110, bottom: 100), // Баннер (~90px) + 20px отступ
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           childAspectRatio: 1.0,
@@ -338,7 +395,7 @@ class CategoryPage extends StatelessWidget {
       }
 
       return ListView.builder(
-        padding: const EdgeInsets.only(top: 80, bottom: 100), // Отступы для floating элементов
+        padding: const EdgeInsets.only(top: 110, bottom: 100), // Баннер (~90px) + 20px отступ
         itemCount: groups.length,
         itemBuilder: (context, index) {
           return SimilarMediaGroup(
@@ -360,7 +417,7 @@ class CategoryPage extends StatelessWidget {
     final List<MediaFile> files = _getCategoryFiles(state);
 
     return GridView.builder(
-      padding: const EdgeInsets.only(top: 80, bottom: 100), // Отступы для floating элементов
+      padding: const EdgeInsets.only(top: 110, bottom: 100), // Баннер (~90px) + 20px отступ
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         childAspectRatio: 1.0,
