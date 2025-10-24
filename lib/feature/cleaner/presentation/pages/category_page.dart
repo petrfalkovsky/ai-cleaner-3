@@ -73,9 +73,7 @@ class CategoryPage extends StatelessWidget {
                       glassColor: Colors.white.withOpacity(0.15),
                       thickness: 12,
                     ),
-                    shape: LiquidRoundedSuperellipse(
-                      borderRadius: const Radius.circular(12),
-                    ),
+                    shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(12)),
                     glassContainsChild: false,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -101,10 +99,7 @@ class CategoryPage extends StatelessWidget {
 
           if (categoryFiles.isEmpty) {
             return const Center(
-              child: Text(
-                'Нет файлов в категории',
-                style: TextStyle(color: Colors.white60),
-              ),
+              child: Text('Нет файлов в категории', style: TextStyle(color: Colors.white60)),
             );
           }
 
@@ -112,9 +107,7 @@ class CategoryPage extends StatelessWidget {
             children: [
               // Градиентный фон для похожих фото
               if (categoryName == 'Похожие' || categoryName == 'Серии снимков')
-                const Positioned.fill(
-                  child: AnimatedBackground(),
-                ),
+                const Positioned.fill(child: AnimatedBackground()),
 
               // Полноэкранный grid
               _buildCategoryContent(context, state),
@@ -124,10 +117,7 @@ class CategoryPage extends StatelessWidget {
                 top: 0,
                 left: 0,
                 right: 0,
-                child: SafeArea(
-                  bottom: false,
-                  child: _buildSwipeBanner(context, categoryFiles),
-                ),
+                child: SafeArea(bottom: false, child: _buildSwipeBanner(context, categoryFiles)),
               ),
 
               // Floating bottom bar
@@ -135,10 +125,7 @@ class CategoryPage extends StatelessWidget {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: SafeArea(
-                  top: false,
-                  child: _buildBottomBar(context, state, categoryFiles),
-                ),
+                child: SafeArea(top: false, child: _buildBottomBar(context, state, categoryFiles)),
               ),
             ],
           );
@@ -183,9 +170,7 @@ class CategoryPage extends StatelessWidget {
           glassColor: Colors.white.withOpacity(0.12),
           thickness: 25,
         ),
-        shape: LiquidRoundedSuperellipse(
-          borderRadius: const Radius.circular(20),
-        ),
+        shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(20)),
         glassContainsChild: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -195,10 +180,7 @@ class CategoryPage extends StatelessWidget {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                constraints: BoxConstraints(
-                  minWidth: needsExpansion ? 44 : 40,
-                  minHeight: 40,
-                ),
+                constraints: BoxConstraints(minWidth: needsExpansion ? 44 : 40, minHeight: 40),
                 child: LiquidGlass(
                   settings: LiquidGlassSettings(
                     blur: 3,
@@ -212,10 +194,7 @@ class CategoryPage extends StatelessWidget {
                   ),
                   glassContainsChild: false,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: needsExpansion ? 12 : 0,
-                      vertical: 6,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: needsExpansion ? 12 : 0, vertical: 6),
                     child: Center(
                       child: Text(
                         countText,
@@ -241,7 +220,7 @@ class CategoryPage extends StatelessWidget {
                     }
                   },
                   child: const Text(
-                    'Выбрано',
+                    'Отмена',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 17,
@@ -262,65 +241,13 @@ class CategoryPage extends StatelessWidget {
                     glassColor: CupertinoColors.systemRed.withOpacity(0.4),
                     thickness: 12,
                   ),
-                  shape: LiquidRoundedSuperellipse(
-                    borderRadius: const Radius.circular(16),
-                  ),
+                  shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(16)),
                   glassContainsChild: false,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Синий badge с галочкой и числом
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          constraints: BoxConstraints(
-                            minWidth: countText.length >= 2 ? 44 : 40,
-                            minHeight: 28,
-                          ),
-                          child: LiquidGlass(
-                            settings: LiquidGlassSettings(
-                              blur: 2,
-                              ambientStrength: 0.6,
-                              lightAngle: 0.2 * math.pi,
-                              glassColor: CupertinoColors.activeBlue.withOpacity(0.5),
-                              thickness: 10,
-                            ),
-                            shape: LiquidRoundedSuperellipse(
-                              borderRadius: Radius.circular(countText.length >= 2 ? 14 : 100),
-                            ),
-                            glassContainsChild: false,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: countText.length >= 2 ? 10 : 0,
-                                vertical: 4,
-                              ),
-                              child: Center(
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      CupertinoIcons.check_mark,
-                                      size: 14,
-                                      color: Colors.white,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      countText,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
                         const Text(
                           'Удалить',
                           style: TextStyle(
