@@ -310,15 +310,29 @@ class MediaScanner {
     for (final file in files) {
       if (!file.isVideo) continue;
 
-      // Ищем в имени файла "RPReplay" или "ReplayKit" (case-insensitive)
+      // Проверяем имя файла и путь
       final title = file.entity.title ?? '';
       final titleLower = title.toLowerCase();
+      final relativePath = file.entity.relativePath?.toLowerCase() ?? '';
+
+      // iOS записи экрана могут иметь разные имена:
+      // - "RPReplay_Final..." или просто "RPReplay..."
+      // - "Screen Recording 2024-..."
+      // - Путь может содержать "ReplayKit"
       final isScreenRecording = titleLower.contains('rpreplay') ||
-                                titleLower.contains('replaykit');
+                                titleLower.contains('replaykit') ||
+                                titleLower.contains('screen recording') ||
+                                titleLower.startsWith('screen ') ||
+                                relativePath.contains('replaykit');
 
       if (isScreenRecording) {
         screenRecordings.add(file.copyWith(category: 'screenRecordings'));
-        debugPrint('Найдена запись экрана: $title');
+        debugPrint('✓ Найдена запись экрана: $title (путь: $relativePath)');
+      } else {
+        // Логируем первые 5 видео для отладки
+        if (screenRecordings.length < 5) {
+          debugPrint('  Пропущено видео: $title (путь: $relativePath)');
+        }
       }
     }
 

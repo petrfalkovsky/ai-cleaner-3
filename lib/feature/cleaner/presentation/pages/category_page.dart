@@ -1,5 +1,6 @@
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/pages/media_preview_page.dart';
+import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/animated_background.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/blurry_media_grid_item.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/media_grid_item.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/similar_media_group.dart';
@@ -109,6 +110,12 @@ class CategoryPage extends StatelessWidget {
 
           return Stack(
             children: [
+              // Градиентный фон для похожих фото
+              if (categoryName == 'Похожие' || categoryName == 'Серии снимков')
+                const Positioned.fill(
+                  child: AnimatedBackground(),
+                ),
+
               // Полноэкранный grid
               _buildCategoryContent(context, state),
 
