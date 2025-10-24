@@ -173,21 +173,65 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
                         borderRadius: const Radius.circular(16),
                       ),
                       glassContainsChild: false,
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 10,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              CupertinoIcons.trash,
-                              size: 18,
-                              color: Colors.white,
+                            // Синий badge с галочкой и числом
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              constraints: BoxConstraints(
+                                minWidth: countText.length >= 2 ? 44 : 40,
+                                minHeight: 28,
+                              ),
+                              child: LiquidGlass(
+                                settings: LiquidGlassSettings(
+                                  blur: 2,
+                                  ambientStrength: 0.6,
+                                  lightAngle: 0.2 * math.pi,
+                                  glassColor: CupertinoColors.activeBlue.withOpacity(0.5),
+                                  thickness: 10,
+                                ),
+                                shape: LiquidRoundedSuperellipse(
+                                  borderRadius: Radius.circular(countText.length >= 2 ? 14 : 100),
+                                ),
+                                glassContainsChild: false,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: countText.length >= 2 ? 10 : 0,
+                                    vertical: 4,
+                                  ),
+                                  child: Center(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          CupertinoIcons.check_mark,
+                                          size: 14,
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          countText,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                            SizedBox(width: 6),
-                            Text(
+                            const SizedBox(width: 10),
+                            const Text(
                               'Удалить',
                               style: TextStyle(
                                 color: Colors.white,
@@ -214,13 +258,13 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
           ),
         )
             .animate()
-            .slideY(
-              begin: 1.0,
-              end: 0.0,
-              duration: 400.ms,
-              curve: Curves.easeOut,
+            .scale(
+              begin: const Offset(0.8, 0.8),
+              end: const Offset(1.0, 1.0),
+              duration: 350.ms,
+              curve: Curves.easeOutBack,
             )
-            .fadeIn(duration: 300.ms);
+            .fadeIn(duration: 250.ms);
       },
     );
   }

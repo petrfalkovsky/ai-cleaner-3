@@ -39,6 +39,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTabIndex);
+    _tabController.addListener(() {
+      setState(() {}); // Обновляем UI при изменении таба
+    });
 
     _fabController = AnimationController(duration: const Duration(milliseconds: 200), vsync: this);
 
@@ -106,10 +109,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       children: [
                                         Expanded(
                                           child: GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
                                             onTap: () {
-                                              setState(() {
-                                                _tabController.animateTo(0);
-                                              });
+                                              _tabController.animateTo(0);
                                             },
                                             child: _tabController.index == 0
                                                 ? LiquidGlass(
@@ -156,10 +158,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         const SizedBox(width: 4),
                                         Expanded(
                                           child: GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
                                             onTap: () {
-                                              setState(() {
-                                                _tabController.animateTo(1);
-                                              });
+                                              _tabController.animateTo(1);
                                             },
                                             child: _tabController.index == 1
                                                 ? LiquidGlass(
@@ -221,7 +222,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: showTabs
                           ? TabBarView(
                               controller: _tabController,
-                              children: [_buildPhotoTab(), _buildVideoTab()],
+                              children: [
+                                KeepAliveWrapper(child: _buildPhotoTab()),
+                                KeepAliveWrapper(child: _buildVideoTab()),
+                              ],
                             )
                           : _buildPhotoTab(), // До завершения показываем только фото вкладку
                     ),
@@ -397,6 +401,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
 
     return CustomScrollView(
+      key: const PageStorageKey('photo_tab'),
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
@@ -583,6 +588,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
 
     return CustomScrollView(
+      key: const PageStorageKey('video_tab'),
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
@@ -668,5 +674,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ],
     );
+  }
+}
+
+// Wrapper для сохранения состояния вкладок при переключении
+class KeepAliveWrapper extends StatefulWidget {
+  final Widget child;
+
+  const KeepAliveWrapper({Key? key, required this.child}) : super(key: key);
+
+  @override
+  State<KeepAliveWrapper> createState() => _KeepAliveWrapperState();
+}
+
+class _KeepAliveWrapperState extends State<KeepAliveWrapper> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // Обязательно вызываем super.build для AutomaticKeepAliveClientMixin
+    return widget.child;
   }
 }
