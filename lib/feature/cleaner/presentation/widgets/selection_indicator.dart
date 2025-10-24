@@ -31,23 +31,30 @@ class SelectionIndicator extends StatelessWidget {
           }
         }
 
+        // Определяем количество цифр и ширину контейнера
+        final numberText = selectionNumber?.toString() ?? '';
+        final needsExpansion = numberText.length >= 2;
+        final containerWidth = needsExpansion ? size * 1.4 : size;
+
         return GestureDetector(
           onTap: () {
             HapticFeedback.selectionClick();
             context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(fileId));
           },
-          child: Container(
-            width: size,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            width: containerWidth,
             height: size,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(needsExpansion ? size / 2 : size),
               color: isSelected ? Colors.blue : Colors.black.withOpacity(0.5),
               border: Border.all(color: Colors.white, width: 1.5),
             ),
             child: isSelected
                 ? Center(
                     child: Text(
-                      selectionNumber?.toString() ?? '',
+                      numberText,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: size * 0.5,
@@ -55,7 +62,7 @@ class SelectionIndicator extends StatelessWidget {
                       ),
                     ),
                   )
-                : SizedBox(),
+                : const SizedBox(),
           ),
         );
       },
