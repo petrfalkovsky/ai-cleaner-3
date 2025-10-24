@@ -337,7 +337,7 @@ class CategoryPage extends StatelessWidget {
       final blurryFiles = state.blurry;
 
       return GridView.builder(
-        padding: const EdgeInsets.only(top: 110, bottom: 100), // Баннер (~90px) + 20px отступ
+        padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           childAspectRatio: 1.0,
@@ -377,7 +377,7 @@ class CategoryPage extends StatelessWidget {
       }
 
       return ListView.builder(
-        padding: const EdgeInsets.only(top: 110, bottom: 100), // Баннер (~90px) + 20px отступ
+        padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
         itemCount: groups.length,
         itemBuilder: (context, index) {
           return SimilarMediaGroup(
@@ -399,7 +399,7 @@ class CategoryPage extends StatelessWidget {
     final List<MediaFile> files = _getCategoryFiles(state);
 
     return GridView.builder(
-      padding: const EdgeInsets.only(top: 110, bottom: 100), // Баннер (~90px) + 20px отступ
+      padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         childAspectRatio: 1.0,

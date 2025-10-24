@@ -125,7 +125,7 @@ class _AssetSwiperState extends State<AssetSwiper> {
                                   });
                                 },
                                 child: StyledButton.filled(
-                                  title: selectedCount > 0 ? "выбрать ($selectedCount)" : "выбрать",
+                                  title: "Выбрать",
                                   isLoading: _deleting,
                                   fullWidth: true,
                                   onPressed: () {
@@ -188,7 +188,7 @@ class _AssetSwiperState extends State<AssetSwiper> {
 
                     Flexible(
                       child: StyledButton.filled(
-                        title: "оставить",
+                        title: "Оставить",
                         fullWidth: true,
                         onPressed: () {
                           widget.controller.swipeRight();
