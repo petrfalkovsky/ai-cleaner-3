@@ -10,13 +10,17 @@ import '../../../../core/theme/text_extension.dart';
 import '../../../../core/widgets/custom_appbar.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
+
 enum AssetCategory { shuffle, screenshots, nearby, month }
+
 @RoutePage()
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
+
   @override
   State<CategoriesPage> createState() => _CategoriesPageState();
 }
+
 class _CategoriesPageState extends State<CategoriesPage> {
   final controller = ScrollController();
   @override
@@ -72,6 +76,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
     );
   }
 }
+
 class PhotosCard extends StatelessWidget {
   const PhotosCard({
     super.key,
@@ -81,11 +86,13 @@ class PhotosCard extends StatelessWidget {
     this.title,
     this.subtitle,
   });
+
   final String? title;
   final String? subtitle;
   final AssetEntity? secondary;
   final AssetEntity asset;
   final List<AssetEntity> assets;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

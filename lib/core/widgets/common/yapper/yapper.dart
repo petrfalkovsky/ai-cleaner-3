@@ -1,15 +1,19 @@
 class Yapper {
   Yapper();
   final counter = Counter();
+
   bool oneBeforeLast() {
     return counter.counter == yaps.length - 2;
   }
+
   bool hasNextYap() {
     return counter.counter < yaps.length - 1;
   }
+
   String get nextYap {
     return yaps[counter.next % yaps.length];
   }
+
   List<String> get yaps => const [
         "life as seen through your eyes",
         "this is a secret message",
@@ -27,12 +31,14 @@ class Yapper {
         "do you have any idea what this thing is? i found it in the woods. i think it's a hat",
       ];
 }
+
 class Counter {
   Counter();
   int _counter = 0;
   int get counter {
     return _counter;
   }
+
   int get next {
     _counter = _counter + 1;
     return _counter;

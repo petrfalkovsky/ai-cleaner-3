@@ -5,12 +5,15 @@ import '../../../gallery/presentation/cubit/gallery_assets/gallery_assets_cubit.
 import '../widgets/home_appbar.dart';
 import '../../../../app/swiper/custom_controller.dart';
 import '../../../../app/swiper/swiper.dart';
+
 @RoutePage()
 class SwipeScreen extends StatefulWidget {
   const SwipeScreen({super.key});
+
   @override
   State<SwipeScreen> createState() => _SwipeScreenState();
 }
+
 class _SwipeScreenState extends State<SwipeScreen> {
   final controller = CustomSwiperController();
   int deletedAssetsCount = 0;

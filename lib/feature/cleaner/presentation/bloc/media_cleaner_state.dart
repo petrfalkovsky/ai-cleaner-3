@@ -1,18 +1,27 @@
 part of 'media_cleaner_bloc.dart';
+
 class MediaCleanerState extends Equatable {
   const MediaCleanerState();
+
   @override
   List<Object?> get props => [];
 }
+
 class MediaCleanerInitial extends MediaCleanerState {}
+
 class MediaCleanerLoading extends MediaCleanerState {}
+
 class MediaCleanerEmpty extends MediaCleanerState {}
+
 class MediaCleanerError extends MediaCleanerState {
   final String message;
+
   const MediaCleanerError(this.message);
+
   @override
   List<Object> get props => [message];
 }
+
 class MediaCleanerLoaded extends MediaCleanerState {
   final List<MediaFile> allFiles;
   final List<MediaFile> photoFiles;
@@ -20,6 +29,7 @@ class MediaCleanerLoaded extends MediaCleanerState {
   final List<MediaFile> selectedFiles;
   final bool isScanningInBackground;
   final String? scanError;
+
   const MediaCleanerLoaded({
     required this.allFiles,
     required this.photoFiles,
@@ -28,6 +38,7 @@ class MediaCleanerLoaded extends MediaCleanerState {
     this.isScanningInBackground = false,
     this.scanError,
   });
+
   @override
   List<Object?> get props => [
     allFiles,
@@ -38,12 +49,14 @@ class MediaCleanerLoaded extends MediaCleanerState {
     scanError,
   ];
 }
+
 class MediaCleanerScanning extends MediaCleanerReady {
   final double scanProgress;
   final String scanMessage;
   final int? processedFiles;
   final int? totalFiles;
   final bool isPaused;
+
   const MediaCleanerScanning({
     required super.allFiles,
     required super.photoFiles,
@@ -65,6 +78,7 @@ class MediaCleanerScanning extends MediaCleanerReady {
     super.scanError,
     this.isPaused = false,
   });
+
   @override
   List<Object?> get props => [
     ...super.props,
@@ -73,6 +87,7 @@ class MediaCleanerScanning extends MediaCleanerReady {
     processedFiles,
     totalFiles,
   ];
+
   @override
   MediaCleanerScanning copyWith({
     List<MediaFile>? allFiles,
@@ -118,6 +133,7 @@ class MediaCleanerScanning extends MediaCleanerReady {
     );
   }
 }
+
 class MediaCleanerReady extends MediaCleanerLoaded {
   final List<MediaGroup> similarGroups;
   final List<MediaFile> screenshots;
@@ -127,6 +143,7 @@ class MediaCleanerReady extends MediaCleanerLoaded {
   final List<MediaFile> shortVideos;
   final List<MediaFile> screenRecordings;
   final DateTime? lastScanTime;
+
   const MediaCleanerReady({
     required super.allFiles,
     required super.photoFiles,
@@ -143,6 +160,7 @@ class MediaCleanerReady extends MediaCleanerLoaded {
     super.isScanningInBackground = false,
     super.scanError,
   });
+
   @override
   List<Object?> get props => [
     ...super.props,
@@ -155,6 +173,7 @@ class MediaCleanerReady extends MediaCleanerLoaded {
     screenRecordings,
     if (lastScanTime != null) lastScanTime!,
   ];
+
   @override
   MediaCleanerReady copyWith({
     List<MediaFile>? allFiles,
@@ -189,6 +208,8 @@ class MediaCleanerReady extends MediaCleanerLoaded {
       scanError: scanError ?? this.scanError,
     );
   }
+
+  // Вспомогательные методы для получения статистики категорий
   int get similarCount => similarGroups.fold<int>(0, (sum, group) => sum + group.files.length);
   int get screenshotsCount => screenshots.length;
   int get blurryCount => blurry.length;

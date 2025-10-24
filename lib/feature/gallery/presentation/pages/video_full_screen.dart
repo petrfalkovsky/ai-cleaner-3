@@ -7,10 +7,13 @@ import '../widgets/widget_zoom_fullscreen.dart';
 import '../../../../core/extensions/core_extensions.dart';
 import '../../../../core/widgets/common/video_player.dart';
 import 'package:photo_manager/photo_manager.dart';
+
 @RoutePage()
 class VideoFullPage extends StatelessWidget {
   const VideoFullPage({super.key, required this.entity});
+
   final AssetEntity entity;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,11 +23,14 @@ class VideoFullPage extends StatelessWidget {
           zoomWidget: Stack(
             children: [
               Center(child: VideoPlayerWidget(entity: entity)),
+
+              // Индикатор выбора
               Positioned(
                 top: 16,
                 right: 16,
                 child: SelectionIndicator(fileId: entity.id, size: 40),
               ),
+
               Align(
                 alignment: Alignment.bottomCenter,
                 child: SafeArea(

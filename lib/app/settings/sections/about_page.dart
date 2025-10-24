@@ -1,13 +1,19 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+// import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:gap/gap.dart';
 import '../../../core/app_info/app_info.dart';
 import '../../../core/extensions/core_extensions.dart';
 import '../../../core/theme/text_extension.dart';
 import '../../../core/widgets/custom_appbar.dart';
+// import 'package:mailto/mailto.dart';
+// import 'package:url_launcher/url_launcher.dart';
+
 @RoutePage()
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,6 +56,43 @@ class AboutPage extends StatelessWidget {
                     '${AppInfo.instance.packageInfo.version}+${AppInfo.instance.packageInfo.buildNumber}',
               ),
               const Gap(0),
+
+              // Row(
+              //   spacing: 8,
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     IconButton(
+              //       onPressed: () {
+              //         HapticFeedback.selectionClick();
+              //         launchUrl(
+              //           RemoteConfigRepository.instance.data.instagram.toUri,
+              //           mode: LaunchMode.externalApplication,
+              //         );
+              //       },
+              //       icon: const Icon(FeatherIcons.instagram),
+              //     ),
+              //     IconButton(
+              //       onPressed: () {
+              //         HapticFeedback.selectionClick();
+              //         launchUrl(
+              //           Mailto(
+              //             to: [RemoteConfigRepository.instance.data.mail],
+              //           ).toString().toUri,
+              //         );
+              //       },
+              //       icon: const Icon(FeatherIcons.mail),
+              //     ),
+              //     IconButton(
+              //       onPressed: () {
+              //         HapticFeedback.selectionClick();
+              //         launchUrl(
+              //           RemoteConfigRepository.instance.data.github.toUri,
+              //         );
+              //       },
+              //       icon: const Icon(FeatherIcons.github),
+              //     ),
+              //   ],
+              // ),
             ],
           ).p(all: 16),
         ),
@@ -57,10 +100,13 @@ class AboutPage extends StatelessWidget {
     );
   }
 }
+
 class AboutItem extends StatelessWidget {
   const AboutItem({super.key, required this.title, required this.subtitle});
+
   final String title;
   final String subtitle;
+
   @override
   Widget build(BuildContext context) {
     return Column(

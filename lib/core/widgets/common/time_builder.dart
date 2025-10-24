@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class TimeBuilder extends StatefulWidget {
   const TimeBuilder({
     super.key,
@@ -8,6 +9,7 @@ class TimeBuilder extends StatefulWidget {
   @override
   State<TimeBuilder> createState() => _TimeBuilderState();
 }
+
 class _TimeBuilderState extends State<TimeBuilder> {
   final ValueNotifier<double> _timeNotifier = ValueNotifier(0.0);
   @override
@@ -15,6 +17,7 @@ class _TimeBuilderState extends State<TimeBuilder> {
     super.initState();
     _startAnimation();
   }
+
   void _startAnimation() {
     Future.microtask(() async {
       while (mounted) {
@@ -23,6 +26,7 @@ class _TimeBuilderState extends State<TimeBuilder> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(

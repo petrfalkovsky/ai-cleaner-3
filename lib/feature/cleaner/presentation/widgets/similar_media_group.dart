@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/bloc/media_cleaner_bloc.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selection_indicator.dart';
@@ -9,11 +10,13 @@ import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import 'dart:math' as math;
+
 class SimilarMediaGroup extends StatelessWidget {
   final MediaGroup group;
   final Function(String) onFileSelected;
   final Function(MediaFile) onPreviewFile;
   final Function(List<String>) onSelectAllInGroup;
+
   const SimilarMediaGroup({
     super.key,
     required this.group,
@@ -21,6 +24,7 @@ class SimilarMediaGroup extends StatelessWidget {
     required this.onPreviewFile,
     required this.onSelectAllInGroup,
   });
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -43,6 +47,7 @@ class SimilarMediaGroup extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Заголовок группы
                   Row(
                     children: [
                       const Icon(Icons.image_search, color: Colors.white, size: 20),
@@ -61,6 +66,8 @@ class SimilarMediaGroup extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
+
+                  // Галерея изображений
                   SizedBox(
                     height: 120,
                     child: ListView.builder(
@@ -79,18 +86,26 @@ class SimilarMediaGroup extends StatelessWidget {
       ),
     );
   }
+
+  // Кнопка "Выбрать все" - полностью переписан
   Widget _buildSelectAllButton(BuildContext context) {
     return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
       builder: (context, state) {
         if (state is! MediaCleanerReady) {
           return const SizedBox();
         }
+
+        // Проверяем, все ли файлы в группе выбраны
         final fileIds = group.files.map((file) => file.entity.id).toList();
         final selectedIds = state.selectedFiles.map((file) => file.entity.id).toList();
+
+        // Проверяем, сколько файлов из группы выбрано
         final selectedCount = fileIds.where((id) => selectedIds.contains(id)).length;
         final allSelected = selectedCount == fileIds.length;
+
         return GestureDetector(
           onTap: () {
+            // Если все выбраны - снимаем выбор
             if (allSelected) {
               for (final fileId in fileIds) {
                 if (selectedIds.contains(fileId)) {
@@ -98,6 +113,7 @@ class SimilarMediaGroup extends StatelessWidget {
                 }
               }
             }
+            // Иначе - выбираем все невыбранные
             else {
               for (final fileId in fileIds) {
                 if (!selectedIds.contains(fileId)) {
@@ -137,17 +153,22 @@ class SimilarMediaGroup extends StatelessWidget {
       },
     );
   }
+
+  // Миниатюра медиафайла в группе
   Widget _buildMediaItem(BuildContext context, MediaFile file) {
     return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
       builder: (context, state) {
+        // Правильная проверка: используем state.selectedFiles вместо file.isSelected
         final isSelected =
             state is MediaCleanerLoaded &&
             state.selectedFiles.any((f) => f.entity.id == file.entity.id);
+
         return Container(
           width: 100,
           margin: const EdgeInsets.only(right: 8),
           child: Stack(
             children: [
+              // Основное изображение с возможностью просмотра
               Positioned.fill(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
@@ -171,6 +192,8 @@ class SimilarMediaGroup extends StatelessWidget {
                   ),
                 ),
               ),
+
+              // Затемнение при выборе
               if (isSelected)
                 Positioned.fill(
                   child: Container(
@@ -180,11 +203,15 @@ class SimilarMediaGroup extends StatelessWidget {
                     ),
                   ),
                 ),
+
+              // Индикатор выбора
               Positioned(
                 top: 4,
                 right: 4,
                 child: SelectionIndicator(fileId: file.entity.id, size: 20),
               ),
+
+              // Индикатор для видео
               if (file.isVideo)
                 Positioned(
                   bottom: 4,

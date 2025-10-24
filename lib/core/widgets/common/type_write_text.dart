@@ -3,6 +3,7 @@ import '../../theme/text_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
 class AnimatableText {
   const AnimatableText({
     required this.text,
@@ -12,6 +13,7 @@ class AnimatableText {
   final String text;
   final Duration delay;
   final Duration deleteDelay;
+
   AnimatableText copyWith({
     String? text,
     Duration? delay,
@@ -24,6 +26,7 @@ class AnimatableText {
     );
   }
 }
+
 class TypeWriterText extends StatefulWidget {
   const TypeWriterText({
     super.key,
@@ -34,9 +37,11 @@ class TypeWriterText extends StatefulWidget {
   final void Function(BuildContext)? onComplete;
   final List<AnimatableText> texts;
   final bool center;
+
   @override
   State<TypeWriterText> createState() => _TypeWriterTextState();
 }
+
 class _TypeWriterTextState extends State<TypeWriterText> {
   late AnimatableText _text = widget.texts.first;
   late int _listIndex = 0;
@@ -51,14 +56,18 @@ class _TypeWriterTextState extends State<TypeWriterText> {
     _text = widget.texts[_listIndex];
     _index = 0;
     _animationFinished = false;
+
     await Future.delayed(_text.delay);
+
     if (mounted) {
       setState(() {});
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final chars = _text.text.split('');
+
     return Stack(
       children: [
         if (!_animationFinished)
@@ -120,6 +129,7 @@ class _TypeWriterTextState extends State<TypeWriterText> {
     );
   }
 }
+
 class DeleteTextAnimation extends StatefulWidget {
   const DeleteTextAnimation({
     super.key,
@@ -128,16 +138,20 @@ class DeleteTextAnimation extends StatefulWidget {
     this.onComplete,
     this.center = false,
   });
+
   final String text;
   final Duration delay;
   final void Function()? onComplete;
   final bool center;
+
   @override
   State<DeleteTextAnimation> createState() => _DeleteTextAnimationState();
 }
+
 class _DeleteTextAnimationState extends State<DeleteTextAnimation> {
   late int _index = widget.text.length - 1;
   bool ready = false;
+
   @override
   void initState() {
     super.initState();
@@ -150,6 +164,7 @@ class _DeleteTextAnimationState extends State<DeleteTextAnimation> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final chars = widget.text.split('');
@@ -190,6 +205,7 @@ class _DeleteTextAnimationState extends State<DeleteTextAnimation> {
     );
   }
 }
+
 double decay(double value, int index) {
   final decay = index / 100;
   return (value - (value * decay)).clamp(15, value);

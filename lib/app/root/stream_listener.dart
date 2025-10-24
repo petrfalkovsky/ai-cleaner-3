@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class StreamListener<T> extends StatefulWidget {
   const StreamListener({
     super.key,
@@ -11,9 +12,11 @@ class StreamListener<T> extends StatefulWidget {
   final Widget child;
   final void Function(T) listener;
   final Future<T> Function()? initialData;
+
   @override
   State<StreamListener<T>> createState() => _StreamListenerState<T>();
 }
+
 class _StreamListenerState<T> extends State<StreamListener<T>> {
   @override
   void initState() {
@@ -28,6 +31,7 @@ class _StreamListenerState<T> extends State<StreamListener<T>> {
       widget.listener(event);
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return widget.child;

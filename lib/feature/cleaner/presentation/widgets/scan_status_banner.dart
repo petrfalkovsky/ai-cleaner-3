@@ -3,11 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/media_cleaner_bloc.dart';
+
 class ScanStatusBanner extends StatefulWidget {
   const ScanStatusBanner({Key? key}) : super(key: key);
+
   @override
   State<ScanStatusBanner> createState() => _ScanStatusBannerState();
 }
+
 class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProviderStateMixin {
   bool _isExpanded = true;
   DateTime? _scanStartTime;
@@ -17,18 +20,23 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
   late AnimationController _warningController;
   bool _showCompletionMessage = false;
   Timer? _completionTimer;
+
   @override
   void initState() {
     super.initState();
+    // Анимация пульсации кнопки паузы после 3 минут
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     )..repeat(reverse: true);
+
+    // Анимация появления предупреждения
     _warningController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
   }
+
   @override
   void dispose() {
     _heatWarningTimer?.cancel();
@@ -37,9 +45,12 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
     _warningController.dispose();
     super.dispose();
   }
+
   void _startHeatWarningTimer() {
     _heatWarningTimer?.cancel();
     _scanStartTime = DateTime.now();
+
+    // Через 3 минуты показываем предупреждение
     _heatWarningTimer = Timer(const Duration(minutes: 3), () {
       if (mounted) {
         setState(() {
@@ -49,6 +60,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
       }
     });
   }
+
   void _stopHeatWarningTimer() {
     _heatWarningTimer?.cancel();
     _scanStartTime = null;
@@ -57,6 +69,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
     });
     _warningController.reverse();
   }
+
   String _getElapsedTime() {
     if (_scanStartTime == null) return '';
     final elapsed = DateTime.now().difference(_scanStartTime!);
@@ -64,6 +77,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
     final seconds = elapsed.inSeconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MediaCleanerBloc, MediaCleanerState>(
@@ -72,6 +86,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
           if (_scanStartTime == null) {
             _startHeatWarningTimer();
           }
+          // Убираем сообщение о завершении если началось новое сканирование
           if (_showCompletionMessage) {
             setState(() {
               _showCompletionMessage = false;
@@ -79,6 +94,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
             _completionTimer?.cancel();
           }
         } else if (state is MediaCleanerReady && !state.isScanningInBackground) {
+          // Сканирование завершено - показываем сообщение на 3 секунды
           _stopHeatWarningTimer();
           if (!_showCompletionMessage && _scanStartTime != null) {
             setState(() {
@@ -98,6 +114,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
         }
       },
       builder: (context, state) {
+        // Показываем баннер при сканировании или ошибке
         bool showBanner = false;
         String? message;
         double? progress;
@@ -106,7 +123,9 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
         bool isCompleted = false;
         int? processedFiles;
         int? totalFiles;
+
         if (_showCompletionMessage) {
+          // Показываем сообщение о завершении
           showBanner = true;
           message = "Сканирование завершено!";
           isCompleted = true;
@@ -129,9 +148,11 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
           message = state.message;
           isError = true;
         }
+
         if (!showBanner) {
           return const SizedBox.shrink();
         }
+
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -158,6 +179,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
             borderRadius: BorderRadius.circular(16),
             child: Column(
               children: [
+                // Основной заголовок - всегда видимый
                 GestureDetector(
                   onTap: () {
                     setState(() {
@@ -169,6 +191,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                     color: Colors.transparent,
                     child: Row(
                       children: [
+                        // Иконка или индикатор
                         if (isCompleted)
                           const Icon(
                             Icons.check_circle,
@@ -197,6 +220,8 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                             ),
                           ),
                         const SizedBox(width: 12),
+
+                        // Сообщение
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +241,14 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                             ],
                           ),
                         ),
+
                         const SizedBox(width: 12),
+
+                        // // Кнопка паузы/возобновления
+                        // if (!isError && state is MediaCleanerScanning)
+                        //   _buildPauseButton(context, state),
+
+                        // Стрелка разворачивания
                         AnimatedRotation(
                           turns: _isExpanded ? 0.5 : 0,
                           duration: const Duration(milliseconds: 300),
@@ -229,12 +261,15 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                     ),
                   ),
                 ),
+
+                // Развернутый контент с анимацией
                 AnimatedSize(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                   child: _isExpanded
                       ? Column(
                           children: [
+                            // Прогресс-бар
                             if (progress != null) ...[
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -263,6 +298,8 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                               ),
                               const SizedBox(height: 12),
                             ],
+
+                            // Дополнительная информация
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
@@ -275,6 +312,8 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                                 textAlign: TextAlign.center,
                               ),
                             ),
+
+                            // Предупреждение о нагреве
                             if (_showHeatWarning)
                               FadeTransition(
                                 opacity: _warningController,
@@ -326,6 +365,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                                   ),
                                 ),
                               ),
+
                             const SizedBox(height: 16),
                           ],
                         )
@@ -338,12 +378,14 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
       },
     );
   }
+
   Widget _buildPauseButton(BuildContext context, MediaCleanerScanning state) {
     final isPaused = state.isPaused;
     final elapsedMinutes = _scanStartTime != null
         ? DateTime.now().difference(_scanStartTime!).inMinutes
         : 0;
     final shouldPulse = elapsedMinutes >= 3 && !isPaused;
+
     Widget button = CupertinoButton(
       padding: EdgeInsets.zero,
       minSize: 36,
@@ -384,6 +426,8 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
         }
       },
     );
+
+    // Добавляем пульсацию после 3 минут
     if (shouldPulse) {
       return AnimatedBuilder(
         animation: _pulseController,
@@ -396,6 +440,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
         child: button,
       );
     }
+
     return button;
   }
 }

@@ -5,11 +5,13 @@ import 'package:ai_cleaner_2/feature/categories/presentation/widgets/animated_co
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+
 class VideoCategoryCard extends StatefulWidget {
   final VideoCategory category;
   final int count;
   final int selectedCount;
   final VoidCallback onTap;
+
   const VideoCategoryCard({
     super.key,
     required this.category,
@@ -17,15 +19,19 @@ class VideoCategoryCard extends StatefulWidget {
     required this.selectedCount,
     required this.onTap,
   });
+
   @override
   State<VideoCategoryCard> createState() => _VideoCategoryCardState();
 }
+
 class _VideoCategoryCardState extends State<VideoCategoryCard> {
   bool _isPressed = false;
+
   @override
   Widget build(BuildContext context) {
     final countKey = 'video_category_${widget.category.name}_count';
     final selectedCountKey = 'video_category_${widget.category.name}_selected';
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -53,6 +59,7 @@ class _VideoCategoryCardState extends State<VideoCategoryCard> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
+                  // Иконка
                   LiquidGlass(
                     settings: LiquidGlassSettings(
                       blur: 3,
@@ -70,6 +77,8 @@ class _VideoCategoryCardState extends State<VideoCategoryCard> {
                     ),
                   ),
                   const SizedBox(width: 16),
+
+                  // Информация
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,6 +101,8 @@ class _VideoCategoryCardState extends State<VideoCategoryCard> {
                       ],
                     ),
                   ),
+
+                  // Счетчики
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -141,6 +152,7 @@ class _VideoCategoryCardState extends State<VideoCategoryCard> {
                         ),
                     ],
                   ),
+
                   const SizedBox(width: 8),
                   const Icon(CupertinoIcons.chevron_right, size: 18, color: Colors.white60),
                 ],

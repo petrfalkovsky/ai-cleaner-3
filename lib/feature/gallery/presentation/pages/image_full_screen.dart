@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selection_indicator.dart';
 import 'package:appinio_social_share/appinio_social_share.dart';
 import 'package:auto_route/auto_route.dart';
@@ -13,11 +14,14 @@ import '../widgets/widget_zoom_fullscreen.dart';
 import '../../../../core/extensions/core_extensions.dart';
 import '../../../../core/theme/button.dart';
 import '../../../../core/util/social_share.dart';
+
 @RoutePage()
 class ImageFullPage extends StatelessWidget {
   const ImageFullPage({super.key, required this.entity, required this.option});
+
   final AssetEntity entity;
   final ThumbnailOption option;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,11 +36,14 @@ class ImageFullPage extends StatelessWidget {
                 thumbnailSize: ThumbnailSize(720, 1560),
               ).p(all: 4, bottom: 72),
             ),
+
+            // Индикатор выбора в правый верхний угол
             Positioned(
               top: MediaQuery.of(context).padding.top + 16,
               right: 16,
               child: SelectionIndicator(fileId: entity.id, size: 40),
             ),
+
             Align(
               alignment: Alignment.bottomCenter,
               child: SafeArea(
@@ -55,20 +62,26 @@ class ImageFullPage extends StatelessWidget {
     ).blur(64);
   }
 }
+
 class ShareButtons extends StatefulWidget {
   const ShareButtons({super.key, required this.entity, required this.isVideo});
+
   final bool isVideo;
   final AssetEntity entity;
+
   @override
   State<ShareButtons> createState() => _ShareButtonsState();
 }
+
 class _ShareButtonsState extends State<ShareButtons> {
   File? file;
+
   @override
   void initState() {
     super.initState();
     scheduleMicrotask(_loadFile);
   }
+
   Future<void> _loadFile() async {
     final file = await widget.entity.originFile;
     if (mounted) {
@@ -77,7 +90,9 @@ class _ShareButtonsState extends State<ShareButtons> {
       });
     }
   }
+
   final _share = AppinioSocialShare();
+
   void onPressed() {
     if (widget.isVideo) {
       _share.shareToInstagramStory(backgroundVideo: file?.path);
@@ -85,6 +100,7 @@ class _ShareButtonsState extends State<ShareButtons> {
       _share.shareToInstagramStory(backgroundImage: file?.path);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Row(

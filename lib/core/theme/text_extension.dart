@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 final _textScaleFactor = clampDouble(
   MediaQueryData.fromView(
         WidgetsBinding.instance.platformDispatcher.views.single,
@@ -10,6 +11,7 @@ final _textScaleFactor = clampDouble(
   1,
   1.5,
 );
+
 extension TextExtension on Text {
   Text copyWith({
     TextStyle? style,
@@ -44,6 +46,7 @@ extension TextExtension on Text {
       selectionColor: selectionColor ?? this.selectionColor,
     );
   }
+
   Text bodySmall({
     double? opacity,
     Color color = Colors.white,
@@ -60,6 +63,7 @@ extension TextExtension on Text {
       ),
     );
   }
+
   Text bodyMedium({
     double? opacity,
     Color color = Colors.white,
@@ -76,6 +80,7 @@ extension TextExtension on Text {
       ),
     );
   }
+
   Text bodyLarge({
     double? opacity,
     Color color = Colors.white,
@@ -92,6 +97,7 @@ extension TextExtension on Text {
       ),
     );
   }
+
   Text titleSmall({
     double? opacity,
     Color color = Colors.white,
@@ -108,6 +114,7 @@ extension TextExtension on Text {
       ),
     );
   }
+
   Text titleMedium({
     double? opacity,
     Color color = Colors.white,
@@ -124,6 +131,7 @@ extension TextExtension on Text {
       ),
     );
   }
+
   Text titleLarge({
     double? opacity,
     Color color = Colors.white,
@@ -140,6 +148,7 @@ extension TextExtension on Text {
       ),
     );
   }
+
   Text headingSmall({
     double? opacity,
     Color color = Colors.white,
@@ -156,6 +165,7 @@ extension TextExtension on Text {
       ),
     );
   }
+
   Text headingMedium({
     double? opacity,
     Color color = Colors.white,
@@ -172,6 +182,7 @@ extension TextExtension on Text {
       ),
     );
   }
+
   Text headingLarge({
     double? opacity,
     Color color = Colors.white,
@@ -189,6 +200,7 @@ extension TextExtension on Text {
     );
   }
 }
+
 extension AutoSizeTextExtension on AutoSizeText {
   AutoSizeText overflowReplacementBuilder(
     Widget Function(AutoSizeText text) builder,
@@ -200,6 +212,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       overflowReplacement: builder(this),
     );
   }
+
   AutoSizeText overflowFade({
     Alignment alignment = Alignment.bottomCenter,
     Alignment begin = Alignment.center,
@@ -234,6 +247,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       ),
     );
   }
+
   AutoSizeText copyWith({
     Key? textKey,
     TextStyle? style,
@@ -276,6 +290,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       semanticsLabel: semanticsLabel ?? this.semanticsLabel,
     );
   }
+
   AutoSizeText bodySmall({
     double? opacity,
     Color color = Colors.white,
@@ -292,6 +307,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       ),
     );
   }
+
   AutoSizeText bodyMedium({
     double? opacity,
     Color color = Colors.white,
@@ -308,6 +324,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       ),
     );
   }
+
   AutoSizeText bodyLarge({
     double? opacity,
     Color color = Colors.white,
@@ -324,6 +341,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       ),
     );
   }
+
   AutoSizeText titleSmall({
     double? opacity,
     Color color = Colors.white,
@@ -340,6 +358,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       ),
     );
   }
+
   AutoSizeText titleMedium({
     double? opacity,
     Color color = Colors.white,
@@ -356,6 +375,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       ),
     );
   }
+
   AutoSizeText titleLarge({
     double? opacity,
     Color color = Colors.white,
@@ -372,6 +392,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       ),
     );
   }
+
   AutoSizeText headingSmall({
     double? opacity,
     Color color = Colors.white,
@@ -388,6 +409,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       ),
     );
   }
+
   AutoSizeText headingMedium({
     double? opacity,
     Color color = Colors.white,
@@ -404,6 +426,7 @@ extension AutoSizeTextExtension on AutoSizeText {
       ),
     );
   }
+
   AutoSizeText headingLarge({
     double? opacity,
     Color color = Colors.white,

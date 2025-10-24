@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 Widget fadeTransition(
   BuildContext context,
   Animation<double> animation,

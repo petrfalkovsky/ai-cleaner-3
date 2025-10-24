@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../../core/legal/prirvacy_policy.dart';
 import '../../../core/widgets/custom_appbar.dart';
+
 @RoutePage()
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Scaffold(

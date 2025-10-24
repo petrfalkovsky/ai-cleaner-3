@@ -1,6 +1,8 @@
 import 'dart:io';
+
 import 'package:appinio_social_share/appinio_social_share.dart';
 import '../dotenv/dotenv.dart';
+
 extension SocialShare on AppinioSocialShare {
   void shareToInstagramStory({
     String? backgroundVideo,
@@ -24,6 +26,7 @@ extension SocialShare on AppinioSocialShare {
       );
     }
   }
+
   void shareToSystem(String filePath) {
     if (Platform.isIOS) {
       iOS.shareToSystem("", filePaths: [filePath]);

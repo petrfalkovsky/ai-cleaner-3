@@ -1,4 +1,5 @@
 import 'package:package_info_plus/package_info_plus.dart';
+
 class AppInfo {
   AppInfo._();
   static final instance = AppInfo._();
@@ -9,7 +10,9 @@ class AppInfo {
     }
     return _appInfo!;
   }
+
   String get version => '${packageInfo.version}+${packageInfo.buildNumber}';
+
   Future<void> loadAppInfo() async {
     final appInfo = await PackageInfo.fromPlatform();
     _appInfo = appInfo;

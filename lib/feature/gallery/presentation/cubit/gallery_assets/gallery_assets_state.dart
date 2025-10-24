@@ -1,12 +1,15 @@
 part of 'gallery_assets_cubit.dart';
+
 @freezed
 class GalleryAssetsState with _$GalleryAssetsState {
   const factory GalleryAssetsState({
     @Default([]) List<AssetEntity> assets,
     @Default(TaskStatus.initial) TaskStatus status,
   }) = _GalleryAssetsState;
+
   const GalleryAssetsState._();
 }
+
 extension AssetCategoryX on List<AssetEntity> {
   Map<String, List<AssetEntity>> fromCategory(AssetCategory category) {
     switch (category) {
@@ -54,6 +57,9 @@ extension AssetCategoryX on List<AssetEntity> {
       case AssetCategory.shuffle:
         final shuffled = [...toList()]..shuffle();
         return {'shuffled': shuffled};
+      // throw UnimplementedError(
+      //   'Shuffle cannot be accessed directly from the state because it will change every time it is accessed.',
+      // );
     }
   }
 }

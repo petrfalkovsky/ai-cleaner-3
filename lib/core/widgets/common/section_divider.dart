@@ -2,10 +2,13 @@ import '../../theme/text_extension.dart';
 import 'divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+
 class SectionDivider extends StatelessWidget {
   const SectionDivider({super.key, required this.label, this.icon});
+
   final IconData? icon;
   final String label;
+
   @override
   Widget build(BuildContext context) {
     return Row(

@@ -7,9 +7,11 @@ import '../../core/router/router.gr.dart';
 import '../../core/theme/button.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:pixelarticons/pixel.dart';
+
 @RoutePage()
 class PermissionRequestPage extends StatelessWidget {
   const PermissionRequestPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

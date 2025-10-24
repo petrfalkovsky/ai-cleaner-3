@@ -11,6 +11,7 @@ import '../../../core/theme/text_extension.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import 'package:pixelarticons/pixel.dart';
+
 class ImageItemWidget extends StatefulWidget {
   const ImageItemWidget({
     super.key,
@@ -19,16 +20,20 @@ class ImageItemWidget extends StatefulWidget {
     required this.controller,
     required this.index,
   });
+
   final CustomSwiperController controller;
   final int index;
   final AssetEntity entity;
   final ThumbnailOption option;
+
   @override
   State<ImageItemWidget> createState() => _ImageItemWidgetState();
 }
+
 class _ImageItemWidgetState extends State<ImageItemWidget> {
   bool hapticDispatched = false;
   final appinioSocialShare = AppinioSocialShare();
+
   @override
   void initState() {
     super.initState();
@@ -47,6 +52,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Hero(
@@ -75,6 +81,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
               fit: StackFit.expand,
               children: [
                 Container(color: Colors.black),
+                // if (widget.entity.type != AssetType.video)
                 AssetEntityImage(
                   widget.entity,
                   isOriginal: false,
@@ -82,6 +89,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
                   thumbnailFormat: widget.option.format,
                   fit: BoxFit.cover,
                 ),
+
                 if (widget.entity.type == AssetType.video)
                   Center(
                     child: Container(
@@ -93,6 +101,14 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
                       child: Icon(Pixel.play, size: 24),
                     ),
                   ),
+
+                // if (widget.entity.type == AssetType.video)
+                //   VideoPlayerWidget(
+                //     entity: widget.entity,
+                //     autoPlay:
+                //         (widget.controller.cardIndex == widget.index) ||
+                //         widget.index == 0,
+                //   ),
                 IgnorePointer(
                   child: Align(
                     alignment: Alignment.bottomCenter,
@@ -218,6 +234,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
                     ),
                   ),
                 ),
+
                 Positioned(
                   top: 8,
                   right: 8,

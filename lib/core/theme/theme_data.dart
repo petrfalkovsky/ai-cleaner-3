@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 ThemeData theme(BuildContext context) {
   return ThemeData(
     primaryColor: Colors.white,
@@ -121,6 +122,7 @@ ThemeData theme(BuildContext context) {
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
+      // activeIndicatorBorder: InputBorder.none,
       labelStyle: TextStyle(
         color: Colors.white.withValues(alpha: 0.5),
         fontSize: 14,

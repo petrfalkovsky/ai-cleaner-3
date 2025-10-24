@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'custom_route_transition.dart';
 import 'router.gr.dart';
+
 export 'router.gr.dart';
+
 @AutoRouterConfig()
 class AppRouter extends RootStackRouter {
   @override
@@ -20,6 +22,7 @@ class AppRouter extends RootStackRouter {
           opaque: false,
         ),
         CustomRoute(page: PermissionRequestRoute.page, transitionsBuilder: fadeTransition),
+        CustomRoute(page: CategoryRoute.page, transitionsBuilder: fadeTransition),
         CustomRoute(page: CategoriesSwiperRoute.page, transitionsBuilder: fadeTransition),
         CustomRoute(page: CategoriesRoute.page, transitionsBuilder: fadeTransition),
         CustomRoute(

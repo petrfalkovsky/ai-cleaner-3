@@ -5,9 +5,12 @@ import '../../../categories/presentation/pages/category_page.dart';
 import '../../../../core/extensions/core_extensions.dart';
 import '../../../../core/router/router.gr.dart';
 import '../../../../core/theme/button.dart';
+
 class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppbar({super.key, this.onDelete});
+
   final Function(List<String>)? onDelete;
+
   @override
   Widget build(BuildContext context) {
     final widget = Container(
@@ -42,8 +45,10 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
     );
+
     return widget;
   }
+
   @override
   Size get preferredSize => const Size.fromHeight(75);
 }
