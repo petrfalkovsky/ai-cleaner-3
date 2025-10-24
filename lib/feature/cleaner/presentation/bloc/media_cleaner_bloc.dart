@@ -284,7 +284,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
 
             final newGroup = MediaGroup(
               id: '${entry.key}_${i ~/ similarBatchSize}_${allSimilarGroups.length}',
-              name: 'Похожие фото ${entry.key.split('_').last}',
+              name: '',
               files: entry.value,
             );
 
@@ -300,7 +300,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             final progress =
                 0.35 + (0.15 * ((i + similarBatchSize / 2) / currentState.photoFiles.length));
             await updateStatus(
-              "Найдено ${allSimilarGroups.length} групп похожих фото",
+              "Найдено ${allSimilarGroups.length} групп\nпохожих фото",
               progress,
               currentBatch: processedFiles,
             );

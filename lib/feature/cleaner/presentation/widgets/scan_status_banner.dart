@@ -11,8 +11,7 @@ class ScanStatusBanner extends StatefulWidget {
   State<ScanStatusBanner> createState() => _ScanStatusBannerState();
 }
 
-class _ScanStatusBannerState extends State<ScanStatusBanner>
-    with TickerProviderStateMixin {
+class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProviderStateMixin {
   bool _isExpanded = true;
   DateTime? _scanStartTime;
   Timer? _heatWarningTimer;
@@ -194,23 +193,30 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
                       children: [
                         // Иконка или индикатор
                         if (isCompleted)
-                          const Icon(Icons.check_circle,
-                              color: CupertinoColors.systemGreen, size: 24)
+                          const Icon(
+                            Icons.check_circle,
+                            color: CupertinoColors.systemGreen,
+                            size: 24,
+                          )
                         else if (isError)
-                          const Icon(Icons.error_outline,
-                              color: CupertinoColors.systemRed, size: 24)
+                          const Icon(
+                            Icons.error_outline,
+                            color: CupertinoColors.systemRed,
+                            size: 24,
+                          )
                         else if (isPaused)
-                          const Icon(Icons.pause_circle_outline,
-                              color: CupertinoColors.systemOrange, size: 24)
+                          const Icon(
+                            Icons.pause_circle_outline,
+                            color: CupertinoColors.systemOrange,
+                            size: 24,
+                          )
                         else
                           const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                CupertinoColors.activeBlue,
-                              ),
+                              valueColor: AlwaysStoppedAnimation<Color>(CupertinoColors.activeBlue),
                             ),
                           ),
                         const SizedBox(width: 12),
@@ -222,27 +228,25 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
                             children: [
                               Text(
                                 message ?? "Сканирование...",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                ),
+                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                               ),
                               if (progress != null && processedFiles != null)
                                 Text(
                                   '$processedFiles из $totalFiles • ${(progress * 100).toStringAsFixed(0)}%',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: CupertinoColors.secondaryLabel
-                                        .resolveFrom(context),
+                                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
                                   ),
                                 ),
                             ],
                           ),
                         ),
 
-                        // Кнопка паузы/возобновления
-                        if (!isError && state is MediaCleanerScanning)
-                          _buildPauseButton(context, state),
+                        const SizedBox(width: 12),
+
+                        // // Кнопка паузы/возобновления
+                        // if (!isError && state is MediaCleanerScanning)
+                        //   _buildPauseButton(context, state),
 
                         // Стрелка разворачивания
                         AnimatedRotation(
@@ -250,8 +254,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
                           duration: const Duration(milliseconds: 300),
                           child: Icon(
                             Icons.keyboard_arrow_down,
-                            color: CupertinoColors.secondaryLabel
-                                .resolveFrom(context),
+                            color: CupertinoColors.secondaryLabel.resolveFrom(context),
                           ),
                         ),
                       ],
@@ -269,8 +272,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
                             // Прогресс-бар
                             if (progress != null) ...[
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: TweenAnimationBuilder<double>(
@@ -280,11 +282,10 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
                                     builder: (context, value, child) {
                                       return LinearProgressIndicator(
                                         value: value,
-                                        backgroundColor: CupertinoColors
-                                            .systemGrey4
-                                            .resolveFrom(context),
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
+                                        backgroundColor: CupertinoColors.systemGrey4.resolveFrom(
+                                          context,
+                                        ),
+                                        valueColor: AlwaysStoppedAnimation<Color>(
                                           progress! > 0.9
                                               ? CupertinoColors.systemGreen
                                               : CupertinoColors.activeBlue,
@@ -300,14 +301,12 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
 
                             // Дополнительная информация
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
                                 "AI Cleaner анализирует фото и видео для поиска дубликатов, размытых изображений и освобождения места.",
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: CupertinoColors.secondaryLabel
-                                      .resolveFrom(context),
+                                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
                                   height: 1.4,
                                 ),
                                 textAlign: TextAlign.center,
@@ -319,30 +318,29 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
                               FadeTransition(
                                 opacity: _warningController,
                                 child: SlideTransition(
-                                  position: Tween<Offset>(
-                                    begin: const Offset(0, -0.5),
-                                    end: Offset.zero,
-                                  ).animate(CurvedAnimation(
-                                    parent: _warningController,
-                                    curve: Curves.easeOut,
-                                  )),
+                                  position:
+                                      Tween<Offset>(
+                                        begin: const Offset(0, -0.5),
+                                        end: Offset.zero,
+                                      ).animate(
+                                        CurvedAnimation(
+                                          parent: _warningController,
+                                          curve: Curves.easeOut,
+                                        ),
+                                      ),
                                   child: Container(
-                                    margin: const EdgeInsets.only(
-                                        top: 12, left: 16, right: 16),
+                                    margin: const EdgeInsets.only(top: 12, left: 16, right: 16),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          CupertinoColors.systemRed
-                                              .withOpacity(0.1),
-                                          CupertinoColors.systemOrange
-                                              .withOpacity(0.1),
+                                          CupertinoColors.systemRed.withOpacity(0.1),
+                                          CupertinoColors.systemOrange.withOpacity(0.1),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: CupertinoColors.systemOrange
-                                            .withOpacity(0.3),
+                                        color: CupertinoColors.systemOrange.withOpacity(0.3),
                                       ),
                                     ),
                                     child: Row(
@@ -358,8 +356,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
                                             'Устройство может нагреться. Рекомендуем приостановить сканирование.',
                                             style: TextStyle(
                                               fontSize: 12,
-                                              color: CupertinoColors.label
-                                                  .resolveFrom(context),
+                                              color: CupertinoColors.label.resolveFrom(context),
                                             ),
                                           ),
                                         ),
@@ -399,15 +396,15 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
           color: isPaused
               ? CupertinoColors.systemOrange.withOpacity(0.1)
               : shouldPulse
-                  ? CupertinoColors.systemRed.withOpacity(0.1)
-                  : CupertinoColors.systemGrey5.resolveFrom(context),
+              ? CupertinoColors.systemRed.withOpacity(0.1)
+              : CupertinoColors.systemGrey5.resolveFrom(context),
           shape: BoxShape.circle,
           border: Border.all(
             color: isPaused
                 ? CupertinoColors.systemOrange
                 : shouldPulse
-                    ? CupertinoColors.systemRed
-                    : CupertinoColors.systemGrey3.resolveFrom(context),
+                ? CupertinoColors.systemRed
+                : CupertinoColors.systemGrey3.resolveFrom(context),
             width: 2,
           ),
         ),
@@ -417,8 +414,8 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
           color: isPaused
               ? CupertinoColors.systemOrange
               : shouldPulse
-                  ? CupertinoColors.systemRed
-                  : CupertinoColors.label.resolveFrom(context),
+              ? CupertinoColors.systemRed
+              : CupertinoColors.label.resolveFrom(context),
         ),
       ),
       onPressed: () {
@@ -437,10 +434,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner>
         builder: (context, child) {
           return Transform.scale(
             scale: 1.0 + (_pulseController.value * 0.1),
-            child: Opacity(
-              opacity: 0.8 + (_pulseController.value * 0.2),
-              child: child,
-            ),
+            child: Opacity(opacity: 0.8 + (_pulseController.value * 0.2), child: child),
           );
         },
         child: button,

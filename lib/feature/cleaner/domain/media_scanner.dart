@@ -139,7 +139,7 @@ class MediaScanner {
       processed.add(fileId);
     }
 
-    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${similarGroups.length} групп похожих');
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${similarGroups.length} групп\nпохожих');
     return similarGroups;
   }
 
@@ -393,7 +393,7 @@ class MediaScanner {
         result.add(
           MediaGroup(
             id: 'dup_${groupCounter++}',
-            name: 'Серия ${groupCounter}',
+            name: '',
             files: groupFiles,
           ),
         );

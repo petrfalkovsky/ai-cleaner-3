@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/bloc/media_cleaner_bloc.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selection_indicator.dart';
@@ -27,55 +29,58 @@ class SimilarMediaGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: LiquidGlass(
-        settings: LiquidGlassSettings(
-          blur: 8,
-          ambientStrength: 0.8,
-          lightAngle: 0.3 * math.pi,
-          glassColor: Colors.white.withOpacity(0.15),
-          thickness: 20,
-        ),
-        shape: LiquidRoundedSuperellipse(
-          borderRadius: const Radius.circular(16),
-        ),
-        glassContainsChild: false,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Заголовок группы
-              Row(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.white.withOpacity(0.1),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.image_search, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      "${group.name} (${group.files.length})",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Colors.white,
+                  // Заголовок группы
+                  Row(
+                    children: [
+                      const Icon(Icons.image_search, color: Colors.white, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "${group.name} (${group.files.length})",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
+                      _buildSelectAllButton(context),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Галерея изображений
+                  SizedBox(
+                    height: 120,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: group.files.length,
+                      itemBuilder: (context, index) {
+                        return _buildMediaItem(context, group.files[index]);
+                      },
                     ),
                   ),
-                  _buildSelectAllButton(context),
                 ],
               ),
-              const SizedBox(height: 12),
-
-              // Галерея изображений
-              SizedBox(
-                height: 120,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: group.files.length,
-                  itemBuilder: (context, index) {
-                    return _buildMediaItem(context, group.files[index]);
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -125,21 +130,13 @@ class SimilarMediaGroup extends StatelessWidget {
               glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
               thickness: 12,
             ),
-            shape: LiquidRoundedSuperellipse(
-              borderRadius: const Radius.circular(12),
-            ),
+            shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(12)),
             glassContainsChild: false,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    allSelected ? Icons.check_circle : Icons.check_circle_outline,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(width: 6),
                   Text(
                     allSelected ? "Отменить" : "Выбрать все",
                     style: const TextStyle(
@@ -162,7 +159,8 @@ class SimilarMediaGroup extends StatelessWidget {
     return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
       builder: (context, state) {
         // Правильная проверка: используем state.selectedFiles вместо file.isSelected
-        final isSelected = state is MediaCleanerLoaded &&
+        final isSelected =
+            state is MediaCleanerLoaded &&
             state.selectedFiles.any((f) => f.entity.id == file.entity.id);
 
         return Container(
