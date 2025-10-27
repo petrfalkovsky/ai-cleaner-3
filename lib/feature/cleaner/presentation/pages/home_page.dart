@@ -391,9 +391,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Ваша галерея в отличном состоянии!',
-              style: TextStyle(color: CupertinoColors.secondaryLabel),
+              style: TextStyle(color: Colors.white.withOpacity(.5)),
             ),
           ],
         ).animate().fadeIn(duration: 500.ms).scale(),
