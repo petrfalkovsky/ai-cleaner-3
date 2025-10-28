@@ -353,7 +353,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
-                                            'Устройство может нагреться. Рекомендуем приостановить сканирование.',
+                                            'Дождитесь окончания сканирования для стабильной работы приложения.\nУстройство может нагреться. Вы можете приостановить сканирование для зарядки или охлаждения устройства (функция в разработке)',
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: CupertinoColors.label.resolveFrom(context),

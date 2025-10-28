@@ -250,12 +250,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 CupertinoActivityIndicator(radius: 16),
                 SizedBox(height: 16),
                 Text(
                   'Загрузка...',
-                  style: TextStyle(fontSize: 16, color: CupertinoColors.secondaryLabel),
+                  style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(.5)),
                 ),
               ],
             ),
@@ -440,9 +440,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           category: category,
                           count: count,
                           selectedCount: selectedCount,
-                          onTap: () => context.router.push(
-                            CategoryRoute(categoryType: 'photo', categoryName: category.name),
-                          ),
+                          onTap: isScanningInBackground
+                              ? () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Дождитесь окончания сканирования'),
+                                      duration: Duration(seconds: 2),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                  return;
+                                }
+                              : () => context.router.push(
+                                  CategoryRoute(categoryType: 'photo', categoryName: category.name),
+                                ),
                         )
                         .animate(key: ValueKey('anim_${category.name}'))
                         .fadeIn(
@@ -626,9 +637,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           category: category,
                           count: count,
                           selectedCount: selectedCount,
-                          onTap: () => context.router.push(
-                            CategoryRoute(categoryType: 'video', categoryName: category.name),
-                          ),
+                          onTap: isScanningInBackground
+                              ? () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Дождитесь окончания сканирования'),
+                                      duration: Duration(seconds: 2),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                  return;
+                                }
+                              : () => context.router.push(
+                                  CategoryRoute(categoryType: 'video', categoryName: category.name),
+                                ),
                         )
                         .animate(key: ValueKey('anim_${category.name}'))
                         .fadeIn(
