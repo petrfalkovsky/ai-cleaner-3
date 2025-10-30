@@ -1,8 +1,10 @@
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/feature/categories/presentation/widgets/animated_counter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class PhotoCategoryCard extends StatefulWidget {
   final PhotoCategory category;
@@ -42,48 +44,37 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
       child: AnimatedScale(
         scale: _isPressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
+        child: Material(
+          color: Colors.transparent,
+          child: LiquidGlass(
+            settings: LiquidGlassSettings(
+              blur: 4,
+              ambientStrength: 0.8,
+              lightAngle: 0.3 * math.pi,
+              glassColor: Colors.white.withOpacity(0.15),
+              thickness: 20,
+            ),
+            shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(20)),
+            glassContainsChild: false,
+            child: Padding(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
-                  width: 1.5,
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withOpacity(0.15),
-                    Colors.white.withOpacity(0.05),
-                  ],
-                ),
-              ),
               child: Row(
                 children: [
                   // Иконка
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                      child: Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.25),
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(widget.category.icon, color: Colors.white, size: 28),
-                      ),
+                  LiquidGlass(
+                    settings: LiquidGlassSettings(
+                      blur: 3,
+                      ambientStrength: 0.5,
+                      lightAngle: 0.2 * math.pi,
+                      glassColor: Colors.white.withOpacity(0.2),
+                      thickness: 15,
+                    ),
+                    shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(16)),
+                    glassContainsChild: false,
+                    child: SizedBox(
+                      width: 56,
+                      height: 56,
+                      child: Icon(widget.category.icon, color: Colors.white, size: 28),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -131,32 +122,31 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
                       if (widget.selectedCount > 0)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: CupertinoColors.activeBlue.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: CupertinoColors.activeBlue.withOpacity(0.4),
-                                    width: 1,
-                                  ),
+                          child: LiquidGlass(
+                            settings: LiquidGlassSettings(
+                              blur: 2,
+                              ambientStrength: 0.3,
+                              lightAngle: 0.1 * math.pi,
+                              glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
+                              thickness: 8,
+                            ),
+                            shape: LiquidRoundedSuperellipse(
+                              borderRadius: const Radius.circular(12),
+                            ),
+                            glassContainsChild: false,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              child: CategoryAnimatedCounter(
+                                targetValue: widget.selectedCount,
+                                counterKey: selectedCountKey,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                child: CategoryAnimatedCounter(
-                                  targetValue: widget.selectedCount,
-                                  counterKey: selectedCountKey,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  animationDuration: const Duration(milliseconds: 800),
-                                  minIncrement: 1,
-                                  maxIncrement: 1,
-                                ),
+                                animationDuration: const Duration(milliseconds: 800),
+                                minIncrement: 1,
+                                maxIncrement: 1,
                               ),
                             ),
                           ),

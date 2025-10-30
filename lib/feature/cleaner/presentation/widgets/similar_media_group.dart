@@ -7,8 +7,10 @@ import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
+import 'dart:math' as math;
 
 class SimilarMediaGroup extends StatelessWidget {
   final MediaGroup group;
@@ -121,28 +123,30 @@ class SimilarMediaGroup extends StatelessWidget {
               }
             }
           },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: CupertinoColors.activeBlue.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: CupertinoColors.activeBlue.withOpacity(0.5),
-                    width: 1,
+          child: LiquidGlass(
+            settings: LiquidGlassSettings(
+              blur: 3,
+              ambientStrength: 0.6,
+              lightAngle: 0.2 * math.pi,
+              glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
+              thickness: 12,
+            ),
+            shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(12)),
+            glassContainsChild: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    allSelected ? Locales.current.cancel : Locales.current.select_all,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                child: Text(
-                  allSelected ? Locales.current.cancel : Locales.current.select_all,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                ],
               ),
             ),
           ),
