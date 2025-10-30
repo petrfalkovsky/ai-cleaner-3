@@ -53,7 +53,6 @@ dependencies:
   simple_shadow: ^0.3.1
   widget_zoom: ^0.0.4
   toastification: ^2.3.0
-  liquid_glass_renderer: ^0.1.1-dev.25
 
   # Иконки и шрифты
   google_fonts: ^6.2.1

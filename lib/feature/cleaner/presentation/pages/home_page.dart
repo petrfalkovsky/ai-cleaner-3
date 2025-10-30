@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/core/router/router.gr.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
@@ -12,8 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
-import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
 import '../widgets/photo_category_card.dart';
 import '../widgets/video_category_card.dart';
@@ -84,133 +83,128 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 const Positioned.fill(child: AnimatedBackground()),
                 Column(
                   children: [
-                    // Custom Tab Bar в iOS стиле с liquid glass - показываем только после сканирования
+                    // Custom Tab Bar в iOS стиле с glassmorphism эффектом - показываем только после сканирования
                     if (showTabs)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        child: LiquidGlassLayer(
-                          settings: LiquidGlassSettings(
-                            blur: 3,
-                            ambientStrength: 0.5,
-                            lightAngle: 0.2 * math.pi,
-                            glassColor: Colors.white12,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Expanded(
-                                child: LiquidGlass.inLayer(
-                                  shape: LiquidRoundedSuperellipse(
-                                    borderRadius: const Radius.circular(12),
-                                  ),
-                                  glassContainsChild: false,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: GestureDetector(
-                                            behavior: HitTestBehavior.opaque,
-                                            onTap: () {
-                                              _tabController.animateTo(0);
-                                            },
-                                            child: _tabController.index == 0
-                                                ? LiquidGlass(
-                                                    settings: LiquidGlassSettings(
-                                                      blur: 8,
-                                                      ambientStrength: 0.5,
-                                                      lightAngle: 0.2 * math.pi,
-                                                      glassColor: Colors.black26,
-                                                      thickness: 10,
-                                                    ),
-                                                    shape: LiquidRoundedSuperellipse(
-                                                      borderRadius: const Radius.circular(10),
-                                                    ),
-                                                    glassContainsChild: false,
-                                                    child: Padding(
-                                                      padding: EdgeInsets.symmetric(vertical: 8),
-                                                      child: Center(
-                                                        child: Text(
-                                                          Locales.current.photos,
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16,
-                                                            fontWeight: FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Padding(
-                                                    padding: EdgeInsets.symmetric(vertical: 8),
-                                                    child: Center(
-                                                      child: Text(
-                                                        Locales.current.photos,
-                                                        style: TextStyle(
-                                                          color: Colors.white70,
-                                                          fontSize: 16,
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: GestureDetector(
-                                            behavior: HitTestBehavior.opaque,
-                                            onTap: () {
-                                              _tabController.animateTo(1);
-                                            },
-                                            child: _tabController.index == 1
-                                                ? LiquidGlass(
-                                                    settings: LiquidGlassSettings(
-                                                      blur: 8,
-                                                      ambientStrength: 0.5,
-                                                      lightAngle: 0.2 * math.pi,
-                                                      glassColor: Colors.black26,
-                                                      thickness: 10,
-                                                    ),
-                                                    shape: LiquidRoundedSuperellipse(
-                                                      borderRadius: const Radius.circular(10),
-                                                    ),
-                                                    glassContainsChild: false,
-                                                    child: Padding(
-                                                      padding: EdgeInsets.symmetric(vertical: 8),
-                                                      child: Center(
-                                                        child: Text(
-                                                          Locales.current.videos,
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16,
-                                                            fontWeight: FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Padding(
-                                                    padding: EdgeInsets.symmetric(vertical: 8),
-                                                    child: Center(
-                                                      child: Text(
-                                                        Locales.current.videos,
-                                                        style: TextStyle(
-                                                          color: Colors.white70,
-                                                          fontSize: 16,
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
+                                  width: 1,
                                 ),
                               ),
-                            ],
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () {
+                                        _tabController.animateTo(0);
+                                      },
+                                      child: _tabController.index == 0
+                                          ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(10),
+                                              child: BackdropFilter(
+                                                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black.withOpacity(0.3),
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    border: Border.all(
+                                                      color: Colors.white.withOpacity(0.15),
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      Locales.current.photos,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          : Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 8),
+                                              child: Center(
+                                                child: Text(
+                                                  Locales.current.photos,
+                                                  style: const TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () {
+                                        _tabController.animateTo(1);
+                                      },
+                                      child: _tabController.index == 1
+                                          ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(10),
+                                              child: BackdropFilter(
+                                                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black.withOpacity(0.3),
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    border: Border.all(
+                                                      color: Colors.white.withOpacity(0.15),
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      Locales.current.videos,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          : Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 8),
+                                              child: Center(
+                                                child: Text(
+                                                  Locales.current.videos,
+                                                  style: const TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
