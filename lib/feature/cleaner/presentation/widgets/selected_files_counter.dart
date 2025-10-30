@@ -1,3 +1,4 @@
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -137,8 +138,8 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
                           onTap: () {
                             context.read<MediaCleanerBloc>().add(UnselectAllFiles());
                           },
-                          child: const Text(
-                            'Отмена',
+                          child: Text(
+                            Locales.current.cancel,
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -174,8 +175,8 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Text(
-                                          'Удалить',
+                                        Text(
+                                          Locales.current.delete,
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w600,
@@ -220,9 +221,9 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('Удалить файлы'),
+        title: Text(Locales.current.delete_files),
         content: Text(
-          'Вы уверены, что хотите удалить $selectedCount ${_getFileWord(selectedCount)}?\n\nЭто действие нельзя отменить.',
+          '${Locales.current.are_you_sure_delete} $selectedCount ${_getFileWord(selectedCount)}?\n\n${Locales.current.action_cannot_be_undone}',
         ),
         actions: [
           CupertinoDialogAction(
@@ -230,7 +231,7 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
             onPressed: () {
               Navigator.of(dialogContext).pop();
             },
-            child: const Text('Отмена'),
+            child: Text(Locales.current.cancel),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
@@ -238,7 +239,7 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
               Navigator.of(dialogContext).pop();
               context.read<MediaCleanerBloc>().add(DeleteSelectedFiles());
             },
-            child: const Text('Удалить'),
+            child: Text(Locales.current.delete),
           ),
         ],
       ),

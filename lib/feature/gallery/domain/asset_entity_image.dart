@@ -157,7 +157,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
                         spacing: 8,
                         children: [
                           Text(
-                                "delete!!",
+                                "Delete!!",
                                 style: TextTheme.of(context).displaySmall?.copyWith(fontSize: 18),
                               )
                               .animate(
@@ -189,7 +189,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
                         spacing: 8,
                         children: [
                           Text(
-                                "keep",
+                                "Keep",
                                 style: TextTheme.of(context).displaySmall?.copyWith(fontSize: 18),
                               )
                               .animate(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -227,12 +228,12 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                message ?? "Сканирование...",
+                                message ?? Locales.current.scanning,
                                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                               ),
                               if (progress != null && processedFiles != null)
                                 Text(
-                                  '$processedFiles из $totalFiles • ${(progress * 100).toStringAsFixed(0)}%',
+                                  '$processedFiles ${Locales.current.from} $totalFiles • ${(progress * 100).toStringAsFixed(0)}%',
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: CupertinoColors.secondaryLabel.resolveFrom(context),
@@ -303,7 +304,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
-                                "AI Cleaner анализирует фото и видео для поиска дубликатов, размытых изображений и освобождения места.",
+                                Locales.current.ai_cleaner_description,
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: CupertinoColors.secondaryLabel.resolveFrom(context),
@@ -353,7 +354,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
-                                            'Дождитесь окончания сканирования для стабильной работы приложения.\nУстройство может нагреться. Вы можете приостановить сканирование для зарядки или охлаждения устройства (функция в разработке)',
+                                            Locales.current.scan_warning,
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: CupertinoColors.label.resolveFrom(context),

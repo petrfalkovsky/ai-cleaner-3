@@ -1,4 +1,5 @@
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
@@ -213,10 +214,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               CircularProgressIndicator(color: Colors.white),
               SizedBox(height: 12),
-              Text('Загрузка видео...', style: TextStyle(color: Colors.white)),
+              Text(Locales.current.loading_videos, style: TextStyle(color: Colors.white)),
             ],
           ),
         ),
@@ -256,14 +257,14 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             children: [
               const Icon(Icons.error_outline, color: Colors.red, size: 48),
               const SizedBox(height: 12),
-              const Text(
-                'Ошибка загрузки видео',
+              Text(
+                Locales.current.video_load_error,
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: _initializeVideoController,
-                child: const Text('Попробовать снова'),
+                child: Text(Locales.current.try_again),
               ),
             ],
           ),

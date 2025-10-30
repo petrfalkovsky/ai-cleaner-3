@@ -1,4 +1,5 @@
 import 'package:ai_cleaner_2/feature/cleaner/presentation/bloc/media_cleaner_bloc.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -141,7 +142,7 @@ class _AssetSwiperState extends State<AssetSwiper> {
                                     child: _deleting
                                         ? const CupertinoActivityIndicator(color: Colors.white)
                                         : Text(
-                                            'Выбрать',
+                                            Locales.current.select,
                                             style: const TextStyle(
                                               fontSize: 17,
                                               fontWeight: FontWeight.w600,
@@ -247,8 +248,8 @@ class _AssetSwiperState extends State<AssetSwiper> {
                           child: Container(
                             height: 52,
                             alignment: Alignment.center,
-                            child: const Text(
-                              'Оставить',
+                            child: Text(
+                              Locales.current.keep,
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,

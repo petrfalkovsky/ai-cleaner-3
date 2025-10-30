@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_scanner.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +57,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
         ),
       );
     } catch (e) {
-      emit(MediaCleanerError('Ошибка загрузки файлов: $e'));
+      emit(MediaCleanerError('${Locales.current.files_load_error} $e'));
     }
   }
 

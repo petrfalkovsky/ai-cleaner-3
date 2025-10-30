@@ -1,12 +1,11 @@
 import 'package:ai_cleaner_2/core/widgets/common/video_player.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selection_indicator.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
-import '../bloc/media_cleaner_bloc.dart';
 
 @RoutePage()
 class MediaPreviewPage extends StatelessWidget {
@@ -21,7 +20,10 @@ class MediaPreviewPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(file.entity.title ?? 'Просмотр', style: const TextStyle(color: Colors.white)),
+        title: Text(
+          file.entity.title ?? Locales.current.view,
+          style: const TextStyle(color: Colors.white),
+        ),
         actions: [
           // Заменяем кнопку на полях на наш индикатор
           Padding(
@@ -43,7 +45,7 @@ class MediaPreviewPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  file.entity.title ?? 'Файл без имени',
+                  file.entity.title ?? Locales.current.unnamed_file,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -134,7 +136,7 @@ class MediaPreviewPage extends StatelessWidget {
                 const Icon(Icons.error_outline, color: Colors.red, size: 48),
                 const SizedBox(height: 16),
                 Text(
-                  'Ошибка загрузки изображения',
+                  Locales.current.image_load_error,
                   style: TextStyle(color: Colors.white.withOpacity(0.7)),
                 ),
               ],

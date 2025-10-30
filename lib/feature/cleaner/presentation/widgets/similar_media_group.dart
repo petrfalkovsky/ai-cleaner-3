@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/bloc/media_cleaner_bloc.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selection_indicator.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -138,7 +139,7 @@ class SimilarMediaGroup extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    allSelected ? "Отменить" : "Выбрать все",
+                    allSelected ? Locales.current.cancel : Locales.current.select_all,
                     style: const TextStyle(
                       fontSize: 13,
                       color: Colors.white,

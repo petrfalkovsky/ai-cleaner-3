@@ -5,6 +5,7 @@ import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_button.da
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_status_banner.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selected_files_counter.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/animated_background.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -69,8 +70,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return Scaffold(
           backgroundColor: const Color(0xFF0A0E27), // Темный фон для контраста
           appBar: AppBar(
-            title: const Text(
-              'AI Cleaner',
+            title: Text(
+              Locales.current.ai_cleaner,
               style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
             ),
             backgroundColor: Colors.transparent,
@@ -126,11 +127,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                       borderRadius: const Radius.circular(10),
                                                     ),
                                                     glassContainsChild: false,
-                                                    child: const Padding(
+                                                    child: Padding(
                                                       padding: EdgeInsets.symmetric(vertical: 8),
                                                       child: Center(
                                                         child: Text(
-                                                          'Фото',
+                                                          Locales.current.photos,
                                                           style: TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 16,
@@ -140,11 +141,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                       ),
                                                     ),
                                                   )
-                                                : const Padding(
+                                                : Padding(
                                                     padding: EdgeInsets.symmetric(vertical: 8),
                                                     child: Center(
                                                       child: Text(
-                                                        'Фото',
+                                                        Locales.current.photos,
                                                         style: TextStyle(
                                                           color: Colors.white70,
                                                           fontSize: 16,
@@ -175,11 +176,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                       borderRadius: const Radius.circular(10),
                                                     ),
                                                     glassContainsChild: false,
-                                                    child: const Padding(
+                                                    child: Padding(
                                                       padding: EdgeInsets.symmetric(vertical: 8),
                                                       child: Center(
                                                         child: Text(
-                                                          'Видео',
+                                                          Locales.current.videos,
                                                           style: TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 16,
@@ -189,11 +190,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                       ),
                                                     ),
                                                   )
-                                                : const Padding(
+                                                : Padding(
                                                     padding: EdgeInsets.symmetric(vertical: 8),
                                                     child: Center(
                                                       child: Text(
-                                                        'Видео',
+                                                        Locales.current.videos,
                                                         style: TextStyle(
                                                           color: Colors.white70,
                                                           fontSize: 16,
@@ -254,7 +255,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 CupertinoActivityIndicator(radius: 16),
                 SizedBox(height: 16),
                 Text(
-                  'Загрузка...',
+                  Locales.current.loading,
                   style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(.5)),
                 ),
               ],
@@ -273,8 +274,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   color: CupertinoColors.systemRed,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Произошла ошибка',
+                Text(
+                  Locales.current.error_occurred,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
@@ -289,7 +290,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 const SizedBox(height: 24),
                 CupertinoButton.filled(
                   onPressed: () => context.read<MediaCleanerBloc>().add(LoadMediaFiles()),
-                  child: const Text('Попробовать снова'),
+                  child: Text(Locales.current.try_again),
                 ),
               ],
             ),
@@ -313,15 +314,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   color: CupertinoColors.systemGrey.resolveFrom(context),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Очистите свою галерею',
+                Text(
+                  Locales.current.clean_your_gallery,
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 12),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
-                    'Найдите и удалите ненужные фотографии для освобождения места',
+                    Locales.current.find_and_delete_unnecessary_photos,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.5)),
                   ),
@@ -386,13 +387,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               color: CupertinoColors.systemGreen.resolveFrom(context),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Проблем не найдено',
+            Text(
+              Locales.current.no_issues_found,
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
-              'Ваша галерея в отличном состоянии!',
+              Locales.current.gallery_in_good_shape,
               style: TextStyle(color: Colors.white.withOpacity(.5)),
             ),
           ],
@@ -409,14 +410,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: Column(
               children: [
                 Text(
-                  'Проблемные фото',
+                  Locales.current.problem_photos,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 if (lastScanTime != null && !isScanningInBackground)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      'Обновлено: ${DateFormat('dd.MM HH:mm').format(lastScanTime)}',
+                      '${Locales.current.updated} ${DateFormat('dd.MM HH:mm').format(lastScanTime)}',
                       style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.5)),
                     ),
                   ),
@@ -443,8 +444,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           onTap: isScanningInBackground
                               ? () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Дождитесь окончания сканирования'),
+                                    SnackBar(
+                                      content: Text(Locales.current.scan_warning),
                                       duration: Duration(seconds: 2),
                                       behavior: SnackBarBehavior.floating,
                                     ),
@@ -485,7 +486,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Повторить сканирование',
+                    Locales.current.rescan,
                     style: TextStyle(
                       color: isScanningInBackground
                           ? Colors.white.withOpacity(0.3)
@@ -519,15 +520,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   color: CupertinoColors.systemGrey.resolveFrom(context),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Очистите видео',
+                Text(
+                  Locales.current.clean_videos,
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 12),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
-                    'Найдите дубликаты и ненужные видео',
+                    Locales.current.find_duplicate_and_unnecessary_videos,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16, color: CupertinoColors.secondaryLabel),
                   ),
@@ -587,12 +588,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               color: CupertinoColors.systemGreen.resolveFrom(context),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Проблем пока не найдено',
+            Text(
+              Locales.current.no_video_issues_yet,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
-            Text('Все видео в порядке!', style: TextStyle(color: Colors.white.withOpacity(0.5))),
+            Text(
+              Locales.current.all_videos_ok,
+              style: TextStyle(color: Colors.white.withOpacity(0.5)),
+            ),
           ],
         ).animate().fadeIn(duration: 500.ms).scale(),
       );
@@ -607,14 +611,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: Column(
               children: [
                 Text(
-                  'Проблемные видео',
+                  Locales.current.problem_videos,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 if (lastScanTime != null && !isScanningInBackground)
                   Padding(
                     padding: EdgeInsets.only(top: 8),
                     child: Text(
-                      'Обновлено: ${DateFormat('dd.MM HH:mm').format(lastScanTime)}',
+                      '${Locales.current.updated}  ${DateFormat('dd.MM HH:mm').format(lastScanTime)}',
                       style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.5)),
                     ),
                   ),
@@ -640,8 +644,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           onTap: isScanningInBackground
                               ? () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Дождитесь окончания сканирования'),
+                                    SnackBar(
+                                      content: Text(Locales.current.from),
                                       duration: Duration(seconds: 2),
                                       behavior: SnackBarBehavior.floating,
                                     ),
@@ -682,7 +686,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Повторить сканирование',
+                    Locales.current.rescan,
                     style: TextStyle(
                       color: isScanningInBackground
                           ? Colors.white.withOpacity(0.3)

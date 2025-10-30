@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -27,24 +28,17 @@ class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _dropController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
+    _dropController = AnimationController(duration: const Duration(milliseconds: 600), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _dropController,
-        curve: Curves.easeInBack,
-      ),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _dropController, curve: Curves.easeInBack));
 
-    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _dropController,
-        curve: const Interval(0.5, 1.0),
-      ),
-    );
+    _opacityAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _dropController, curve: const Interval(0.5, 1.0)));
   }
 
   void _startScan() {
@@ -102,8 +96,8 @@ class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateM
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Подготовка к сканированию...',
+                  Text(
+                    Locales.current.preparing_for_scan,
                     style: TextStyle(fontSize: 15, color: Colors.white70),
                   ),
                 ],
@@ -111,55 +105,52 @@ class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateM
             ),
           )
         : AnimatedBuilder(
-            animation: _dropController,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _scaleAnimation.value,
-                child: Opacity(
-                  opacity: _opacityAnimation.value,
-                  child: GestureDetector(
-                    onTap: _startScan,
-                    child: LiquidGlass(
-                      settings: LiquidGlassSettings(
-                        blur: 5,
-                        ambientStrength: 1.0,
-                        lightAngle: 0.25 * math.pi,
-                        glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
-                        thickness: 25,
-                      ),
-                      shape: LiquidRoundedSuperellipse(
-                        borderRadius: const Radius.circular(25),
-                      ),
-                      glassContainsChild: false,
-                      child: Container(
-                        width: 280,
-                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              CupertinoIcons.sparkles,
-                              color: Colors.white,
-                              size: 24,
+                animation: _dropController,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _scaleAnimation.value,
+                    child: Opacity(
+                      opacity: _opacityAnimation.value,
+                      child: GestureDetector(
+                        onTap: _startScan,
+                        child: LiquidGlass(
+                          settings: LiquidGlassSettings(
+                            blur: 5,
+                            ambientStrength: 1.0,
+                            lightAngle: 0.25 * math.pi,
+                            glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
+                            thickness: 25,
+                          ),
+                          shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(25)),
+                          glassContainsChild: false,
+                          child: Container(
+                            width: 280,
+                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(CupertinoIcons.sparkles, color: Colors.white, size: 24),
+                                SizedBox(width: 12),
+                                Text(
+                                  Locales.current.start_scan,
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: 12),
-                            Text(
-                              'Начать сканирование',
-                              style: TextStyle(
-                                fontSize: 17,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              );
-            },
-          ).animate().fadeIn(duration: 350.ms).scale(
+                  );
+                },
+              )
+              .animate()
+              .fadeIn(duration: 350.ms)
+              .scale(
                 begin: const Offset(0.8, 0.8),
                 end: const Offset(1.0, 1.0),
                 duration: 400.ms,

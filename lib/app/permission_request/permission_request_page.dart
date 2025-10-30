@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/animated_background.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +56,8 @@ class PermissionRequestPage extends StatelessWidget {
                     child: Container(
                       height: 52,
                       alignment: Alignment.center,
-                      child: const Text(
-                        'Give gallery access',
+                      child:  Text(
+                        Locales.current.give_gallery_access,
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,

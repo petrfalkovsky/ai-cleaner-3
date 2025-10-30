@@ -13,8 +13,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
+  flutter_localizations:
+    sdk: flutter
   intl: ^0.20.2
+  cupertino_icons: ^1.0.8
+
   collection: ^1.19.0
   path: ^1.9.0
   timezone: ^0.10.0
@@ -23,10 +26,13 @@ dependencies:
   flutter_bloc: ^9.1.1
   bloc: ^9.0.0
   hydrated_bloc: ^10.0.0
-  get_it: ^8.0.3
   mutex: ^3.1.0
   rate_limiter: ^1.0.0
   equatable: ^2.0.7
+
+  # Внедрение зависимостей
+  get_it: ^8.0.3
+  injectable: ^2.5.2
 
   # Генерация кода и аннотации
   freezed_annotation: ^2.4.4
@@ -97,6 +103,7 @@ dev_dependencies:
   freezed: ^2.4.7
   json_serializable: ^6.7.1
   auto_route_generator: ^9.0.0
+  intl_utils: ^2.8.3
 
 flutter:
   uses-material-design: true
@@ -108,6 +115,11 @@ flutter:
     # - assets/vectors/
     # - assets/lottie/
     - assets/models/
+
+flutter_intl:
+  enabled: true
+  class_name: Locales
+  main_locale: en
 
 flutter_launcher_icons:
   android: true

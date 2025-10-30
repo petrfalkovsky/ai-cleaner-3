@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/router/router.gr.dart';
@@ -40,7 +41,7 @@ class SwipeModeBanner extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Попробуйте режим смахивания',
+                        Locales.current.try_swipe_mode,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -49,7 +50,7 @@ class SwipeModeBanner extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Удаляйте или сохраняйте файлы простым свайпом',
+                        Locales.current.swipe_hint,
                         style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.6)),
                       ),
                     ],

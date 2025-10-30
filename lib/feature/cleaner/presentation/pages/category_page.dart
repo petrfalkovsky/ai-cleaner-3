@@ -5,6 +5,7 @@ import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/blurry_media_g
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/media_grid_item.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/similar_media_group.dart';
 import 'package:ai_cleaner_2/feature/swipe/presentation/widgets/swipe_mode_banner.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +79,7 @@ class CategoryPage extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Text(
-                        allSelected ? 'Отменить' : 'Выбрать все',
+                        allSelected ? Locales.current.cancel : Locales.current.select_all,
                         style: const TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
@@ -98,8 +99,11 @@ class CategoryPage extends StatelessWidget {
           final List<MediaFile> categoryFiles = _getCategoryFiles(state);
 
           if (categoryFiles.isEmpty) {
-            return const Center(
-              child: Text('Нет файлов в категории', style: TextStyle(color: Colors.white60)),
+            return Center(
+              child: Text(
+                Locales.current.no_files_in_category,
+                style: TextStyle(color: Colors.white60),
+              ),
             );
           }
 
@@ -219,8 +223,8 @@ class CategoryPage extends StatelessWidget {
                       context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
                     }
                   },
-                  child: const Text(
-                    'Отмена',
+                  child: Text(
+                    Locales.current.cancel,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 17,
@@ -248,8 +252,8 @@ class CategoryPage extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
-                          'Удалить',
+                        Text(
+                          Locales.current.delete,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
@@ -272,13 +276,13 @@ class CategoryPage extends StatelessWidget {
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('Удалить файлы'),
-        content: Text('Вы уверены, что хотите удалить $count ${_getFileWord(count)}?'),
+        title: Text(Locales.current.delete_files),
+        content: Text('${Locales.current.are_you_sure_delete} $count ${_getFileWord(count)}?'),
         actions: [
           CupertinoDialogAction(
             isDefaultAction: true,
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Отмена'),
+            child: Text(Locales.current.cancel),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
@@ -286,7 +290,7 @@ class CategoryPage extends StatelessWidget {
               Navigator.of(dialogContext).pop();
               context.read<MediaCleanerBloc>().add(DeleteSelectedFiles());
             },
-            child: const Text('Удалить'),
+            child: Text(Locales.current.delete),
           ),
         ],
       ),
@@ -373,7 +377,7 @@ class CategoryPage extends StatelessWidget {
       }
 
       if (groups.isEmpty) {
-        return Center(child: Text('$categoryName не найдены'));
+        return Center(child: Text('$categoryName ${Locales.current.not_found.toLowerCase()}'));
       }
 
       return ListView.builder(
