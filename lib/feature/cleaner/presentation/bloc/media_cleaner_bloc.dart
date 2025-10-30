@@ -35,7 +35,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       // Запрос разрешений
       final PermissionState permissionState = await PhotoManager.requestPermissionExtend();
       if (!permissionState.hasAccess) {
-        emit(MediaCleanerError('Для доступа к галерее требуется разрешение'));
+        emit(MediaCleanerError(Locales.current.gallery_permission_required));
         return;
       }
 
@@ -159,7 +159,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       debugPrint('СКАНИРОВАНИЕ: Инициализация моделей завершена');
 
       // 1. Находим скриншоты - быстрая операция
-      await updateStatus("Ai-модель ищет снимки экрана...", 0.05);
+      await updateStatus(Locales.current.ai_model_searching_screenshots, 0.05);
 
       final screenshots = MediaScanner.findScreenshots(currentState.photoFiles);
       currentState = currentState.copyWith(screenshots: screenshots);
@@ -167,14 +167,16 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
 
       // Отправляем первое обновление после нахождения скриншотов
       await updateStatus(
-        "Найдено ${screenshots.length} скриншотов",
+        '${Locales.current.found} ${screenshots.length} ${Locales.current.screenshots_count.toLowerCase()}',
         0.1,
         currentBatch: processedFiles,
       );
-      debugPrint('СКАНИРОВАНИЕ: Найдено ${screenshots.length} скриншотов');
+      debugPrint(
+        'СКАНИРОВАНИЕ: Найдено ${screenshots.length} ${Locales.current.screenshots_count.toLowerCase()}',
+      );
 
       // 2. Ищем серии снимков - разбиваем на порции для более плавного UI
-      await updateStatus("Ai-модель ищет серии снимков...", 0.15, currentBatch: processedFiles);
+      await updateStatus('Ai-модель ищет серии снимков...', 0.15, currentBatch: processedFiles);
 
       // Разбиваем на порции по 100 фото
       const photoBatchSize = 100;
@@ -214,17 +216,17 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             final progress =
                 0.15 + (0.15 * (i + photoBatchSize / 2) / currentState.photoFiles.length);
             await updateStatus(
-              "Найдено ${allPhotoDuplicateGroups.length} групп дубликатов фото",
+              '${Locales.current.found} ${allPhotoDuplicateGroups.length} ${Locales.current.duplicate_photo_groups.toLowerCase()}',
               progress,
               currentBatch: processedFiles,
             );
-            if (isPaused) break; // Проверка после updateStatus
+            if (isPaused) break;
           }
         } else {
           // Если в этой порции ничего не нашли, всё равно обновляем прогресс
           final progress = 0.15 + (0.15 * end / currentState.photoFiles.length);
           await updateStatus(
-            "Поиск дубликатов фото (обработано $end/${currentState.photoFiles.length})",
+            '${Locales.current.searching_duplicate_photos_processed} $end/${currentState.photoFiles.length})',
             progress,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы
           );
@@ -246,14 +248,14 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       );
 
       await updateStatus(
-        "Найдено ${allPhotoDuplicateGroups.length} групп дубликатов (${totalDuplicatesCount} фото)",
+        '${Locales.current.found} ${allPhotoDuplicateGroups.length} ${Locales.current.duplicate_groups.toLowerCase()} ($totalDuplicatesCount ${Locales.current.photos.toLowerCase()})',
         0.3,
         currentBatch: processedFiles,
       );
 
       // 3. Ищем похожие фотографии - обновляем UI после каждой найденной группы
       await updateStatus(
-        "Ai-модель группирует похожие фотографии...",
+        Locales.current.ai_model_grouping_similar_photos,
         0.35,
         currentBatch: processedFiles,
       );
@@ -301,7 +303,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             final progress =
                 0.35 + (0.15 * ((i + similarBatchSize / 2) / currentState.photoFiles.length));
             await updateStatus(
-              "Найдено ${allSimilarGroups.length} групп\nпохожих фото",
+              '${Locales.current.found} ${allSimilarGroups.length} ${Locales.current.similar_photo_groups_multiline.toLowerCase()}',
               progress,
               currentBatch: processedFiles,
             );
@@ -311,7 +313,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
           // Даже если не нашли группы в порции, всё равно обновляем прогресс
           final progress = 0.35 + (0.15 * end / currentState.photoFiles.length);
           await updateStatus(
-            "Поиск похожих фото (обработано ${end}/${currentState.photoFiles.length})",
+            '${Locales.current.searching_similar_photos_processed} ${end}/${currentState.photoFiles.length})',
             progress,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы
           );
@@ -333,13 +335,17 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       );
 
       await updateStatus(
-        "Найдено ${allSimilarGroups.length} групп похожих фото (${totalSimilarCount} фото)",
+        '${Locales.current.found} ${allSimilarGroups.length} ${Locales.current.similar_photo_groups_multiline.toLowerCase()} (${totalSimilarCount})',
         0.5,
         currentBatch: processedFiles,
       );
 
       // 4. Находим размытые фотографии - обновляем после каждого найденного
-      await updateStatus("Ai-модель ищет заблюренные фото...", 0.55, currentBatch: processedFiles);
+      await updateStatus(
+        Locales.current.ai_model_searching_blurry_photos,
+        0.55,
+        currentBatch: processedFiles,
+      );
 
       // Ещё меньшие порции для размытых фото
       const blurryBatchSize = 20; // Меньшие порции
@@ -378,7 +384,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
           final progressValue = 0.55 + (0.15 * end / currentState.photoFiles.length);
 
           await updateStatus(
-            "Найдено ${allBlurry.length} размытых фото (+$newBlurryCount новых)",
+            '${Locales.current.found} ${allBlurry.length} ${Locales.current.blurry_photos.toLowerCase()} (+$newBlurryCount ${Locales.current.new_word.toLowerCase()})',
             progressValue,
             currentBatch: processedFiles,
           );
@@ -388,7 +394,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
           final progressValue = 0.55 + (0.15 * end / currentState.photoFiles.length);
 
           await updateStatus(
-            "Поиск размытых фото (обработано $end/${currentState.photoFiles.length})",
+            '${Locales.current.searching_similar_photos_processed} $end/${currentState.photoFiles.length})',
             progressValue,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы
           );
@@ -405,7 +411,11 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       }
 
       // 5. Обрабатываем видео - обновляем после каждой находки
-      await updateStatus("Ai-модель анализирует видео...", 0.7, currentBatch: processedFiles);
+      await updateStatus(
+        Locales.current.ai_model_analyzing_videos,
+        0.7,
+        currentBatch: processedFiles,
+      );
 
       // Еще меньше порции для быстрого обновления UI
       const videoBatchSize = 20;
@@ -445,7 +455,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
 
           final progress = 0.7 + (0.05 * end / currentState.videoFiles.length);
           await updateStatus(
-            "Найдено ${allVideoDuplicateGroups.length} групп дубликатов видео (+${batchVideoDuplicates.length} новых)",
+            '${Locales.current.found} ${allVideoDuplicateGroups.length} групп дубликатов видео (+${batchVideoDuplicates.length} ${Locales.current.new_word.toLowerCase()})',
             progress,
             currentBatch: processedFiles,
           );
@@ -464,11 +474,11 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
 
           final progress = 0.75 + (0.05 * end / currentState.videoFiles.length);
           await updateStatus(
-            "Найдено ${allScreenRecordings.length} записей экрана (+${batchScreenRecordings.length} новых)",
+            '${Locales.current.found} ${allScreenRecordings.length} ${Locales.current.screen_recordings_2.toLowerCase()} (+${batchScreenRecordings.length} ${Locales.current.new_word.toLowerCase()})',
             progress,
             currentBatch: processedFiles,
           );
-          if (isPaused) break; // Проверка после updateStatus
+          if (isPaused) break;
         }
 
         // Находим короткие видео
@@ -483,11 +493,11 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
 
           final progress = 0.8 + (0.05 * end / currentState.videoFiles.length);
           await updateStatus(
-            "Найдено ${allShortVideos.length} коротких видео (+${batchShortVideos.length} новых)",
+            '${Locales.current.found} ${allShortVideos.length} ${Locales.current.short_videos.toLowerCase()} (+${batchShortVideos.length} ${Locales.current.new_word.toLowerCase()})',
             progress,
             currentBatch: processedFiles,
           );
-          if (isPaused) break; // Проверка после updateStatus
+          if (isPaused) break;
         }
 
         // Если в этой порции ничего не нашли, всё равно обновляем прогресс
@@ -496,11 +506,11 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             batchShortVideos.isEmpty) {
           final progress = 0.7 + (0.15 * end / currentState.videoFiles.length);
           await updateStatus(
-            "Анализ видео (обработано $end/${currentState.videoFiles.length})",
+            '${Locales.current.analyzing_videos_processed} $end/${currentState.videoFiles.length})',
             progress,
-            currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы к счетчику
+            currentBatch: processedFiles + (end - i),
           );
-          if (isPaused) break; // Проверка после updateStatus
+          if (isPaused) break;
         }
 
         // Пауза для отзывчивости
@@ -513,7 +523,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       }
 
       // Завершающая стадия - финальное обновление
-      await updateStatus("Сканирование завершено", 1.0, currentBatch: processedFiles);
+      await updateStatus('Сканирование завершено', 1.0, currentBatch: processedFiles);
 
       // Завершаем сканирование
       if (!emit.isDone) {

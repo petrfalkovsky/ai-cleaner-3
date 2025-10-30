@@ -299,11 +299,11 @@ class CategoryPage extends StatelessWidget {
 
   String _getFileWord(int count) {
     if (count % 10 == 1 && count % 100 != 11) {
-      return 'файл';
+      return Locales.current.file.toLowerCase();
     } else if ([2, 3, 4].contains(count % 10) && ![12, 13, 14].contains(count % 100)) {
-      return 'файла';
+      return Locales.current.a_file.toLowerCase();
     } else {
-      return 'файлов';
+      return Locales.current.files.toLowerCase();
     }
   }
 

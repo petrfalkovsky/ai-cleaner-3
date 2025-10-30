@@ -445,7 +445,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ? () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(Locales.current.scan_warning),
+                                      content: Text(Locales.current.please_wait),
                                       duration: Duration(seconds: 2),
                                       behavior: SnackBarBehavior.floating,
                                     ),

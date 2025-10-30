@@ -77,33 +77,6 @@ class MediaPreviewPage extends StatelessWidget {
               ],
             ),
           ),
-
-          // // Кнопка выбора/отмены выбора
-          // SafeArea(
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(16.0),
-          //     child: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-          //       builder: (context, state) {
-          //         final isSelected =
-          //             (state is MediaCleanerLoaded) &&
-          //             state.selectedFiles.any((f) => f.entity.id == file.entity.id);
-
-          //         return ElevatedButton.icon(
-          //           onPressed: () {
-          //             context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(file.entity.id));
-          //           },
-          //           icon: Icon(isSelected ? Icons.check_circle : Icons.check_circle_outline),
-          //           label: Text(isSelected ? 'Снять выделение' : 'Выбрать файл'),
-          //           style: ElevatedButton.styleFrom(
-          //             backgroundColor: isSelected ? Colors.green : Colors.blue,
-          //             foregroundColor: Colors.white,
-          //             minimumSize: const Size(double.infinity, 50),
-          //           ),
-          //         );
-          //       },
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );

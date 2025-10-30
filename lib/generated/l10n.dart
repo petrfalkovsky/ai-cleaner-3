@@ -18,20 +18,17 @@ class Locales {
   static Locales? _current;
 
   static Locales get current {
-    assert(
-      _current != null,
-      'No instance of Locales was loaded. Try to initialize the Locales delegate before accessing Locales.current.',
-    );
+    assert(_current != null,
+        'No instance of Locales was loaded. Try to initialize the Locales delegate before accessing Locales.current.');
     return _current!;
   }
 
   static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
 
   static Future<Locales> load(Locale locale) {
-    final name =
-        (locale.countryCode?.isEmpty ?? false)
-            ? locale.languageCode
-            : locale.toString();
+    final name = (locale.countryCode?.isEmpty ?? false)
+        ? locale.languageCode
+        : locale.toString();
     final localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
@@ -44,10 +41,8 @@ class Locales {
 
   static Locales of(BuildContext context) {
     final instance = Locales.maybeOf(context);
-    assert(
-      instance != null,
-      'No instance of Locales present in the widget tree. Did you add Locales.delegate in localizationsDelegates?',
-    );
+    assert(instance != null,
+        'No instance of Locales present in the widget tree. Did you add Locales.delegate in localizationsDelegates?');
     return instance!;
   }
 
@@ -67,22 +62,42 @@ class Locales {
 
   /// `Select`
   String get select {
-    return Intl.message('Select', name: 'select', desc: '', args: []);
+    return Intl.message(
+      'Select',
+      name: 'select',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Keep`
   String get keep {
-    return Intl.message('Keep', name: 'keep', desc: '', args: []);
+    return Intl.message(
+      'Keep',
+      name: 'keep',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Cancel`
   String get cancel {
-    return Intl.message('Cancel', name: 'cancel', desc: '', args: []);
+    return Intl.message(
+      'Cancel',
+      name: 'cancel',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Select all`
   String get select_all {
-    return Intl.message('Select all', name: 'select_all', desc: '', args: []);
+    return Intl.message(
+      'Select all',
+      name: 'select_all',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `No files in this category`
@@ -97,27 +112,52 @@ class Locales {
 
   /// `Delete`
   String get delete {
-    return Intl.message('Delete', name: 'delete', desc: '', args: []);
+    return Intl.message(
+      'Delete',
+      name: 'delete',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `AI Cleaner`
   String get ai_cleaner {
-    return Intl.message('AI Cleaner', name: 'ai_cleaner', desc: '', args: []);
+    return Intl.message(
+      'AI Cleaner',
+      name: 'ai_cleaner',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Photos`
   String get photos {
-    return Intl.message('Photos', name: 'photos', desc: '', args: []);
+    return Intl.message(
+      'Photos',
+      name: 'photos',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Videos`
   String get videos {
-    return Intl.message('Videos', name: 'videos', desc: '', args: []);
+    return Intl.message(
+      'Videos',
+      name: 'videos',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Loading...`
   String get loading {
-    return Intl.message('Loading...', name: 'loading', desc: '', args: []);
+    return Intl.message(
+      'Loading...',
+      name: 'loading',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `An error occurred`
@@ -172,12 +212,22 @@ class Locales {
 
   /// `Updated:`
   String get updated {
-    return Intl.message('Updated:', name: 'updated', desc: '', args: []);
+    return Intl.message(
+      'Updated:',
+      name: 'updated',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Rescan`
   String get rescan {
-    return Intl.message('Rescan', name: 'rescan', desc: '', args: []);
+    return Intl.message(
+      'Rescan',
+      name: 'rescan',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Clean videos`
@@ -232,7 +282,12 @@ class Locales {
 
   /// `View`
   String get view {
-    return Intl.message('View', name: 'view', desc: '', args: []);
+    return Intl.message(
+      'View',
+      name: 'view',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Unnamed file`
@@ -267,17 +322,32 @@ class Locales {
 
   /// `Start scan`
   String get start_scan {
-    return Intl.message('Start scan', name: 'start_scan', desc: '', args: []);
+    return Intl.message(
+      'Start scan',
+      name: 'start_scan',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Scanning...`
   String get scanning {
-    return Intl.message('Scanning...', name: 'scanning', desc: '', args: []);
+    return Intl.message(
+      'Scanning...',
+      name: 'scanning',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `from`
   String get from {
-    return Intl.message('from', name: 'from', desc: '', args: []);
+    return Intl.message(
+      'from',
+      name: 'from',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Please wait until the scan is complete for stable app performance.\nYour device may heat up. You can pause the scan for charging or cooling (feature in development).`
@@ -285,6 +355,16 @@ class Locales {
     return Intl.message(
       'Please wait until the scan is complete for stable app performance.\nYour device may heat up. You can pause the scan for charging or cooling (feature in development).',
       name: 'scan_warning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please wait until the scan is complete`
+  String get please_wait {
+    return Intl.message(
+      'Please wait until the scan is complete',
+      name: 'please_wait',
       desc: '',
       args: [],
     );
@@ -372,22 +452,42 @@ class Locales {
 
   /// `Done`
   String get done {
-    return Intl.message('Done', name: 'done', desc: '', args: []);
+    return Intl.message(
+      'Done',
+      name: 'done',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Close`
   String get close {
-    return Intl.message('Close', name: 'close', desc: '', args: []);
+    return Intl.message(
+      'Close',
+      name: 'close',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Not found`
   String get not_found {
-    return Intl.message('Not found', name: 'not_found', desc: '', args: []);
+    return Intl.message(
+      'Not found',
+      name: 'not_found',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Tra again`
   String get try_again {
-    return Intl.message('Tra again', name: 'try_again', desc: '', args: []);
+    return Intl.message(
+      'Tra again',
+      name: 'try_again',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Give gallery access`
@@ -405,6 +505,356 @@ class Locales {
     return Intl.message(
       'AI Cleaner analyzes photos and videos to find duplicates, blurry images, and free up storage space.',
       name: 'ai_cleaner_description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Permission required to access gallery`
+  String get gallery_permission_required {
+    return Intl.message(
+      'Permission required to access gallery',
+      name: 'gallery_permission_required',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Файл`
+  String get file {
+    return Intl.message(
+      'Файл',
+      name: 'file',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Файлов`
+  String get files {
+    return Intl.message(
+      'Файлов',
+      name: 'files',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Файла`
+  String get a_file {
+    return Intl.message(
+      'Файла',
+      name: 'a_file',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Similar`
+  String get similar {
+    return Intl.message(
+      'Similar',
+      name: 'similar',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Photo bursts`
+  String get photo_bursts {
+    return Intl.message(
+      'Photo bursts',
+      name: 'photo_bursts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Screenshots`
+  String get screenshots {
+    return Intl.message(
+      'Screenshots',
+      name: 'screenshots',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Blurry`
+  String get blurry {
+    return Intl.message(
+      'Blurry',
+      name: 'blurry',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Similar photos`
+  String get similar_photos {
+    return Intl.message(
+      'Similar photos',
+      name: 'similar_photos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Photo series`
+  String get photo_series {
+    return Intl.message(
+      'Photo series',
+      name: 'photo_series',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Device screenshots`
+  String get device_screenshots {
+    return Intl.message(
+      'Device screenshots',
+      name: 'device_screenshots',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Blurry and unclear photos`
+  String get blurry_not_clear_photos {
+    return Intl.message(
+      'Blurry and unclear photos',
+      name: 'blurry_not_clear_photos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Duplicates`
+  String get duplicates {
+    return Intl.message(
+      'Duplicates',
+      name: 'duplicates',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Screen recordings`
+  String get screen_recordings {
+    return Intl.message(
+      'Screen recordings',
+      name: 'screen_recordings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Short recordings`
+  String get short_recordings {
+    return Intl.message(
+      'Short recordings',
+      name: 'short_recordings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Identical video files`
+  String get identical_videos {
+    return Intl.message(
+      'Identical video files',
+      name: 'identical_videos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Device screen recordings`
+  String get device_screen_recordings {
+    return Intl.message(
+      'Device screen recordings',
+      name: 'device_screen_recordings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Short video clips`
+  String get short_video_clips {
+    return Intl.message(
+      'Short video clips',
+      name: 'short_video_clips',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Short video clips`
+  String get short_video_clips_ {
+    return Intl.message(
+      'Short video clips',
+      name: 'short_video_clips_',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `AI model is searching for screenshots...`
+  String get ai_model_searching_screenshots {
+    return Intl.message(
+      'AI model is searching for screenshots...',
+      name: 'ai_model_searching_screenshots',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `AI model is grouping similar photos...`
+  String get ai_model_grouping_similar_photos {
+    return Intl.message(
+      'AI model is grouping similar photos...',
+      name: 'ai_model_grouping_similar_photos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Found`
+  String get found {
+    return Intl.message(
+      'Found',
+      name: 'found',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Screenshots`
+  String get screenshots_count {
+    return Intl.message(
+      'Screenshots',
+      name: 'screenshots_count',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Duplicate photo groups`
+  String get duplicate_photo_groups {
+    return Intl.message(
+      'Duplicate photo groups',
+      name: 'duplicate_photo_groups',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Searching duplicate photos (processed`
+  String get searching_duplicate_photos_processed {
+    return Intl.message(
+      'Searching duplicate photos (processed',
+      name: 'searching_duplicate_photos_processed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Duplicate groups`
+  String get duplicate_groups {
+    return Intl.message(
+      'Duplicate groups',
+      name: 'duplicate_groups',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Groups of similar photos`
+  String get similar_photo_groups_multiline {
+    return Intl.message(
+      'Groups of similar photos',
+      name: 'similar_photo_groups_multiline',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Searching similar photos (processed`
+  String get searching_similar_photos_processed {
+    return Intl.message(
+      'Searching similar photos (processed',
+      name: 'searching_similar_photos_processed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `AI model is searching for blurry photos...`
+  String get ai_model_searching_blurry_photos {
+    return Intl.message(
+      'AI model is searching for blurry photos...',
+      name: 'ai_model_searching_blurry_photos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New`
+  String get new_word {
+    return Intl.message(
+      'New',
+      name: 'new_word',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Screen recordings`
+  String get screen_recordings_2 {
+    return Intl.message(
+      'Screen recordings',
+      name: 'screen_recordings_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Blurry photos`
+  String get blurry_photos {
+    return Intl.message(
+      'Blurry photos',
+      name: 'blurry_photos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `AI model is analyzing videos...`
+  String get ai_model_analyzing_videos {
+    return Intl.message(
+      'AI model is analyzing videos...',
+      name: 'ai_model_analyzing_videos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Analyzing videos (processed`
+  String get analyzing_videos_processed {
+    return Intl.message(
+      'Analyzing videos (processed',
+      name: 'analyzing_videos_processed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Short videos`
+  String get short_videos {
+    return Intl.message(
+      'Short videos',
+      name: 'short_videos',
       desc: '',
       args: [],
     );
