@@ -19,12 +19,12 @@ class BlurIndicator extends StatelessWidget {
     }
 
     return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(color: Colors.black.withOpacity(0.7), shape: BoxShape.circle),
-      child: Center(
-        child: Icon(Icons.blur_on, color: color, size: size * 0.6),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(4),
       ),
+      child: Icon(Icons.blur_on, color: color, size: 12),
     );
   }
 }

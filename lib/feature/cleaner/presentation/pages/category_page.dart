@@ -1,12 +1,17 @@
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/pages/media_preview_page.dart';
+import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/animated_background.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/blurry_media_grid_item.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/media_grid_item.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/similar_media_group.dart';
 import 'package:ai_cleaner_2/feature/swipe/presentation/widgets/swipe_mode_banner.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
 
 @RoutePage()
@@ -19,200 +24,287 @@ class CategoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF0A0E27),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(categoryName),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(categoryName, style: const TextStyle(color: Colors.white)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         actions: [
-          // Выбрать все/Отменить
           BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
             builder: (context, state) {
               if (state is! MediaCleanerReady) return const SizedBox();
 
               final List<MediaFile> categoryFiles = _getCategoryFiles(state);
+              if (categoryFiles.isEmpty) return const SizedBox();
 
-              // Пропускаем, если нет файлов в категории
-              if (categoryFiles.isEmpty) {
-                return const SizedBox();
-              }
-
-              // Получаем текущие выбранные файлы и их ID
               final selectedFiles = state.selectedFiles;
               final selectedIds = selectedFiles.map((file) => file.entity.id).toList();
-
-              // Получаем ID всех файлов в категории
               final categoryIds = categoryFiles.map((file) => file.entity.id).toList();
-
-              // Проверяем, сколько файлов из категории выбрано
               final selectedCount = categoryIds.where((id) => selectedIds.contains(id)).length;
               final allSelected = selectedCount == categoryIds.length && categoryIds.isNotEmpty;
 
-              return TextButton.icon(
-                onPressed: () {
-                  if (allSelected) {
-                    // Если все выбраны - снимаем выбор со всех файлов категории
-                    for (final id in categoryIds) {
-                      if (selectedIds.contains(id)) {
-                        context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    if (allSelected) {
+                      for (final id in categoryIds) {
+                        if (selectedIds.contains(id)) {
+                          context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
+                        }
+                      }
+                    } else {
+                      for (final id in categoryIds) {
+                        if (!selectedIds.contains(id)) {
+                          context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
+                        }
                       }
                     }
-                  } else {
-                    // Иначе выбираем все невыбранные файлы в категории
-                    for (final id in categoryIds) {
-                      if (!selectedIds.contains(id)) {
-                        context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
-                      }
-                    }
-                  }
-                },
-                icon: Icon(
-                  allSelected ? Icons.check_circle : Icons.check_circle_outline,
-                  color: Colors.white,
-                ),
-                label: Text(
-                  allSelected ? "Отменить выбор" : "Выбрать все",
-                  style: const TextStyle(color: Colors.white),
+                  },
+                  child: LiquidGlass(
+                    settings: LiquidGlassSettings(
+                      blur: 3,
+                      ambientStrength: 0.6,
+                      lightAngle: 0.2 * math.pi,
+                      glassColor: Colors.white.withOpacity(0.15),
+                      thickness: 12,
+                    ),
+                    shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(12)),
+                    glassContainsChild: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Text(
+                        allSelected ? Locales.current.cancel : Locales.current.select_all,
+                        style: const TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
                 ),
               );
             },
           ),
-          const SizedBox(width: 16),
         ],
       ),
       body: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
         builder: (context, state) {
           if (state is! MediaCleanerReady) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CupertinoActivityIndicator());
           }
 
           final List<MediaFile> categoryFiles = _getCategoryFiles(state);
 
           if (categoryFiles.isEmpty) {
-            return Center(child: Text('Нет файлов в категории $categoryName'));
+            return Center(
+              child: Text(
+                Locales.current.no_files_in_category,
+                style: TextStyle(color: Colors.white60),
+              ),
+            );
           }
 
-          return Column(
+          return Stack(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Найдено ${categoryFiles.length} ${categoryType == "photo" ? "фото" : "видео"}',
-                  style: const TextStyle(color: Colors.grey),
-                ),
+              // Градиентный фон для похожих фото
+              if (categoryName == 'Похожие' || categoryName == 'Серии снимков')
+                const Positioned.fill(child: AnimatedBackground()),
+
+              // Полноэкранный grid
+              _buildCategoryContent(context, state),
+
+              // Floating banner сверху
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SafeArea(bottom: false, child: _buildSwipeBanner(context, categoryFiles)),
               ),
 
-              Expanded(child: _buildCategoryContent(context, state)),
+              // Floating bottom bar
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: SafeArea(top: false, child: _buildBottomBar(context, state, categoryFiles)),
+              ),
             ],
           );
         },
       ),
-      bottomNavigationBar: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-        builder: (context, state) {
-          if (state is! MediaCleanerReady) return SizedBox();
+    );
+  }
 
-          // Получаем файлы категории и общее количество выбранных файлов
-          final categoryFiles = _getCategoryFiles(state);
-          final selectedCategoryCount = categoryFiles.where((f) => f.isSelected).length;
-          final totalSelectedCount = state.selectedFiles.length;
+  Widget _buildSwipeBanner(BuildContext context, List<MediaFile> files) {
+    return SwipeModeBanner(
+      mediaIds: files.map((file) => file.entity.id).toList(),
+      title: categoryName,
+    );
+  }
 
-          // Показываем либо оригинальную панель для категории, либо общий счетчик выбранных
-          if (selectedCategoryCount > 0) {
-            // Старая нижняя панель с акцентом на выбранные в этой категории
-            return Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, -2),
+  Widget _buildBottomBar(
+    BuildContext context,
+    MediaCleanerReady state,
+    List<MediaFile> categoryFiles,
+  ) {
+    // Правильная проверка: сравниваем ID файлов категории с ID выбранных файлов из state
+    final categoryIds = categoryFiles.map((f) => f.entity.id).toSet();
+    final selectedIds = state.selectedFiles.map((f) => f.entity.id).toSet();
+    final selectedCategoryCount = categoryIds.intersection(selectedIds).length;
+    final totalSelectedCount = state.selectedFiles.length;
+
+    if (selectedCategoryCount == 0 && totalSelectedCount == 0) {
+      return const SizedBox.shrink();
+    }
+
+    final displayCount = selectedCategoryCount > 0 ? selectedCategoryCount : totalSelectedCount;
+    final countText = displayCount.toString();
+    final needsExpansion = countText.length >= 2;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: LiquidGlass(
+        settings: LiquidGlassSettings(
+          blur: 5,
+          ambientStrength: 1.0,
+          lightAngle: 0.25 * math.pi,
+          glassColor: Colors.white.withOpacity(0.12),
+          thickness: 25,
+        ),
+        shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(20)),
+        glassContainsChild: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Row(
+            children: [
+              // Badge с числом
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                constraints: BoxConstraints(minWidth: needsExpansion ? 44 : 40, minHeight: 40),
+                child: LiquidGlass(
+                  settings: LiquidGlassSettings(
+                    blur: 3,
+                    ambientStrength: 0.6,
+                    lightAngle: 0.2 * math.pi,
+                    glassColor: CupertinoColors.activeBlue.withOpacity(0.4),
+                    thickness: 12,
                   ),
-                ],
-              ),
-              child: SafeArea(
-                top: false,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.arrow_back),
-                        label: const Text('Назад'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: selectedCategoryCount > 0
-                            ? () => context.read<MediaCleanerBloc>().add(DeleteSelectedFiles())
-                            : null,
-                        icon: const Icon(Icons.delete_outline),
-                        label: Text('Удалить ($selectedCategoryCount)'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          disabledBackgroundColor: Colors.grey.shade300,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          } else if (totalSelectedCount > 0) {
-            // Показываем счетчик всех выбранных файлов, если в этой категории ничего не выбрано
-            return Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, -2),
+                  shape: LiquidRoundedSuperellipse(
+                    borderRadius: Radius.circular(needsExpansion ? 20 : 100),
                   ),
-                ],
-                border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
-              ),
-              child: SafeArea(
-                top: false,
-                child: Row(
-                  children: [
-                    Expanded(
+                  glassContainsChild: false,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: needsExpansion ? 12 : 0, vertical: 6),
+                    child: Center(
                       child: Text(
-                        'Выбрано: $totalSelectedCount',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                        countText,
+                        style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        context.read<MediaCleanerBloc>().add(DeleteSelectedFiles());
-                      },
-                      icon: const Icon(Icons.delete_outline),
-                      label: const Text('Удалить'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            );
-          }
-
-          return SizedBox(); // Не показываем нижнюю панель, если нет выбранных файлов
-        },
+              const SizedBox(width: 12),
+              // Текст "Выбрано" с tap для очистки
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    // Очищаем только выбранные файлы из текущей категории
+                    final categorySelectedIds = categoryIds.intersection(selectedIds).toList();
+                    for (final id in categorySelectedIds) {
+                      context.read<MediaCleanerBloc>().add(ToggleFileSelectionById(id));
+                    }
+                  },
+                  child: Text(
+                    Locales.current.cancel,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  _showDeleteConfirmation(context, displayCount);
+                },
+                child: LiquidGlass(
+                  settings: LiquidGlassSettings(
+                    blur: 3,
+                    ambientStrength: 0.6,
+                    lightAngle: 0.2 * math.pi,
+                    glassColor: CupertinoColors.systemRed.withOpacity(0.4),
+                    thickness: 12,
+                  ),
+                  shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(16)),
+                  glassContainsChild: false,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          Locales.current.delete,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, int count) {
+    showCupertinoDialog(
+      context: context,
+      builder: (dialogContext) => CupertinoAlertDialog(
+        title: Text(Locales.current.delete_files),
+        content: Text('${Locales.current.are_you_sure_delete} $count ${_getFileWord(count)}?'),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(Locales.current.cancel),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              context.read<MediaCleanerBloc>().add(DeleteSelectedFiles());
+            },
+            child: Text(Locales.current.delete),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getFileWord(int count) {
+    if (count % 10 == 1 && count % 100 != 11) {
+      return Locales.current.file.toLowerCase();
+    } else if ([2, 3, 4].contains(count % 10) && ![12, 13, 14].contains(count % 100)) {
+      return Locales.current.a_file.toLowerCase();
+    } else {
+      return Locales.current.files.toLowerCase();
+    }
   }
 
   // Получает файлы для выбранной категории
@@ -231,7 +323,6 @@ class CategoryPage extends StatelessWidget {
           return [];
       }
     } else {
-      // video
       switch (categoryName) {
         case 'Дубликаты':
           return state.videoDuplicateGroups.expand((group) => group.files).toList();
@@ -245,49 +336,35 @@ class CategoryPage extends StatelessWidget {
     }
   }
 
-  // Строит содержимое категории в зависимости от типа
   Widget _buildCategoryContent(BuildContext context, MediaCleanerReady state) {
-    // Для категории размытых фотографий используем специальную сетку
     if (categoryName == 'Размытые') {
       final blurryFiles = state.blurry;
 
-      return Column(
-        children: [
-          SwipeModeBanner(
-            mediaIds: blurryFiles.map((file) => file.entity.id).toList(),
-            title: 'Размытые фото',
-          ),
-
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 1.0,
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
-              ),
-              itemCount: blurryFiles.length,
-              itemBuilder: (context, index) {
-                return BlurryMediaGridItem(
-                  file: blurryFiles[index],
-                  onTap: () {
-                    context.read<MediaCleanerBloc>().add(
-                      ToggleFileSelection(blurryFiles[index].entity.id),
-                    );
-                  },
-                  onPreview: () {
-                    _showMediaPreview(context, blurryFiles[index]);
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+      return GridView.builder(
+        padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 1.0,
+          crossAxisSpacing: 1.0,
+          mainAxisSpacing: 1.0,
+        ),
+        itemCount: blurryFiles.length,
+        itemBuilder: (context, index) {
+          return BlurryMediaGridItem(
+            file: blurryFiles[index],
+            onTap: () {
+              context.read<MediaCleanerBloc>().add(
+                ToggleFileSelection(blurryFiles[index].entity.id),
+              );
+            },
+            onPreview: () {
+              _showMediaPreview(context, blurryFiles[index]);
+            },
+          );
+        },
       );
     }
 
-    // Для категорий с группировкой (похожие и Серии снимков)
     if (categoryName == 'Похожие' || categoryName == 'Серии снимков') {
       final List<MediaGroup> groups;
 
@@ -300,79 +377,54 @@ class CategoryPage extends StatelessWidget {
       }
 
       if (groups.isEmpty) {
-        return Center(child: Text('${categoryName} не найдены'));
+        return Center(child: Text('$categoryName ${Locales.current.not_found.toLowerCase()}'));
       }
 
-      return Column(
-        children: [
-          // Добавляем баннер сверху
-          SwipeModeBanner(
-            mediaIds: groups.expand((group) => group.files).map((file) => file.entity.id).toList(),
-            title: categoryName,
-          ),
-
-          Expanded(
-            child: ListView.builder(
-              itemCount: groups.length,
-              itemBuilder: (context, index) {
-                return SimilarMediaGroup(
-                  group: groups[index],
-                  onFileSelected: (fileId) {
-                    context.read<MediaCleanerBloc>().add(ToggleFileSelection(fileId));
-                  },
-                  onPreviewFile: (file) {
-                    _showMediaPreview(context, file);
-                  },
-                  onSelectAllInGroup: (fileIds) {
-                    context.read<MediaCleanerBloc>().add(SelectAllInGroup(groups[index].id));
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+      return ListView.builder(
+        padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
+        itemCount: groups.length,
+        itemBuilder: (context, index) {
+          return SimilarMediaGroup(
+            group: groups[index],
+            onFileSelected: (fileId) {
+              context.read<MediaCleanerBloc>().add(ToggleFileSelection(fileId));
+            },
+            onPreviewFile: (file) {
+              _showMediaPreview(context, file);
+            },
+            onSelectAllInGroup: (fileIds) {
+              context.read<MediaCleanerBloc>().add(SelectAllInGroup(groups[index].id));
+            },
+          );
+        },
       );
     }
 
-    // Для остальных категорий - простая сетка
     final List<MediaFile> files = _getCategoryFiles(state);
 
-    return Column(
-      children: [
-        // Добавляем баннер сверху
-        SwipeModeBanner(
-          mediaIds: files.map((file) => file.entity.id).toList(),
-          title: categoryName,
-        ),
-
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.all(8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-            ),
-            itemCount: files.length,
-            itemBuilder: (context, index) {
-              return MediaGridItem(
-                file: files[index],
-                onTap: () {
-                  context.read<MediaCleanerBloc>().add(ToggleFileSelection(files[index].entity.id));
-                },
-                onPreview: () {
-                  _showMediaPreview(context, files[index]);
-                },
-              );
-            },
-          ),
-        ),
-      ],
+    return GridView.builder(
+      padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1.0,
+        crossAxisSpacing: 1.0,
+        mainAxisSpacing: 1.0,
+      ),
+      itemCount: files.length,
+      itemBuilder: (context, index) {
+        return MediaGridItem(
+          file: files[index],
+          onTap: () {
+            context.read<MediaCleanerBloc>().add(ToggleFileSelection(files[index].entity.id));
+          },
+          onPreview: () {
+            _showMediaPreview(context, files[index]);
+          },
+        );
+      },
     );
   }
 
-  // Показывает превью медиафайла
   void _showMediaPreview(BuildContext context, MediaFile file) {
     Navigator.of(context).push(
       MaterialPageRoute(fullscreenDialog: true, builder: (context) => MediaPreviewPage(file: file)),

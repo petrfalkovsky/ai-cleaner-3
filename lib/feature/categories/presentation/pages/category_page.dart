@@ -10,16 +10,16 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:pixelarticons/pixel.dart';
 
 @RoutePage()
-class CategoryPage extends StatefulWidget {
-  const CategoryPage({super.key, required this.category});
+class CategoryPageOld extends StatefulWidget {
+  const CategoryPageOld({super.key, required this.category});
 
   final AssetCategory category;
 
   @override
-  State<CategoryPage> createState() => _CategoryPageState();
+  State<CategoryPageOld> createState() => _CategoryPageOldState();
 }
 
-class _CategoryPageState extends State<CategoryPage> {
+class _CategoryPageOldState extends State<CategoryPageOld> {
   final controller = ScrollController();
   List<AssetEntity> shuffled = [];
 

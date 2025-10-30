@@ -157,7 +157,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
                         spacing: 8,
                         children: [
                           Text(
-                                "delete!!",
+                                "Delete!!",
                                 style: TextTheme.of(context).displaySmall?.copyWith(fontSize: 18),
                               )
                               .animate(
@@ -189,7 +189,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
                         spacing: 8,
                         children: [
                           Text(
-                                "keep",
+                                "Keep",
                                 style: TextTheme.of(context).displaySmall?.copyWith(fontSize: 18),
                               )
                               .animate(
@@ -217,11 +217,19 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(color: Colors.black),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         child: Text(
-                          widget.entity.createDateTime.format("dd/MM/yyyy"),
-                        ).bodySmall(fontSize: 10),
+                          widget.entity.createDateTime.format("dd.MM.yyyy"),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
                   ),

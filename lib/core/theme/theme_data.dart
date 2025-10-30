@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 ThemeData theme(BuildContext context) {
   return ThemeData(
@@ -14,8 +13,8 @@ ThemeData theme(BuildContext context) {
         ),
         visualDensity: VisualDensity.compact,
         textStyle: WidgetStateProperty.all(
-          GoogleFonts.pressStart2p(
-            fontSize: 14,
+          const TextStyle(
+            fontSize: 17,
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
@@ -28,19 +27,19 @@ ThemeData theme(BuildContext context) {
         iconSize: WidgetStateProperty.all(24),
         backgroundColor: WidgetStateProperty.all(Colors.black),
         padding: WidgetStateProperty.all(
-          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-            side: BorderSide(color: Colors.white, width: 2),
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: Colors.white, width: 2),
           ),
         ),
         visualDensity: VisualDensity.compact,
         splashFactory: NoSplash.splashFactory,
         textStyle: WidgetStateProperty.all(
-          GoogleFonts.pressStart2p(
-            fontSize: 14,
+          const TextStyle(
+            fontSize: 17,
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
@@ -88,14 +87,14 @@ ThemeData theme(BuildContext context) {
       selectedColor: Colors.white.withValues(alpha: 0.75),
       secondarySelectedColor: Colors.white.withValues(alpha: 0.5),
       labelPadding: const EdgeInsets.symmetric(horizontal: 0),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      labelStyle: GoogleFonts.pressStart2p(
-        fontSize: 12,
+      labelStyle: const TextStyle(
+        fontSize: 15,
         fontWeight: FontWeight.w600,
       ),
-      secondaryLabelStyle: GoogleFonts.pressStart2p(
-        fontSize: 12,
+      secondaryLabelStyle: const TextStyle(
+        fontSize: 15,
         fontWeight: FontWeight.w600,
       ),
       brightness: Brightness.dark,
@@ -137,46 +136,47 @@ ThemeData theme(BuildContext context) {
       border: InputBorder.none,
       enabledBorder: InputBorder.none,
     ),
-    cupertinoOverrideTheme: CupertinoThemeData(
+    cupertinoOverrideTheme: const CupertinoThemeData(
       primaryColor: Colors.white,
       scaffoldBackgroundColor: Colors.black,
       barBackgroundColor: Colors.black,
       textTheme: CupertinoTextThemeData(
         primaryColor: Colors.white,
-        navTitleTextStyle: GoogleFonts.pressStart2p(
-          fontSize: 18,
+        navTitleTextStyle: TextStyle(
+          fontSize: 17,
           color: Colors.white,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
-        navLargeTitleTextStyle: GoogleFonts.pressStart2p(
+        navLargeTitleTextStyle: TextStyle(
           fontSize: 34,
           color: Colors.white,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.bold,
         ),
-        textStyle: GoogleFonts.pressStart2p(
-          fontSize: 14,
+        textStyle: TextStyle(
+          fontSize: 17,
           color: Colors.white,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w400,
         ),
       ),
     ),
     iconButtonTheme: IconButtonThemeData(
       style: ButtonStyle(iconColor: WidgetStateProperty.all(Colors.white)),
     ),
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: Colors.black,
       surfaceTintColor: Colors.transparent,
-      titleTextStyle: GoogleFonts.pressStart2p(
-        fontSize: 14,
+      titleTextStyle: TextStyle(
+        fontSize: 17,
         fontWeight: FontWeight.w600,
+        color: Colors.white,
       ),
     ),
     useMaterial3: true,
     brightness: Brightness.dark,
-    textTheme: GoogleFonts.pressStart2pTextTheme(
-      Theme.of(
-        context,
-      ).textTheme.apply(bodyColor: Colors.white, displayColor: Colors.white),
+    textTheme: Theme.of(context).textTheme.apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
+      fontSizeFactor: 1.0,
     ),
   );
 }

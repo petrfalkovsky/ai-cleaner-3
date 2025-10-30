@@ -1,183 +1,190 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
-import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 import '../domain/media_file_entity.dart';
 
 class MediaScanner {
-  static Interpreter? _blurDetectionInterpreter;
-  static const int _batchSize = 50; // Обрабатываем файлы порциями
+  // Оптимизированный размер батчей для разных операций
+  static const int _hashBatchSize = 100; // Для хэширования
+  static const int _blurBatchSize = 30; // Для детекции размытия
+  static const int _metadataBatchSize = 200; // Для работы с метаданными
 
-  // Инициализация моделей TFLite
+  // Кэш для хэшей изображений (ограничен по размеру)
+  static final Map<String, String> _hashCache = {};
+  static const int _maxCacheSize = 1000; // Максимум 1000 хэшей в памяти
+
+  // Инициализация моделей больше не требуется - используем только алгоритмы
   static Future<void> initModels() async {
-    try {
-      if (_blurDetectionInterpreter == null) {
-        final options = InterpreterOptions()..threads = 2; // Ограничиваем количество потоков
-        _blurDetectionInterpreter = await Interpreter.fromAsset(
-          'assets/models/blur_detection.tflite',
-          options: options,
-        );
-      }
-    } catch (e) {
-      debugPrint('Error loading TFLite models: $e');
-    }
+    debugPrint('ОПТИМИЗАЦИЯ: Используем нативные алгоритмы без ML-моделей');
+    _hashCache.clear();
   }
 
   // Освобождение ресурсов
   static void disposeModels() {
-    _blurDetectionInterpreter?.close();
-    _blurDetectionInterpreter = null;
-    // Вызываем сборщик мусора
+    _hashCache.clear();
     _releaseMemory();
   }
 
   // Вспомогательный метод для освобождения памяти
   static void _releaseMemory() {
-    // Это подсказка для сборщика мусора
     imageCache.clear();
     imageCache.clearLiveImages();
-
-    // Программно вызвать сборку мусора нельзя напрямую в Dart,
-    // но можно подсказать системе, что стоит это сделать
   }
 
-  // Функция поиска похожих изображений - оптимизирована для работы батчами
+  // Управление кэшем хэшей
+  static void _addToHashCache(String id, String hash) {
+    if (_hashCache.length >= _maxCacheSize) {
+      // Удаляем старые записи
+      final keysToRemove = _hashCache.keys.take(_maxCacheSize ~/ 4).toList();
+      for (final key in keysToRemove) {
+        _hashCache.remove(key);
+      }
+    }
+    _hashCache[id] = hash;
+  }
+
+  // УЛУЧШЕННАЯ функция поиска похожих изображений с DCT perceptual hash
   static Future<Map<String, List<MediaFile>>> findSimilarImages(List<MediaFile> files) async {
     final Map<String, List<MediaFile>> similarGroups = {};
     final Map<String, String> imageHashes = {};
 
-    // Делим файлы на батчи для уменьшения потребления памяти
+    // Делим файлы на батчи для оптимизации памяти
     final int totalFiles = files.length;
-    final int numBatches = (totalFiles / _batchSize).ceil();
+    final int numBatches = (totalFiles / _hashBatchSize).ceil();
+
+    debugPrint('ОПТИМИЗАЦИЯ: Обработка $totalFiles фото в $numBatches батчах');
 
     for (int batchIndex = 0; batchIndex < numBatches; batchIndex++) {
-      final int startIdx = batchIndex * _batchSize;
-      final int endIdx = min((batchIndex + 1) * _batchSize, totalFiles);
+      final int startIdx = batchIndex * _hashBatchSize;
+      final int endIdx = min((batchIndex + 1) * _hashBatchSize, totalFiles);
       final batchFiles = files.sublist(startIdx, endIdx);
 
-      // Рассчитываем хэши для текущего батча
-      for (var file in batchFiles) {
-        if (file.isImage) {
+      // Рассчитываем хэши для текущего батча параллельно
+      await Future.wait(
+        batchFiles.where((f) => f.isImage).map((file) async {
           try {
-            final imageFile = await file.entity.file;
-            if (imageFile != null) {
-              final bytes = await imageFile.readAsBytes();
-              final hash = await compute(_calculateSimpleHash, bytes);
-              imageHashes[file.entity.id] = hash;
+            // Проверяем кэш
+            if (_hashCache.containsKey(file.entity.id)) {
+              imageHashes[file.entity.id] = _hashCache[file.entity.id]!;
+              return;
+            }
+
+            // Получаем миниатюру вместо полного файла (экономия памяти)
+            final thumbnail = await file.entity.thumbnailDataWithSize(
+              const ThumbnailSize(256, 256),
+              quality: 70,
+            );
+
+            if (thumbnail != null) {
+              final hash = await compute(_calculateDCTHash, thumbnail);
+              if (hash.isNotEmpty) {
+                imageHashes[file.entity.id] = hash;
+                _addToHashCache(file.entity.id, hash);
+              }
             }
           } catch (e) {
-            debugPrint('Error calculating hash for ${file.entity.id}: $e');
+            debugPrint('Ошибка расчета хэша для ${file.entity.id}: $e');
           }
-        }
-      }
+        }),
+      );
 
-      // Освобождаем ресурсы после каждого батча
       _releaseMemory();
     }
 
-    // Теперь сравниваем хэши и группируем похожие изображения
+    debugPrint('ОПТИМИЗАЦИЯ: Рассчитано ${imageHashes.length} хэшей');
+
+    // Группируем похожие изображения
     final processed = <String>{};
     int groupCounter = 0;
 
-    // Снова обрабатываем батчами для сравнения
-    for (int batchIndex = 0; batchIndex < numBatches; batchIndex++) {
-      final int startIdx = batchIndex * _batchSize;
-      final int endIdx = min((batchIndex + 1) * _batchSize, totalFiles);
-      final batchFiles = files.sublist(startIdx, endIdx);
+    for (var file in files.where((f) => f.isImage)) {
+      final fileId = file.entity.id;
+      if (processed.contains(fileId)) continue;
 
-      for (var file in batchFiles) {
-        final fileId = file.entity.id;
+      final hash1 = imageHashes[fileId];
+      if (hash1 == null) continue;
 
-        if (!file.isImage || processed.contains(fileId)) continue;
+      final similarFiles = <MediaFile>[file];
 
-        final hash1 = imageHashes[fileId];
-        if (hash1 == null) continue;
+      // Сравниваем со всеми остальными
+      for (var entry in imageHashes.entries) {
+        if (entry.key == fileId || processed.contains(entry.key)) continue;
 
-        final similarFiles = <MediaFile>[file];
+        final similarity = _calculateHashSimilarity(hash1, entry.value);
 
-        // Сравниваем со всеми остальными хэшами
-        for (var entry in imageHashes.entries) {
-          if (entry.key == fileId || processed.contains(entry.key)) continue;
-
-          final hash2 = entry.value;
-          final similarity = _calculateHashSimilarity(hash1, hash2);
-
-          if (similarity >= 0.85) {
-            // Порог сходства 85%
-            // Найдем соответствующий файл
-            final otherFile = files.firstWhere((f) => f.entity.id == entry.key, orElse: () => file);
-            if (otherFile.entity.id != file.entity.id) {
-              similarFiles.add(otherFile);
-              processed.add(entry.key);
-            }
+        // Более строгий порог для DCT hash (90%)
+        if (similarity >= 0.90) {
+          final otherFile = files.firstWhere(
+            (f) => f.entity.id == entry.key,
+            orElse: () => file,
+          );
+          if (otherFile.entity.id != file.entity.id) {
+            similarFiles.add(otherFile);
+            processed.add(entry.key);
           }
         }
-
-        if (similarFiles.length > 1) {
-          final groupId = 'similar_group_${groupCounter++}';
-          similarGroups[groupId] = similarFiles;
-        }
-
-        processed.add(fileId);
       }
 
-      // Освобождаем ресурсы после каждого батча сравнения
-      _releaseMemory();
+      if (similarFiles.length > 1) {
+        final groupId = 'similar_group_${groupCounter++}';
+        similarGroups[groupId] = similarFiles;
+      }
+
+      processed.add(fileId);
     }
 
-    // Очищаем память после использования
-    imageHashes.clear();
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${similarGroups.length} групп\nпохожих');
     return similarGroups;
   }
 
-  // Оптимизированный метод для расчета хэша
-  static Future<String> _calculateSimpleHash(Uint8List bytes) async {
+  // DCT (Discrete Cosine Transform) perceptual hash - более точный и быстрый
+  static String _calculateDCTHash(Uint8List bytes) {
     try {
-      // Декодируем изображение
       final image = img.decodeImage(bytes);
       if (image == null) return '';
 
-      // Уменьшаем изображение до 8x8 для хэширования
-      final resized = img.copyResize(image, width: 8, height: 8, maintainAspect: false);
+      // Resize к 32x32 для лучшей точности
+      final resized = img.copyResize(image, width: 32, height: 32);
+      final gray = img.grayscale(resized);
 
-      // Преобразуем в оттенки серого
-      final grayImage = img.grayscale(resized);
-
-      final pixels = <int>[];
-      double sum = 0.0;
-
+      // Упрощенный DCT для 8x8 области
+      final dctVals = <double>[];
       for (int y = 0; y < 8; y++) {
         for (int x = 0; x < 8; x++) {
-          final pixel = grayImage.getPixel(x, y);
-          final gray = img.getLuminance(pixel).round();
-          pixels.add(gray);
-          sum += gray;
+          double sum = 0;
+          for (int v = 0; v < 32; v++) {
+            for (int u = 0; u < 32; u++) {
+              final pixel = gray.getPixel(u, v);
+              final intensity = img.getLuminance(pixel).toDouble();
+              final angle = pi * (2 * u + 1) * x / (2 * 32) +
+                           pi * (2 * v + 1) * y / (2 * 32);
+              sum += intensity * cos(angle);
+            }
+          }
+          dctVals.add(sum / 32);
         }
       }
 
-      // Вычисляем средний цвет
-      final avg = sum / 64;
+      // Вычисляем среднее (игнорируя DC компонент)
+      final avg = dctVals.skip(1).reduce((a, b) => a + b) / (dctVals.length - 1);
 
-      // Создаем хэш: 1 если пиксель > среднего, 0 если <= среднего
-      final hashBits = StringBuffer();
-      for (final p in pixels) {
-        hashBits.write(p > avg ? '1' : '0');
-      }
-
-      return hashBits.toString();
+      // Создаем хэш
+      return dctVals.skip(1).map((v) => v > avg ? '1' : '0').join();
     } catch (e) {
-      debugPrint('Error in hash calculation: $e');
+      debugPrint('Ошибка DCT hash: $e');
       return '';
     }
   }
 
-  // Сравниваем хэши изображений
+  // Hamming distance для сравнения хэшей
   static double _calculateHashSimilarity(String hash1, String hash2) {
-    if (hash1.length != hash2.length) return 0.0;
+    if (hash1.length != hash2.length || hash1.isEmpty) return 0.0;
 
     int matches = 0;
     for (int i = 0; i < hash1.length; i++) {
@@ -187,216 +194,197 @@ class MediaScanner {
     return matches / hash1.length;
   }
 
-  // Определение размытых изображений - оптимизировано для работы батчами
+  // ОПТИМИЗИРОВАННАЯ детекция размытых изображений
   static Future<List<MediaFile>> findBlurryImages(List<MediaFile> files) async {
     final blurryImages = <MediaFile>[];
 
-    // Обрабатываем файлы батчами
-    final int totalFiles = files.length;
-    final int numBatches = (totalFiles / _batchSize).ceil();
+    final int totalFiles = files.where((f) => f.isImage).length;
+    final int numBatches = (totalFiles / _blurBatchSize).ceil();
+    final imageFiles = files.where((f) => f.isImage).toList();
+
+    debugPrint('ОПТИМИЗАЦИЯ: Анализ размытия $totalFiles фото в $numBatches батчах');
 
     for (int batchIndex = 0; batchIndex < numBatches; batchIndex++) {
-      final int startIdx = batchIndex * _batchSize;
-      final int endIdx = min((batchIndex + 1) * _batchSize, totalFiles);
-      final batchFiles = files.sublist(startIdx, endIdx);
+      final int startIdx = batchIndex * _blurBatchSize;
+      final int endIdx = min((batchIndex + 1) * _blurBatchSize, imageFiles.length);
+      final batchFiles = imageFiles.sublist(startIdx, endIdx);
 
-      // Используем isolate для параллельной обработки батча
+      // Параллельная обработка батча
       final batchResults = await Future.wait(
         batchFiles.map((file) async {
-          if (!file.isImage) return null;
-
           try {
-            final imageFile = await file.entity.file;
-            if (imageFile != null) {
-              final bytes = await imageFile.readAsBytes();
-              final isBlurry = await compute(_isImageBlurry, bytes);
+            // Используем миниатюру для экономии памяти
+            final thumbnail = await file.entity.thumbnailDataWithSize(
+              const ThumbnailSize(400, 400),
+              quality: 85,
+            );
 
-              if (isBlurry) {
+            if (thumbnail != null) {
+              final blurScore = await compute(_calculateBlurScore, thumbnail);
+
+              // Пороговое значение (чем меньше, тем более размыто)
+              if (blurScore < 120.0) {
                 return file.copyWith(category: 'blurry');
               }
             }
           } catch (e) {
-            debugPrint('Error analyzing blur for ${file.entity.id}: $e');
+            debugPrint('Ошибка анализа размытия ${file.entity.id}: $e');
           }
-
           return null;
         }),
       );
 
-      // Фильтруем null значения и добавляем результаты
       blurryImages.addAll(batchResults.whereType<MediaFile>());
-
-      // Освобождаем ресурсы после каждого батча
       _releaseMemory();
     }
 
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${blurryImages.length} размытых фото');
     return blurryImages;
   }
 
-  // Оптимизированный метод оценки размытости изображения
-  static Future<bool> _isImageBlurry(Uint8List bytes) async {
+  // Улучшенный Laplacian variance для детекции размытия
+  static double _calculateBlurScore(Uint8List bytes) {
     try {
-      // Декодируем изображение
-      final rawImage = img.decodeImage(bytes);
-      if (rawImage == null) return false;
+      final image = img.decodeImage(bytes);
+      if (image == null) return 1000.0;
 
-      // Сильно уменьшаем для анализа - максимум 320px по большей стороне
-      int targetWidth, targetHeight;
-      if (rawImage.width > rawImage.height) {
-        targetWidth = 320;
-        targetHeight = (rawImage.height * (320 / rawImage.width)).round();
-      } else {
-        targetHeight = 320;
-        targetWidth = (rawImage.width * (320 / rawImage.height)).round();
-      }
+      // Уменьшаем до 200px для быстрой обработки
+      final resized = img.copyResize(image, width: 200, height: 200);
+      final gray = img.grayscale(resized);
 
-      final image = img.copyResize(rawImage, width: targetWidth, height: targetHeight);
+      // Применяем Laplacian оператор
+      double variance = 0.0;
+      int count = 0;
 
-      final gray = img.grayscale(image);
+      for (int y = 1; y < gray.height - 1; y++) {
+        for (int x = 1; x < gray.width - 1; x++) {
+          final center = img.getLuminance(gray.getPixel(x, y)).toDouble();
+          final top = img.getLuminance(gray.getPixel(x, y - 1)).toDouble();
+          final bottom = img.getLuminance(gray.getPixel(x, y + 1)).toDouble();
+          final left = img.getLuminance(gray.getPixel(x - 1, y)).toDouble();
+          final right = img.getLuminance(gray.getPixel(x + 1, y)).toDouble();
 
-      // Используем алгоритм Лапласиана для оценки резкости
-      final laplacian = _computeLaplacian(gray);
-
-      // Пороговое значение размытости (подобрано экспериментально)
-      return laplacian < 100.0;
-    } catch (e) {
-      debugPrint('Error analyzing blur: $e');
-      return false;
-    }
-  }
-
-  // Расчет Лапласиана для определения резкости
-  static double _computeLaplacian(img.Image image) {
-    final width = image.width;
-    final height = image.height;
-    final kernel = [0, 1, 0, 1, -4, 1, 0, 1, 0];
-    double variance = 0.0;
-
-    for (int y = 1; y < height - 1; y++) {
-      for (int x = 1; x < width - 1; x++) {
-        double sum = 0.0;
-        for (int ky = -1; ky <= 1; ky++) {
-          for (int kx = -1; kx <= 1; kx++) {
-            final pixel = image.getPixel(x + kx, y + ky);
-            final intensity = img.getLuminance(pixel).toDouble();
-            sum += intensity * kernel[(ky + 1) * 3 + (kx + 1)];
-          }
+          // Laplacian = -4*center + top + bottom + left + right
+          final lap = -4 * center + top + bottom + left + right;
+          variance += lap * lap;
+          count++;
         }
-        variance += sum * sum;
       }
-    }
 
-    // Нормализуем по количеству пикселей
-    return variance / ((width - 2) * (height - 2));
+      return count > 0 ? variance / count : 0.0;
+    } catch (e) {
+      debugPrint('Ошибка расчета blur score: $e');
+      return 1000.0;
+    }
   }
 
-  // Поиск скриншотов - используем оба метода для надежного обнаружения
+  // ОПТИМИЗИРОВАННЫЙ поиск скриншотов - только по iOS метаданным
   static List<MediaFile> findScreenshots(List<MediaFile> files) {
     final screenshots = <MediaFile>[];
+
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск скриншотов среди ${files.length} файлов');
 
     for (final file in files) {
       if (!file.isImage) continue;
 
-      // Проверяем имя файла для обнаружения скриншотов
-      final fileName = file.entity.title?.toLowerCase() ?? '';
-      final hasScreenshotName =
-          fileName.contains('screenshot') ||
-          fileName.contains('screen shot') ||
-          fileName.contains('скриншот') ||
-          fileName.contains('снимок экрана');
+      // iOS помечает скриншоты через PHAssetMediaSubtype.screenshot (бит 4 = 1 << 2)
+      // В photo_manager это доступно через entity.subtype
+      final isIOSScreenshot = (file.entity.subtype & 4) != 0;
 
-      if (hasScreenshotName) {
+      if (isIOSScreenshot) {
         screenshots.add(file.copyWith(category: 'screenshots'));
-        continue;
-      }
-
-      // Проверяем соотношение сторон для распространенных размеров экрана
-      // Для iOS устройств с соотношением сторон 16:9 или 19.5:9
-      final aspectRatio = file.entity.width / file.entity.height;
-
-      final commonRatios = [
-        16.0 / 9.0, // iPhone SE, 7, 8
-        19.5 / 9.0, // iPhone X и новее
-        4.0 / 3.0, // iPad
-        2.165, // iPhone 12/13 Pro Max
-      ];
-
-      bool matchesCommonRatio = false;
-      for (final ratio in commonRatios) {
-        if ((aspectRatio - ratio).abs() < 0.05) {
-          matchesCommonRatio = true;
-          break;
-        }
-      }
-
-      if (matchesCommonRatio) {
-        screenshots.add(file.copyWith(category: 'screenshots'));
+        debugPrint('Найден скриншот (iOS metadata): ${file.entity.title}');
       }
     }
 
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${screenshots.length} скриншотов');
     return screenshots;
   }
 
-  // Поиск записей экрана - исправленный метод для RPReplay
+  // ОПТИМИЗИРОВАННЫЙ поиск записей экрана - поиск по имени файла
   static List<MediaFile> findScreenRecordings(List<MediaFile> files) {
     final screenRecordings = <MediaFile>[];
 
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск записей экрана среди ${files.where((f) => f.isVideo).length} видео');
+
     for (final file in files) {
       if (!file.isVideo) continue;
 
-      // Проверка на префикс RPReplay
-      final fileName = file.entity.title?.toLowerCase() ?? '';
-      if (fileName.contains('rpreplay')) {
+      // Проверяем имя файла и путь
+      final title = file.entity.title ?? '';
+      final titleLower = title.toLowerCase();
+      final relativePath = file.entity.relativePath?.toLowerCase() ?? '';
+
+      // iOS записи экрана могут иметь разные имена:
+      // - "RPReplay_Final..." или просто "RPReplay..."
+      // - "Screen Recording 2024-..."
+      // - Путь может содержать "ReplayKit"
+      final isScreenRecording = titleLower.contains('rpreplay') ||
+                                titleLower.contains('replaykit') ||
+                                titleLower.contains('screen recording') ||
+                                titleLower.startsWith('screen ') ||
+                                relativePath.contains('replaykit');
+
+      if (isScreenRecording) {
         screenRecordings.add(file.copyWith(category: 'screenRecordings'));
+        debugPrint('✓ Найдена запись экрана: $title (путь: $relativePath)');
+      } else {
+        // Логируем первые 5 видео для отладки
+        if (screenRecordings.length < 5) {
+          debugPrint('  Пропущено видео: $title (путь: $relativePath)');
+        }
       }
     }
 
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${screenRecordings.length} записей экрана');
     return screenRecordings;
   }
 
-  // Поиск коротких видео по длительности
+  // ОБНОВЛЕННЫЙ поиск коротких видео - до 2 секунд
   static List<MediaFile> findShortVideos(List<MediaFile> files) {
     final shortVideos = <MediaFile>[];
+
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск коротких видео среди ${files.where((f) => f.isVideo).length} видео');
 
     for (final file in files) {
       if (!file.isVideo) continue;
 
-      // Видео короче 5 секунд
-      if (file.entity.duration != null && file.entity.duration! < 5) {
+      // Видео короче или равно 2 секунд
+      if (file.entity.duration != null && file.entity.duration! <= 2) {
         shortVideos.add(file.copyWith(category: 'shortVideos'));
       }
     }
 
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${shortVideos.length} коротких видео');
     return shortVideos;
   }
 
-  // Поиск дубликатов фото по метаданным
+  // ОПТИМИЗИРОВАННЫЙ поиск дубликатов фото - метаданные + дата создания
   static List<MediaGroup> findDuplicatePhotos(List<MediaFile> files) {
     final Map<String, List<MediaFile>> duplicateGroups = {};
     final Map<String, MediaFile> signatureMap = {};
 
-    // Для фото дубликаты определяются по размеру, ширине, высоте
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск дубликатов среди ${files.where((f) => f.isImage).length} фото');
+
     for (final file in files) {
       if (!file.isImage) continue;
 
-      // Создаем простую сигнатуру на основе размера, ширины, высоты
-      final signature = '${file.entity.size}|${file.entity.width}|${file.entity.height}';
+      // Сигнатура: размер файла + разрешение + дата создания (с точностью до секунды)
+      final createDate = file.entity.createDateTime.millisecondsSinceEpoch ~/ 1000;
+      final signature = '${file.entity.size}|${file.entity.width}|${file.entity.height}|$createDate';
 
       if (signatureMap.containsKey(signature)) {
-        // Если уже есть группа для этой сигнатуры
         if (duplicateGroups.containsKey(signature)) {
           duplicateGroups[signature]!.add(file);
         } else {
-          // Создаем новую группу с существующим файлом и текущим
           duplicateGroups[signature] = [signatureMap[signature]!, file];
         }
       } else {
-        // Запоминаем файл для дальнейшего сравнения
         signatureMap[signature] = file;
       }
     }
 
-    // Преобразуем Map в список MediaGroup
+    // Преобразуем в MediaGroup
     final List<MediaGroup> result = [];
     int groupCounter = 0;
 
@@ -405,38 +393,36 @@ class MediaScanner {
         result.add(
           MediaGroup(
             id: 'dup_${groupCounter++}',
-            name: 'Серии снимков ${groupCounter}',
+            name: '',
             files: groupFiles,
           ),
         );
       }
     });
 
-    // Очищаем память
-    signatureMap.clear();
-    duplicateGroups.clear();
-
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${result.length} групп дубликатов фото');
     return result;
   }
 
-  // Поиск дубликатов для видео
+  // ОПТИМИЗИРОВАННЫЙ поиск дубликатов видео - метаданные
   static List<MediaGroup> findDuplicateVideos(List<MediaFile> files) {
     final Map<String, List<MediaFile>> duplicateGroups = {};
     final Map<String, MediaFile> signatureMap = {};
 
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск дубликатов среди ${files.where((f) => f.isVideo).length} видео');
+
     for (final file in files) {
       if (!file.isVideo) continue;
 
-      // Для видео учитываем размер файла и продолжительность
+      // Сигнатура: размер файла + длительность + дата создания
       final duration = file.entity.duration ?? 0;
-      final signature = '${file.entity.size}|$duration';
+      final createDate = file.entity.createDateTime.millisecondsSinceEpoch ~/ 1000;
+      final signature = '${file.entity.size}|$duration|$createDate';
 
       if (signatureMap.containsKey(signature)) {
-        // Если уже есть группа для этой сигнатуры
         if (duplicateGroups.containsKey(signature)) {
           duplicateGroups[signature]!.add(file);
         } else {
-          // Создаем новую группу с существующим файлом и текущим
           duplicateGroups[signature] = [signatureMap[signature]!, file];
         }
       } else {
@@ -444,7 +430,7 @@ class MediaScanner {
       }
     }
 
-    // Преобразуем Map в список MediaGroup
+    // Преобразуем в MediaGroup
     final List<MediaGroup> result = [];
     int groupCounter = 0;
 
@@ -460,18 +446,7 @@ class MediaScanner {
       }
     });
 
-    signatureMap.clear();
-    duplicateGroups.clear();
-
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${result.length} групп дубликатов видео');
     return result;
-  }
-
-  // Метод для деления коллекции на батчи
-  static List<List<T>> _batchList<T>(List<T> items, int batchSize) {
-    List<List<T>> batches = [];
-    for (var i = 0; i < items.length; i += batchSize) {
-      batches.add(items.sublist(i, min(i + batchSize, items.length)));
-    }
-    return batches;
   }
 }

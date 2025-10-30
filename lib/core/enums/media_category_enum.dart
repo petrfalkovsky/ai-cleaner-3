@@ -1,3 +1,4 @@
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:flutter/material.dart';
 
 enum PhotoCategory {
@@ -9,26 +10,26 @@ enum PhotoCategory {
   String get name {
     switch (this) {
       case PhotoCategory.similar:
-        return 'Похожие';
+        return Locales.current.similar;
       case PhotoCategory.series:
-        return 'Серии снимков';
+        return Locales.current.photo_bursts;
       case PhotoCategory.screenshots:
-        return 'Снимки экрана';
+        return Locales.current.screenshots;
       case PhotoCategory.blurry:
-        return 'Размытые';
+        return Locales.current.blurry;
     }
   }
 
   String get description {
     switch (this) {
       case PhotoCategory.similar:
-        return 'Похожие фотографии';
+        return Locales.current.similar_photos;
       case PhotoCategory.series:
-        return 'Серии фото';
+        return Locales.current.photo_series;
       case PhotoCategory.screenshots:
-        return 'Снимки экрана устройства';
+        return Locales.current.device_screenshots;
       case PhotoCategory.blurry:
-        return 'Нечеткие и размытые фотографии';
+        return Locales.current.blurry_not_clear_photos;
     }
   }
 
@@ -54,22 +55,22 @@ enum VideoCategory {
   String get name {
     switch (this) {
       case VideoCategory.duplicates:
-        return 'Дубликаты';
+        return Locales.current.duplicates;
       case VideoCategory.screenRecordings:
-        return 'Записи экрана';
+        return Locales.current.screen_recordings;
       case VideoCategory.shortVideos:
-        return 'Короткие записи';
+        return Locales.current.short_recordings;
     }
   }
 
   String get description {
     switch (this) {
       case VideoCategory.duplicates:
-        return 'Идентичные видеофайлы';
+        return Locales.current.identical_videos;
       case VideoCategory.screenRecordings:
-        return 'Записи с экрана устройства';
+        return Locales.current.device_screen_recordings;
       case VideoCategory.shortVideos:
-        return 'Короткие видеофрагменты';
+        return Locales.current.short_video_clips;
     }
   }
 

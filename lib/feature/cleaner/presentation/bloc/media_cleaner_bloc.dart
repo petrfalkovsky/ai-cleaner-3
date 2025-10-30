@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_scanner.dart';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       // Запрос разрешений
       final PermissionState permissionState = await PhotoManager.requestPermissionExtend();
       if (!permissionState.hasAccess) {
-        emit(MediaCleanerError('Для доступа к галерее требуется разрешение'));
+        emit(MediaCleanerError(Locales.current.gallery_permission_required));
         return;
       }
 
@@ -56,7 +57,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
         ),
       );
     } catch (e) {
-      emit(MediaCleanerError('Ошибка загрузки файлов: $e'));
+      emit(MediaCleanerError('${Locales.current.files_load_error} $e'));
     }
   }
 
@@ -101,6 +102,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
     final totalFiles = totalPhotoFiles + totalVideoFiles;
 
     int processedFiles = 0;
+    bool isPaused = false; // Флаг для отслеживания паузы
 
     // Добавляем секундомер для регулярных пауз в обработке
     Stopwatch pauseStopwatch = Stopwatch()..start();
@@ -109,6 +111,12 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
     // Вспомогательная функция для обновления статуса с поддержкой пауз для UI
     Future<void> updateStatus(String message, double progressPercent, {int? currentBatch}) async {
       if (emit.isDone) return; // Проверка перед обновлением
+
+      // Проверяем состояние паузы
+      if (state is MediaCleanerScanning && (state as MediaCleanerScanning).isPaused) {
+        isPaused = true;
+        return;
+      }
 
       // Логирование прогресса
       debugPrint(
@@ -151,7 +159,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       debugPrint('СКАНИРОВАНИЕ: Инициализация моделей завершена');
 
       // 1. Находим скриншоты - быстрая операция
-      await updateStatus("Ai-модель ищет снимки экрана...", 0.05);
+      await updateStatus(Locales.current.ai_model_searching_screenshots, 0.05);
 
       final screenshots = MediaScanner.findScreenshots(currentState.photoFiles);
       currentState = currentState.copyWith(screenshots: screenshots);
@@ -159,21 +167,23 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
 
       // Отправляем первое обновление после нахождения скриншотов
       await updateStatus(
-        "Найдено ${screenshots.length} скриншотов",
+        '${Locales.current.found} ${screenshots.length} ${Locales.current.screenshots_count.toLowerCase()}',
         0.1,
         currentBatch: processedFiles,
       );
-      debugPrint('СКАНИРОВАНИЕ: Найдено ${screenshots.length} скриншотов');
+      debugPrint(
+        'СКАНИРОВАНИЕ: Найдено ${screenshots.length} ${Locales.current.screenshots_count.toLowerCase()}',
+      );
 
       // 2. Ищем серии снимков - разбиваем на порции для более плавного UI
-      await updateStatus("Ai-модель ищет серии снимков...", 0.15, currentBatch: processedFiles);
+      await updateStatus('Ai-модель ищет серии снимков...', 0.15, currentBatch: processedFiles);
 
       // Разбиваем на порции по 100 фото
       const photoBatchSize = 100;
       List<MediaGroup> allPhotoDuplicateGroups = [];
 
       for (int i = 0; i < currentState.photoFiles.length; i += photoBatchSize) {
-        if (emit.isDone) break;
+        if (emit.isDone || isPaused) break; // Проверка паузы
 
         final end = (i + photoBatchSize < currentState.photoFiles.length)
             ? i + photoBatchSize
@@ -191,6 +201,8 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
         if (batchDuplicates.isNotEmpty) {
           // Добавляем каждую новую группу и обновляем UI после каждой группы
           for (final group in batchDuplicates) {
+            if (isPaused) break; // Проверка паузы
+
             allPhotoDuplicateGroups.add(group);
 
             // Обновляем текущее состояние после каждой новой группы
@@ -204,23 +216,30 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             final progress =
                 0.15 + (0.15 * (i + photoBatchSize / 2) / currentState.photoFiles.length);
             await updateStatus(
-              "Найдено ${allPhotoDuplicateGroups.length} групп дубликатов фото",
+              '${Locales.current.found} ${allPhotoDuplicateGroups.length} ${Locales.current.duplicate_photo_groups.toLowerCase()}',
               progress,
               currentBatch: processedFiles,
             );
+            if (isPaused) break;
           }
         } else {
           // Если в этой порции ничего не нашли, всё равно обновляем прогресс
           final progress = 0.15 + (0.15 * end / currentState.photoFiles.length);
           await updateStatus(
-            "Поиск дубликатов фото (обработано $end/${currentState.photoFiles.length})",
+            '${Locales.current.searching_duplicate_photos_processed} $end/${currentState.photoFiles.length})',
             progress,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Короткая пауза для отзывчивости UI
         await Future.delayed(const Duration(milliseconds: 10));
+      }
+
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return; // Выходим из функции
       }
 
       final totalDuplicatesCount = allPhotoDuplicateGroups.fold<int>(
@@ -229,14 +248,14 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       );
 
       await updateStatus(
-        "Найдено ${allPhotoDuplicateGroups.length} групп дубликатов (${totalDuplicatesCount} фото)",
+        '${Locales.current.found} ${allPhotoDuplicateGroups.length} ${Locales.current.duplicate_groups.toLowerCase()} ($totalDuplicatesCount ${Locales.current.photos.toLowerCase()})',
         0.3,
         currentBatch: processedFiles,
       );
 
       // 3. Ищем похожие фотографии - обновляем UI после каждой найденной группы
       await updateStatus(
-        "Ai-модель группирует похожие фотографии...",
+        Locales.current.ai_model_grouping_similar_photos,
         0.35,
         currentBatch: processedFiles,
       );
@@ -246,7 +265,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       List<MediaGroup> allSimilarGroups = [];
 
       for (int i = 0; i < currentState.photoFiles.length; i += similarBatchSize) {
-        if (emit.isDone) break;
+        if (emit.isDone || isPaused) break; // Проверка паузы
 
         final end = (i + similarBatchSize < currentState.photoFiles.length)
             ? i + similarBatchSize
@@ -264,9 +283,11 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
         if (similarGroupsMap.isNotEmpty) {
           // Для каждой найденной группы сразу обновляем UI
           for (final entry in similarGroupsMap.entries) {
+            if (isPaused) break; // Проверка паузы
+
             final newGroup = MediaGroup(
               id: '${entry.key}_${i ~/ similarBatchSize}_${allSimilarGroups.length}',
-              name: 'Похожие фото ${entry.key.split('_').last}',
+              name: '',
               files: entry.value,
             );
 
@@ -282,23 +303,30 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             final progress =
                 0.35 + (0.15 * ((i + similarBatchSize / 2) / currentState.photoFiles.length));
             await updateStatus(
-              "Найдено ${allSimilarGroups.length} групп похожих фото",
+              '${Locales.current.found} ${allSimilarGroups.length} ${Locales.current.similar_photo_groups_multiline.toLowerCase()}',
               progress,
               currentBatch: processedFiles,
             );
+            if (isPaused) break; // Проверка после updateStatus
           }
         } else {
           // Даже если не нашли группы в порции, всё равно обновляем прогресс
           final progress = 0.35 + (0.15 * end / currentState.photoFiles.length);
           await updateStatus(
-            "Поиск похожих фото (обработано ${end}/${currentState.photoFiles.length})",
+            '${Locales.current.searching_similar_photos_processed} ${end}/${currentState.photoFiles.length})',
             progress,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Пауза между порциями для отзывчивости UI
         await Future.delayed(const Duration(milliseconds: 20));
+      }
+
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return;
       }
 
       final totalSimilarCount = allSimilarGroups.fold<int>(
@@ -307,13 +335,17 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       );
 
       await updateStatus(
-        "Найдено ${allSimilarGroups.length} групп похожих фото (${totalSimilarCount} фото)",
+        '${Locales.current.found} ${allSimilarGroups.length} ${Locales.current.similar_photo_groups_multiline.toLowerCase()} (${totalSimilarCount})',
         0.5,
         currentBatch: processedFiles,
       );
 
       // 4. Находим размытые фотографии - обновляем после каждого найденного
-      await updateStatus("Ai-модель ищет заблюренные фото...", 0.55, currentBatch: processedFiles);
+      await updateStatus(
+        Locales.current.ai_model_searching_blurry_photos,
+        0.55,
+        currentBatch: processedFiles,
+      );
 
       // Ещё меньшие порции для размытых фото
       const blurryBatchSize = 20; // Меньшие порции
@@ -321,7 +353,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       int lastBlurryCount = 0;
 
       for (int i = 0; i < currentState.photoFiles.length; i += blurryBatchSize) {
-        if (emit.isDone) break;
+        if (emit.isDone || isPaused) break; // Проверка паузы
 
         final end = (i + blurryBatchSize < currentState.photoFiles.length)
             ? i + blurryBatchSize
@@ -352,27 +384,38 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
           final progressValue = 0.55 + (0.15 * end / currentState.photoFiles.length);
 
           await updateStatus(
-            "Найдено ${allBlurry.length} размытых фото (+$newBlurryCount новых)",
+            '${Locales.current.found} ${allBlurry.length} ${Locales.current.blurry_photos.toLowerCase()} (+$newBlurryCount ${Locales.current.new_word.toLowerCase()})',
             progressValue,
             currentBatch: processedFiles,
           );
+          if (isPaused) break; // Проверка после updateStatus
         } else {
           // Даже без новых находок обновляем прогресс
           final progressValue = 0.55 + (0.15 * end / currentState.photoFiles.length);
 
           await updateStatus(
-            "Поиск размытых фото (обработано $end/${currentState.photoFiles.length})",
+            '${Locales.current.searching_similar_photos_processed} $end/${currentState.photoFiles.length})',
             progressValue,
             currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Еще более короткая пауза
         await Future.delayed(const Duration(milliseconds: 10));
       }
 
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return;
+      }
+
       // 5. Обрабатываем видео - обновляем после каждой находки
-      await updateStatus("Ai-модель анализирует видео...", 0.7, currentBatch: processedFiles);
+      await updateStatus(
+        Locales.current.ai_model_analyzing_videos,
+        0.7,
+        currentBatch: processedFiles,
+      );
 
       // Еще меньше порции для быстрого обновления UI
       const videoBatchSize = 20;
@@ -381,7 +424,7 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       List<MediaFile> allShortVideos = [];
 
       for (int i = 0; i < currentState.videoFiles.length; i += videoBatchSize) {
-        if (emit.isDone) break;
+        if (emit.isDone || isPaused) break; // Проверка паузы
 
         final end = (i + videoBatchSize < currentState.videoFiles.length)
             ? i + videoBatchSize
@@ -412,10 +455,11 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
 
           final progress = 0.7 + (0.05 * end / currentState.videoFiles.length);
           await updateStatus(
-            "Найдено ${allVideoDuplicateGroups.length} групп дубликатов видео (+${batchVideoDuplicates.length} новых)",
+            '${Locales.current.found} ${allVideoDuplicateGroups.length} групп дубликатов видео (+${batchVideoDuplicates.length} ${Locales.current.new_word.toLowerCase()})',
             progress,
             currentBatch: processedFiles,
           );
+          if (isPaused) break; // Проверка после updateStatus
         }
 
         // Находим записи экрана
@@ -430,10 +474,11 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
 
           final progress = 0.75 + (0.05 * end / currentState.videoFiles.length);
           await updateStatus(
-            "Найдено ${allScreenRecordings.length} записей экрана (+${batchScreenRecordings.length} новых)",
+            '${Locales.current.found} ${allScreenRecordings.length} ${Locales.current.screen_recordings_2.toLowerCase()} (+${batchScreenRecordings.length} ${Locales.current.new_word.toLowerCase()})',
             progress,
             currentBatch: processedFiles,
           );
+          if (isPaused) break;
         }
 
         // Находим короткие видео
@@ -448,10 +493,11 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
 
           final progress = 0.8 + (0.05 * end / currentState.videoFiles.length);
           await updateStatus(
-            "Найдено ${allShortVideos.length} коротких видео (+${batchShortVideos.length} новых)",
+            '${Locales.current.found} ${allShortVideos.length} ${Locales.current.short_videos.toLowerCase()} (+${batchShortVideos.length} ${Locales.current.new_word.toLowerCase()})',
             progress,
             currentBatch: processedFiles,
           );
+          if (isPaused) break;
         }
 
         // Если в этой порции ничего не нашли, всё равно обновляем прогресс
@@ -460,18 +506,24 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             batchShortVideos.isEmpty) {
           final progress = 0.7 + (0.15 * end / currentState.videoFiles.length);
           await updateStatus(
-            "Анализ видео (обработано $end/${currentState.videoFiles.length})",
+            '${Locales.current.analyzing_videos_processed} $end/${currentState.videoFiles.length})',
             progress,
-            currentBatch: processedFiles + (end - i), // Добавляем проверенные файлы к счетчику
+            currentBatch: processedFiles + (end - i),
           );
+          if (isPaused) break;
         }
 
         // Пауза для отзывчивости
         await Future.delayed(const Duration(milliseconds: 10));
       }
 
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return;
+      }
+
       // Завершающая стадия - финальное обновление
-      await updateStatus("Сканирование завершено", 1.0, currentBatch: processedFiles);
+      await updateStatus('Сканирование завершено', 1.0, currentBatch: processedFiles);
 
       // Завершаем сканирование
       if (!emit.isDone) {
@@ -700,9 +752,65 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       // Удаляем выбранные файлы
       await PhotoManager.editor.deleteWithIds(selectedFileIds);
 
-      // Удаляем файлы из списков
+      // Удаляем файлы из всех списков
       final updatedFiles = currentState.allFiles
           .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из скриншотов
+      final updatedScreenshots = currentState.screenshots
+          .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из размытых
+      final updatedBlurry = currentState.blurry
+          .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из записей экрана
+      final updatedScreenRecordings = currentState.screenRecordings
+          .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из коротких видео
+      final updatedShortVideos = currentState.shortVideos
+          .where((file) => !selectedFileIds.contains(file.entity.id))
+          .toList();
+
+      // Удаляем из групп похожих
+      final updatedSimilarGroups = currentState.similarGroups
+          .map((group) {
+            final updatedGroupFiles = group.files
+                .where((file) => !selectedFileIds.contains(file.entity.id))
+                .toList();
+            return updatedGroupFiles.isEmpty ? null : group.copyWith(files: updatedGroupFiles);
+          })
+          .where((group) => group != null)
+          .cast<MediaGroup>()
+          .toList();
+
+      // Удаляем из групп дубликатов фото
+      final updatedPhotoDuplicateGroups = currentState.photoDuplicateGroups
+          .map((group) {
+            final updatedGroupFiles = group.files
+                .where((file) => !selectedFileIds.contains(file.entity.id))
+                .toList();
+            return updatedGroupFiles.isEmpty ? null : group.copyWith(files: updatedGroupFiles);
+          })
+          .where((group) => group != null)
+          .cast<MediaGroup>()
+          .toList();
+
+      // Удаляем из групп дубликатов видео
+      final updatedVideoDuplicateGroups = currentState.videoDuplicateGroups
+          .map((group) {
+            final updatedGroupFiles = group.files
+                .where((file) => !selectedFileIds.contains(file.entity.id))
+                .toList();
+            return updatedGroupFiles.isEmpty ? null : group.copyWith(files: updatedGroupFiles);
+          })
+          .where((group) => group != null)
+          .cast<MediaGroup>()
           .toList();
 
       emit(
@@ -711,6 +819,13 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
           photoFiles: updatedFiles.where((f) => f.isImage).toList(),
           videoFiles: updatedFiles.where((f) => f.isVideo).toList(),
           selectedFiles: [],
+          screenshots: updatedScreenshots,
+          blurry: updatedBlurry,
+          screenRecordings: updatedScreenRecordings,
+          shortVideos: updatedShortVideos,
+          similarGroups: updatedSimilarGroups,
+          photoDuplicateGroups: updatedPhotoDuplicateGroups,
+          videoDuplicateGroups: updatedVideoDuplicateGroups,
         ),
       );
     } catch (e) {

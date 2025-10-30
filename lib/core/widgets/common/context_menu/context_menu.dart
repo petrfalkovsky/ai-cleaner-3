@@ -83,7 +83,7 @@ class ContextMenuList extends StatelessWidget {
             Align(
                   alignment: Alignment.bottomCenter,
                   child: StyledButton.text(
-                    title: "close",
+                    title: "Сlose",
                     onPressed: () {
                       context.router.maybePop();
                     },

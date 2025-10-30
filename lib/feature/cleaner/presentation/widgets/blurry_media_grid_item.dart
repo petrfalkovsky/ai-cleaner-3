@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import '../../../cleaner/domain/media_file_entity.dart';
 import '../widgets/selection_indicator.dart';
 import '../widgets/blur_indicator.dart';
+import '../bloc/media_cleaner_bloc.dart';
 
 class BlurryMediaGridItem extends StatelessWidget {
   final MediaFile file;
@@ -20,56 +23,61 @@ class BlurryMediaGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      onLongPress: onPreview,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Миниатюра файла
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: AssetEntityImage(
-              file.entity,
-              isOriginal: false,
-              thumbnailSize: const ThumbnailSize.square(200),
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.broken_image, color: Colors.grey),
-                );
-              },
-            ),
-          ),
+      onTap: onPreview, // Тап на превью = полноэкранный просмотр
+      child: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
+        builder: (context, state) {
+          bool isSelected = false;
+          if (state is MediaCleanerLoaded) {
+            isSelected = state.selectedFiles.any((f) => f.entity.id == file.entity.id);
+          }
 
-          // Индикатор размытости (полупрозрачное наложение)
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              // Миниатюра БЕЗ скругления (как в iOS Photos)
+              AssetEntityImage(
+                file.entity,
+                isOriginal: false,
+                thumbnailSize: const ThumbnailSize.square(300),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: CupertinoColors.systemGrey5,
+                    child: const Icon(
+                      CupertinoIcons.photo,
+                      color: CupertinoColors.systemGrey3,
+                    ),
+                  );
+                },
+              ),
+
+              // Индикатор размытости в правом нижнем углу
+              Positioned(
+                bottom: 4,
+                right: 4,
+                child: BlurIndicator(
+                  blurScore: 0.8,
+                  size: 28,
                 ),
               ),
-            ),
-          ),
 
-          // Индикатор размытости
-          Positioned(
-            bottom: 8,
-            right: 8,
-            child: BlurIndicator(
-              // Предполагаем, что размытость где-то между 0.6-0.9
-              blurScore: 0.8,
-              size: 28,
-            ),
-          ),
+              // Затемнение выделенного фото
+              if (isSelected)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                ),
 
-          // Индикатор выбора
-          Positioned(top: 8, right: 8, child: SelectionIndicator(fileId: file.entity.id, size: 24)),
-        ],
+              // Индикатор выбора
+              Positioned(
+                top: 6,
+                right: 6,
+                child: SelectionIndicator(fileId: file.entity.id, size: 24),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

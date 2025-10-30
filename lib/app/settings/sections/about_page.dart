@@ -26,9 +26,9 @@ class AboutPage extends StatelessWidget {
             spacing: 16,
             children: [
               const AboutItem(
-                title: 'what is whoami?',
+                title: 'what is?',
                 subtitle:
-                    'whoami is a private journaling app that helps you document life as seen through your eyes. each entry has a photo, a track and your thoughts to help you capture the moment.',
+                    'Who is a private journaling app that helps you document life as seen through your eyes. each entry has a photo, a track and your thoughts to help you capture the moment.',
               ),
               const AboutItem(
                 title: 'how was it developed?',

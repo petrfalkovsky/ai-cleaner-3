@@ -67,7 +67,7 @@ class SettingsPage extends StatelessWidget {
               onTap: () {
                 // final mailTo = Mailto(
                 //   to: [RemoteConfigRepository.instance.data.feedbackMail],
-                //   subject: 'my thoughts about whoami',
+                //   subject: 'my thoughts about',
                 //   body: 'got any ideas or things you wanna share? let me know!',
                 // );
                 // launchUrl(mailTo.toString().toUri);

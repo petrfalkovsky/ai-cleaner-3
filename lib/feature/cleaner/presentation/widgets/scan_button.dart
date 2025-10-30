@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
-import '../../../../core/theme/button.dart';
 import 'scan_progress.dart';
 
 class ScanButton extends StatefulWidget {
@@ -14,10 +17,29 @@ class ScanButton extends StatefulWidget {
   State<ScanButton> createState() => _ScanButtonState();
 }
 
-class _ScanButtonState extends State<ScanButton> {
+class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateMixin {
   bool _isStarting = false;
   double _startProgress = 0.0;
   Timer? _progressTimer;
+  late AnimationController _dropController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _dropController = AnimationController(duration: const Duration(milliseconds: 600), vsync: this);
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _dropController, curve: Curves.easeInBack));
+
+    _opacityAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _dropController, curve: const Interval(0.5, 1.0)));
+  }
 
   void _startScan() {
     HapticFeedback.mediumImpact();
@@ -26,6 +48,9 @@ class _ScanButtonState extends State<ScanButton> {
       _isStarting = true;
       _startProgress = 0.0;
     });
+
+    // Запускаем анимацию капли
+    _dropController.forward();
 
     // Симулируем небольшую задержку с прогресс-баром
     _progressTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
@@ -46,36 +71,90 @@ class _ScanButtonState extends State<ScanButton> {
   @override
   void dispose() {
     _progressTimer?.cancel();
+    _dropController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return _isStarting
-        ? SizedBox(
-            width: 250,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LinearProgressIndicator(
-                  value: _startProgress,
-                  backgroundColor: Colors.grey.withOpacity(0.3),
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                  minHeight: 8,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                const SizedBox(height: 16),
-                const Text('Подготовка к сканированию...', style: TextStyle(fontSize: 14)),
-              ],
+        ? AnimatedOpacity(
+            duration: const Duration(milliseconds: 300),
+            opacity: _startProgress > 0.5 ? 1.0 : 0.0,
+            child: SizedBox(
+              width: 280,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: _startProgress,
+                      backgroundColor: Colors.white.withOpacity(0.2),
+                      valueColor: const AlwaysStoppedAnimation<Color>(CupertinoColors.activeBlue),
+                      minHeight: 8,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    Locales.current.preparing_for_scan,
+                    style: TextStyle(fontSize: 15, color: Colors.white70),
+                  ),
+                ],
+              ),
             ),
           )
-        : StyledButton.filled(
-            title: "Начать сканирование",
-            onPressed: _startScan,
-            fullWidth: true,
-            backgroundColor: Colors.blue,
-            fontColor: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-          ).animate().fadeIn(duration: 350.ms);
+        : AnimatedBuilder(
+                animation: _dropController,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _scaleAnimation.value,
+                    child: Opacity(
+                      opacity: _opacityAnimation.value,
+                      child: GestureDetector(
+                        onTap: _startScan,
+                        child: LiquidGlass(
+                          settings: LiquidGlassSettings(
+                            blur: 5,
+                            ambientStrength: 1.0,
+                            lightAngle: 0.25 * math.pi,
+                            glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
+                            thickness: 25,
+                          ),
+                          shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(25)),
+                          glassContainsChild: false,
+                          child: Container(
+                            width: 280,
+                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(CupertinoIcons.sparkles, color: Colors.white, size: 24),
+                                SizedBox(width: 12),
+                                Text(
+                                  Locales.current.start_scan,
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )
+              .animate()
+              .fadeIn(duration: 350.ms)
+              .scale(
+                begin: const Offset(0.8, 0.8),
+                end: const Offset(1.0, 1.0),
+                duration: 400.ms,
+                curve: Curves.easeOutBack,
+              );
   }
 }

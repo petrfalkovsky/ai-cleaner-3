@@ -49,3 +49,5 @@ ios/Config.xcconfig
 /upload.sh
 
 /android/build
+/ios/build/ios/XCBuildData
+android/.kotlin/sessions/kotlin-compiler-14855157112420240639.salive

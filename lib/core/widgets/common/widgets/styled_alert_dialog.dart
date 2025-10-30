@@ -133,7 +133,7 @@ class StyledAlertDialog extends StatelessWidget {
                               context.router.maybePop(false);
                             },
                             fontColor: Colors.white.withValues(alpha: 0.6),
-                            title: "cancel",
+                            title: "Сancel",
                           ),
                           StyledButton.text(
                             onPressed: () async {
@@ -147,7 +147,7 @@ class StyledAlertDialog extends StatelessWidget {
                               }
                               context.router.maybePop(true);
                             },
-                            title: "yes.",
+                            title: "Yes",
                           ),
                         ],
                       ),
