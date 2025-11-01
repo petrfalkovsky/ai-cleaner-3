@@ -183,159 +183,161 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
   Widget build(BuildContext context) {
     final trialDate = DateTime.now().add(const Duration(days: 3));
 
-    return CupertinoPageScaffold(
-      backgroundColor: const Color(0xFF0A0E27),
-      child: Stack(
-        children: [
-          // Animated background gradient
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [const Color(0xFF0A0E27), const Color(0xFF1a1f3a).withOpacity(0.8)],
+    return Material(
+      child: CupertinoPageScaffold(
+        backgroundColor: const Color(0xFF0A0E27),
+        child: Stack(
+          children: [
+            // Animated background gradient
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [const Color(0xFF0A0E27), const Color(0xFF1a1f3a).withOpacity(0.8)],
+                  ),
                 ),
               ),
             ),
-          ),
-
-          SafeArea(
-            child: Column(
-              children: [
-                // Close button
-                Align(
-                  alignment: Alignment.topRight,
-                  child: CupertinoButton(
-                    onPressed: () => context.router.maybePop(),
-                    child: const Icon(
-                      CupertinoIcons.xmark_circle_fill,
-                      color: Colors.white54,
-                      size: 30,
+      
+            SafeArea(
+              child: Column(
+                children: [
+                  // Close button
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: CupertinoButton(
+                      onPressed: () => context.router.maybePop(),
+                      child: const Icon(
+                        CupertinoIcons.xmark_circle_fill,
+                        color: Colors.white54,
+                        size: 30,
+                      ),
                     ),
                   ),
-                ),
-
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    children: [
-                      const SizedBox(height: 30),
-
-                      // Crown icon with animation
-                      Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFFFFD700).withOpacity(0.5),
-                                  blurRadius: 30,
-                                  spreadRadius: 5,
+      
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      children: [
+                        const SizedBox(height: 30),
+      
+                        // Crown icon with animation
+                        Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
                                 ),
-                              ],
-                            ),
-                            child: Icon(CupertinoIcons.chevron_down, size: 40, color: Colors.white),
-                          )
-                          .animate(onPlay: (controller) => controller.repeat())
-                          .shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.3))
-                          .shake(hz: 0.5, curve: Curves.easeInOut),
-
-                      const SizedBox(height: 24),
-
-                      Text(
-                        Locales.current.unlock_premium,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.3, end: 0),
-
-                      const SizedBox(height: 40),
-
-                      // Storage animation
-                      _buildStorageAnimation(),
-
-                      const SizedBox(height: 40),
-
-                      // Trial toggle
-                      _buildTrialToggle(),
-
-                      const SizedBox(height: 24),
-
-                      // Pricing
-                      _buildPricing(trialDate),
-
-                      const SizedBox(height: 32),
-
-                      // Start trial button
-                      Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFFD700).withOpacity(0.5),
+                                    blurRadius: 30,
+                                    spreadRadius: 5,
+                                  ),
+                                ],
                               ),
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFFFFD700).withOpacity(0.3),
-                                  blurRadius: 20,
-                                  spreadRadius: 2,
+                              child: Icon(CupertinoIcons.chevron_down, size: 40, color: Colors.white),
+                            )
+                            .animate(onPlay: (controller) => controller.repeat())
+                            .shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.3))
+                            .shake(hz: 0.5, curve: Curves.easeInOut),
+      
+                        const SizedBox(height: 24),
+      
+                        Text(
+                          Locales.current.unlock_premium,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.3, end: 0),
+      
+                        const SizedBox(height: 40),
+      
+                        // Storage animation
+                        _buildStorageAnimation(),
+      
+                        const SizedBox(height: 40),
+      
+                        // Trial toggle
+                        _buildTrialToggle(),
+      
+                        const SizedBox(height: 24),
+      
+                        // Pricing
+                        _buildPricing(trialDate),
+      
+                        const SizedBox(height: 32),
+      
+                        // Start trial button
+                        Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
                                 ),
-                              ],
-                            ),
-                            child: CupertinoButton(
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              onPressed: _isLoading ? null : _startTrial,
-                              child: _isLoading
-                                  ? const CupertinoActivityIndicator(color: Colors.white)
-                                  : Text(
-                                      Locales.current.start_trial,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFFD700).withOpacity(0.3),
+                                    blurRadius: 20,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: CupertinoButton(
+                                padding: const EdgeInsets.symmetric(vertical: 18),
+                                onPressed: _isLoading ? null : _startTrial,
+                                child: _isLoading
+                                    ? const CupertinoActivityIndicator(color: Colors.white)
+                                    : Text(
+                                        Locales.current.start_trial,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                            ),
-                          )
-                          .animate()
-                          .fadeIn(delay: 400.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
-
-                      const SizedBox(height: 16),
-
-                      // Restore purchases button
-                      CupertinoButton(
-                        onPressed: _isLoading ? null : _restorePurchases,
-                        child: Text(
-                          Locales.current.restore_purchases,
-                          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(delay: 400.ms, duration: 600.ms)
+                            .slideY(begin: 0.3, end: 0),
+      
+                        const SizedBox(height: 16),
+      
+                        // Restore purchases button
+                        CupertinoButton(
+                          onPressed: _isLoading ? null : _restorePurchases,
+                          child: Text(
+                            Locales.current.restore_purchases,
+                            style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
+                          ),
                         ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Terms text
-                      Text(
-                        Locales.current.subscription_terms,
-                        style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 40),
-                    ],
+      
+                        const SizedBox(height: 24),
+      
+                        // Terms text
+                        Text(
+                          Locales.current.subscription_terms,
+                          style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),
+      
+                        const SizedBox(height: 40),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

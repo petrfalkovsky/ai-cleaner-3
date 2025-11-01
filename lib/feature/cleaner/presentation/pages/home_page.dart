@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: CupertinoButton(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     minSize: 0,
-                    onPressed: () => context.router.push(const PaywallRoute()),
+                    onPressed: () => context.router.push( PaywallRoute()),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
