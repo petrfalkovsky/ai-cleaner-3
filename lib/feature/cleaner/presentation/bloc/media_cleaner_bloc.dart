@@ -474,8 +474,8 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
           if (isPaused) break; // Проверка после updateStatus
         }
 
-        // Находим записи экрана
-        final batchScreenRecordings = MediaScanner.findScreenRecordings(videoBatch);
+        // Находим записи экрана (теперь асинхронно с нативными метаданными)
+        final batchScreenRecordings = await MediaScanner.findScreenRecordings(videoBatch);
         if (batchScreenRecordings.isNotEmpty) {
           allScreenRecordings.addAll(batchScreenRecordings);
 

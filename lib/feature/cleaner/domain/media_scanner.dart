@@ -8,6 +8,7 @@ import 'package:image/image.dart' as img;
 import 'package:photo_manager/photo_manager.dart';
 
 import '../domain/media_file_entity.dart';
+import '../domain/media_metadata_service.dart';
 
 class MediaScanner {
   // Оптимизированный размер батчей для разных операций
@@ -144,8 +145,8 @@ class MediaScanner {
 
         final similarity = _calculateHashSimilarity(hash1, entry.value);
 
-        // Более строгий порог для DCT hash (90%)
-        if (similarity >= 0.90) {
+        // Понижаем порог для DCT hash до 85% для лучшего обнаружения похожих фото
+        if (similarity >= 0.85) {
           final otherFile = files.firstWhere(
             (f) => f.entity.id == entry.key,
             orElse: () => file,
@@ -153,6 +154,7 @@ class MediaScanner {
           if (otherFile.entity.id != file.entity.id) {
             similarFiles.add(otherFile);
             processed.add(entry.key);
+            debugPrint('  Найдено похожее фото: сходство ${(similarity * 100).toStringAsFixed(1)}%');
           }
         }
       }
@@ -328,38 +330,77 @@ class MediaScanner {
     return screenshots;
   }
 
-  // ОПТИМИЗИРОВАННЫЙ поиск записей экрана - поиск по имени файла
-  static List<MediaFile> findScreenRecordings(List<MediaFile> files) {
+  // ОБНОВЛЕННЫЙ поиск записей экрана - использует нативные iOS метаданные
+  static Future<List<MediaFile>> findScreenRecordings(List<MediaFile> files) async {
     final screenRecordings = <MediaFile>[];
+    final videoFiles = files.where((f) => f.isVideo).toList();
 
-    debugPrint('ОПТИМИЗАЦИЯ: Поиск записей экрана среди ${files.where((f) => f.isVideo).length} видео');
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск записей экрана среди ${videoFiles.length} видео');
 
-    for (final file in files) {
-      if (!file.isVideo) continue;
+    // Обрабатываем видео батчами для оптимизации
+    const batchSize = 20;
+    for (int i = 0; i < videoFiles.length; i += batchSize) {
+      final end = min(i + batchSize, videoFiles.length);
+      final batch = videoFiles.sublist(i, end);
 
-      // Проверяем имя файла и путь
-      final title = file.entity.title ?? '';
-      final titleLower = title.toLowerCase();
-      final relativePath = file.entity.relativePath?.toLowerCase() ?? '';
+      // Получаем метаданные для каждого видео в батче с ограниченной параллельностью
+      final batchResults = await _processWithLimitedConcurrency<MediaFile, MediaFile>(
+        batch,
+        (file) async {
+          try {
+            // СНАЧАЛА проверяем уже загруженные метаданные
+            bool isScreenRecording = file.isScreenRecording;
 
-      // iOS записи экрана могут иметь разные имена:
-      // - "RPReplay_Final..." или просто "RPReplay..."
-      // - "Screen Recording 2024-..."
-      // - Путь может содержать "ReplayKit"
-      final isScreenRecording = titleLower.contains('rpreplay') ||
-                                titleLower.contains('replaykit') ||
-                                titleLower.contains('screen recording') ||
-                                titleLower.startsWith('screen ') ||
-                                relativePath.contains('replaykit');
+            // Если метаданных нет, запрашиваем их из нативного кода
+            if (file.metadata == null) {
+              final metadata = await MediaMetadataService.getMediaMetadata(file.entity.id);
 
-      if (isScreenRecording) {
-        screenRecordings.add(file.copyWith(category: 'screenRecordings'));
-        debugPrint('✓ Найдена запись экрана: $title (путь: $relativePath)');
-      } else {
-        // Логируем первые 5 видео для отладки
-        if (screenRecordings.length < 5) {
-          debugPrint('  Пропущено видео: $title (путь: $relativePath)');
-        }
+              if (metadata != null) {
+                // Создаем новый файл с метаданными
+                final fileWithMetadata = file.copyWith(metadata: metadata);
+                isScreenRecording = fileWithMetadata.isScreenRecording;
+
+                if (isScreenRecording) {
+                  final originalFilename = metadata['originalFilename'] ?? file.entity.title ?? '';
+                  debugPrint('✓ Найдена запись экрана (iOS metadata): $originalFilename');
+                  return fileWithMetadata.copyWith(category: 'screenRecordings');
+                }
+              }
+            } else if (isScreenRecording) {
+              // Метаданные уже есть и указывают, что это запись экрана
+              final originalFilename = file.metadata!['originalFilename'] ?? file.entity.title ?? '';
+              debugPrint('✓ Найдена запись экрана (cached metadata): $originalFilename');
+              return file.copyWith(category: 'screenRecordings');
+            }
+
+            // Fallback: если метаданные недоступны, проверяем по имени файла
+            // Это нужно для Android или если iOS API недоступен
+            if (file.metadata == null) {
+              final title = file.entity.title ?? '';
+              final titleLower = title.toLowerCase();
+
+              // Проверяем ТОЛЬКО надёжные префиксы для iOS
+              final isScreenRecordingByName = titleLower.startsWith('rpreplay') ||
+                                            titleLower.startsWith('screen recording');
+
+              if (isScreenRecordingByName) {
+                debugPrint('✓ Найдена запись экрана (fallback по имени): $title');
+                return file.copyWith(category: 'screenRecordings');
+              }
+            }
+          } catch (e) {
+            debugPrint('Ошибка проверки записи экрана для ${file.entity.id}: $e');
+          }
+
+          return null;
+        },
+      );
+
+      screenRecordings.addAll(batchResults);
+
+      // Небольшая пауза между батчами
+      if (i + batchSize < videoFiles.length) {
+        await Future.delayed(const Duration(milliseconds: 10));
       }
     }
 
@@ -391,20 +432,22 @@ class MediaScanner {
     final Map<String, List<MediaFile>> duplicateGroups = {};
     final Map<String, MediaFile> signatureMap = {};
 
-    debugPrint('ОПТИМИЗАЦИЯ: Поиск дубликатов среди ${files.where((f) => f.isImage).length} фото');
+    final imageFiles = files.where((f) => f.isImage).toList();
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск дубликатов среди ${imageFiles.length} фото');
 
-    for (final file in files) {
-      if (!file.isImage) continue;
-
-      // Сигнатура: размер файла + разрешение + дата создания (с точностью до секунды)
-      final createDate = file.entity.createDateTime.millisecondsSinceEpoch ~/ 1000;
+    for (final file in imageFiles) {
+      // Сигнатура: размер файла + разрешение + дата создания (с точностью до минуты)
+      // Расширяем точность до минуты, так как некоторые дубликаты могут быть созданы в разные секунды
+      final createDate = file.entity.createDateTime.millisecondsSinceEpoch ~/ 60000; // Минуты
       final signature = '${file.entity.size}|${file.entity.width}|${file.entity.height}|$createDate';
 
       if (signatureMap.containsKey(signature)) {
         if (duplicateGroups.containsKey(signature)) {
           duplicateGroups[signature]!.add(file);
+          debugPrint('  Добавлено в группу дубликатов: ${file.entity.title} (размер: ${file.entity.size}, разрешение: ${file.entity.width}x${file.entity.height})');
         } else {
           duplicateGroups[signature] = [signatureMap[signature]!, file];
+          debugPrint('  Создана новая группа дубликатов: ${signatureMap[signature]!.entity.title} + ${file.entity.title}');
         }
       } else {
         signatureMap[signature] = file;
@@ -424,10 +467,11 @@ class MediaScanner {
             files: groupFiles,
           ),
         );
+        debugPrint('  Группа дубликатов #$groupCounter: ${groupFiles.length} файлов');
       }
     });
 
-    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${result.length} групп дубликатов фото');
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${result.length} групп дубликатов фото (всего ${duplicateGroups.values.fold(0, (sum, group) => sum + group.length)} файлов)');
     return result;
   }
 
@@ -436,21 +480,22 @@ class MediaScanner {
     final Map<String, List<MediaFile>> duplicateGroups = {};
     final Map<String, MediaFile> signatureMap = {};
 
-    debugPrint('ОПТИМИЗАЦИЯ: Поиск дубликатов среди ${files.where((f) => f.isVideo).length} видео');
+    final videoFiles = files.where((f) => f.isVideo).toList();
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск дубликатов среди ${videoFiles.length} видео');
 
-    for (final file in files) {
-      if (!file.isVideo) continue;
-
-      // Сигнатура: размер файла + длительность + дата создания
+    for (final file in videoFiles) {
+      // Сигнатура: размер файла + длительность + дата создания (с точностью до минуты)
       final duration = file.entity.duration ?? 0;
-      final createDate = file.entity.createDateTime.millisecondsSinceEpoch ~/ 1000;
+      final createDate = file.entity.createDateTime.millisecondsSinceEpoch ~/ 60000; // Минуты
       final signature = '${file.entity.size}|$duration|$createDate';
 
       if (signatureMap.containsKey(signature)) {
         if (duplicateGroups.containsKey(signature)) {
           duplicateGroups[signature]!.add(file);
+          debugPrint('  Добавлено в группу дубликатов видео: ${file.entity.title} (размер: ${file.entity.size}, длительность: $duration сек)');
         } else {
           duplicateGroups[signature] = [signatureMap[signature]!, file];
+          debugPrint('  Создана новая группа дубликатов видео: ${signatureMap[signature]!.entity.title} + ${file.entity.title}');
         }
       } else {
         signatureMap[signature] = file;
@@ -470,10 +515,11 @@ class MediaScanner {
             files: groupFiles,
           ),
         );
+        debugPrint('  Группа дубликатов видео #$groupCounter: ${groupFiles.length} файлов');
       }
     });
 
-    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${result.length} групп дубликатов видео');
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${result.length} групп дубликатов видео (всего ${duplicateGroups.values.fold(0, (sum, group) => sum + group.length)} файлов)');
     return result;
   }
 }

@@ -230,7 +230,7 @@ class CategoryPage extends StatelessWidget {
                   ),
                 ),
               ),
-              // ),
+
               const SizedBox(width: 12),
               // Текст "Выбрано" с tap для очистки
               Expanded(

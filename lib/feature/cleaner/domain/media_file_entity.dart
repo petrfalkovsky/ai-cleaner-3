@@ -5,25 +5,40 @@ class MediaFile {
   final bool isSelected;
   final List<String> groups;
   final String? category;
+  final Map<String, dynamic>? metadata; // Метаданные из нативного iOS кода
 
-  MediaFile({required this.entity, this.isSelected = false, this.groups = const [], this.category});
+  MediaFile({
+    required this.entity,
+    this.isSelected = false,
+    this.groups = const [],
+    this.category,
+    this.metadata,
+  });
 
   MediaFile copyWith({
     AssetEntity? entity,
     bool? isSelected,
     List<String>? groups,
     String? category,
+    Map<String, dynamic>? metadata,
   }) {
     return MediaFile(
       entity: entity ?? this.entity,
       isSelected: isSelected ?? this.isSelected,
       groups: groups ?? this.groups,
       category: category ?? this.category,
+      metadata: metadata ?? this.metadata,
     );
   }
 
   bool get isImage => entity.type == AssetType.image;
   bool get isVideo => entity.type == AssetType.video;
+
+  /// Является ли видео записью экрана (из iOS метаданных)
+  bool get isScreenRecording {
+    if (!isVideo) return false;
+    return metadata?['isScreenRecording'] == true;
+  }
 }
 
 class MediaGroup {
