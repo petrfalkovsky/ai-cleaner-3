@@ -15,6 +15,10 @@ class MediaScanner {
   static const int _blurBatchSize = 30; // Для детекции размытия
   static const int _metadataBatchSize = 200; // Для работы с метаданными
 
+  // Лимит одновременных запросов к iOS PHCachingImageManager
+  // Предотвращает EXC_BAD_ACCESS при большом количестве параллельных запросов
+  static const int _maxConcurrentRequests = 5;
+
   // Кэш для хэшей изображений (ограничен по размеру)
   static final Map<String, String> _hashCache = {};
   static const int _maxCacheSize = 1000; // Максимум 1000 хэшей в памяти
@@ -49,6 +53,25 @@ class MediaScanner {
     _hashCache[id] = hash;
   }
 
+  // Обработка списка элементов с ограничением параллельности
+  // Предотвращает перегрузку iOS PHCachingImageManager
+  static Future<List<T>> _processWithLimitedConcurrency<T, R>(
+    List<R> items,
+    Future<T?> Function(R item) processor,
+  ) async {
+    final results = <T>[];
+
+    for (int i = 0; i < items.length; i += _maxConcurrentRequests) {
+      final chunk = items.skip(i).take(_maxConcurrentRequests).toList();
+      final chunkResults = await Future.wait(
+        chunk.map((item) => processor(item)),
+      );
+      results.addAll(chunkResults.whereType<T>());
+    }
+
+    return results;
+  }
+
   // УЛУЧШЕННАЯ функция поиска похожих изображений с DCT perceptual hash
   static Future<Map<String, List<MediaFile>>> findSimilarImages(List<MediaFile> files) async {
     final Map<String, List<MediaFile>> similarGroups = {};
@@ -65,9 +88,11 @@ class MediaScanner {
       final int endIdx = min((batchIndex + 1) * _hashBatchSize, totalFiles);
       final batchFiles = files.sublist(startIdx, endIdx);
 
-      // Рассчитываем хэши для текущего батча параллельно
-      await Future.wait(
-        batchFiles.where((f) => f.isImage).map((file) async {
+      // Рассчитываем хэши для текущего батча с ограниченной параллельностью
+      final imageFiles = batchFiles.where((f) => f.isImage).toList();
+      await _processWithLimitedConcurrency<void, MediaFile>(
+        imageFiles,
+        (file) async {
           try {
             // Проверяем кэш
             if (_hashCache.containsKey(file.entity.id)) {
@@ -91,7 +116,8 @@ class MediaScanner {
           } catch (e) {
             debugPrint('Ошибка расчета хэша для ${file.entity.id}: $e');
           }
-        }),
+          return null;
+        },
       );
 
       _releaseMemory();
@@ -209,9 +235,10 @@ class MediaScanner {
       final int endIdx = min((batchIndex + 1) * _blurBatchSize, imageFiles.length);
       final batchFiles = imageFiles.sublist(startIdx, endIdx);
 
-      // Параллельная обработка батча
-      final batchResults = await Future.wait(
-        batchFiles.map((file) async {
+      // Обработка батча с ограниченной параллельностью
+      final batchResults = await _processWithLimitedConcurrency<MediaFile, MediaFile>(
+        batchFiles,
+        (file) async {
           try {
             // Используем миниатюру для экономии памяти
             final thumbnail = await file.entity.thumbnailDataWithSize(
@@ -231,10 +258,10 @@ class MediaScanner {
             debugPrint('Ошибка анализа размытия ${file.entity.id}: $e');
           }
           return null;
-        }),
+        },
       );
 
-      blurryImages.addAll(batchResults.whereType<MediaFile>());
+      blurryImages.addAll(batchResults);
       _releaseMemory();
     }
 
