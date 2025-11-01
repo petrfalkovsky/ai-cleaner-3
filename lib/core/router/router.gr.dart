@@ -9,24 +9,21 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i27;
-
 import 'package:ai_cleaner_2/app/permission_request/permission_request_page.dart'
-    as _i14;
-import 'package:ai_cleaner_2/app/root/app_root.dart' as _i3;
-import 'package:ai_cleaner_2/app/settings/page/settings_page.dart' as _i16;
-import 'package:ai_cleaner_2/app/settings/page/settings_shell_page.dart'
     as _i17;
+import 'package:ai_cleaner_2/app/root/app_root.dart' as _i3;
+import 'package:ai_cleaner_2/app/settings/page/settings_shell_page.dart'
+    as _i20;
 import 'package:ai_cleaner_2/app/settings/sections/about_page.dart' as _i1;
 import 'package:ai_cleaner_2/app/settings/sections/privacy_policy_page.dart'
-    as _i15;
-import 'package:ai_cleaner_2/app/splash_screen/splash_screen.dart' as _i18;
-import 'package:ai_cleaner_2/core/widgets/alert_widget.dart' as _i23;
+    as _i18;
+import 'package:ai_cleaner_2/app/splash_screen/splash_screen.dart' as _i21;
+import 'package:ai_cleaner_2/core/widgets/alert_widget.dart' as _i26;
 import 'package:ai_cleaner_2/core/widgets/common/date_time_picker.dart' as _i8;
 import 'package:ai_cleaner_2/core/widgets/common/widgets/styled_alert_dialog.dart'
     as _i2;
 import 'package:ai_cleaner_2/core/widgets/info_modals/error_modal.dart' as _i9;
-import 'package:ai_cleaner_2/core/widgets/info_modals/info_modal.dart' as _i12;
+import 'package:ai_cleaner_2/core/widgets/info_modals/info_modal.dart' as _i14;
 import 'package:ai_cleaner_2/feature/categories/presentation/pages/categories_page.dart'
     as _i4;
 import 'package:ai_cleaner_2/feature/categories/presentation/pages/categories_swiper_page.dart'
@@ -34,33 +31,41 @@ import 'package:ai_cleaner_2/feature/categories/presentation/pages/categories_sw
 import 'package:ai_cleaner_2/feature/categories/presentation/pages/category_page.dart'
     as _i7;
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart'
-    as _i26;
+    as _i29;
 import 'package:ai_cleaner_2/feature/cleaner/presentation/pages/category_page.dart'
     as _i6;
 import 'package:ai_cleaner_2/feature/cleaner/presentation/pages/home_page.dart'
-    as _i10;
+    as _i12;
 import 'package:ai_cleaner_2/feature/cleaner/presentation/pages/media_preview_page.dart'
-    as _i13;
+    as _i15;
 import 'package:ai_cleaner_2/feature/gallery/presentation/pages/image_full_screen.dart'
-    as _i11;
+    as _i13;
 import 'package:ai_cleaner_2/feature/gallery/presentation/pages/video_full_screen.dart'
-    as _i20;
-import 'package:ai_cleaner_2/feature/swipe/presentation/pages/swipe_screen.dart'
+    as _i23;
+import 'package:ai_cleaner_2/feature/premium/presentation/pages/paywall_screen.dart'
+    as _i16;
+import 'package:ai_cleaner_2/feature/settings/presentation/pages/feedback_screen.dart'
+    as _i10;
+import 'package:ai_cleaner_2/feature/settings/presentation/pages/feedback_success_screen.dart'
+    as _i11;
+import 'package:ai_cleaner_2/feature/settings/presentation/pages/settings_screen.dart'
     as _i19;
-import 'package:auto_route/auto_route.dart' as _i21;
-import 'package:flutter/cupertino.dart' as _i24;
-import 'package:flutter/material.dart' as _i22;
-import 'package:photo_manager/photo_manager.dart' as _i25;
+import 'package:ai_cleaner_2/feature/swipe/presentation/pages/swipe_screen.dart'
+    as _i22;
+import 'package:auto_route/auto_route.dart' as _i24;
+import 'package:flutter/cupertino.dart' as _i27;
+import 'package:flutter/material.dart' as _i25;
+import 'package:photo_manager/photo_manager.dart' as _i28;
 
 /// generated route for
 /// [_i1.AboutPage]
-class AboutRoute extends _i21.PageRouteInfo<void> {
-  const AboutRoute({List<_i21.PageRouteInfo>? children})
+class AboutRoute extends _i24.PageRouteInfo<void> {
+  const AboutRoute({List<_i24.PageRouteInfo>? children})
     : super(AboutRoute.name, initialChildren: children);
 
   static const String name = 'AboutRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       return const _i1.AboutPage();
@@ -70,19 +75,19 @@ class AboutRoute extends _i21.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.AlertDialogPage]
-class AlertDialogRoute extends _i21.PageRouteInfo<AlertDialogRouteArgs> {
+class AlertDialogRoute extends _i24.PageRouteInfo<AlertDialogRouteArgs> {
   AlertDialogRoute({
-    _i22.Key? key,
+    _i25.Key? key,
     required String title,
     String? subtitle,
-    _i22.Widget? leading,
-    _i22.Widget? trailing,
-    void Function(_i22.BuildContext)? onAccept,
-    void Function(_i22.BuildContext)? onCancel,
+    _i25.Widget? leading,
+    _i25.Widget? trailing,
+    void Function(_i25.BuildContext)? onAccept,
+    void Function(_i25.BuildContext)? onCancel,
     bool withEasterEgg = true,
-    _i23.AlertLevel level = _i23.AlertLevel.warning,
+    _i26.AlertLevel level = _i26.AlertLevel.warning,
     bool autoPop = false,
-    List<_i21.PageRouteInfo>? children,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          AlertDialogRoute.name,
          args: AlertDialogRouteArgs(
@@ -102,7 +107,7 @@ class AlertDialogRoute extends _i21.PageRouteInfo<AlertDialogRouteArgs> {
 
   static const String name = 'AlertDialogRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<AlertDialogRouteArgs>();
@@ -132,27 +137,27 @@ class AlertDialogRouteArgs {
     this.onAccept,
     this.onCancel,
     this.withEasterEgg = true,
-    this.level = _i23.AlertLevel.warning,
+    this.level = _i26.AlertLevel.warning,
     this.autoPop = false,
   });
 
-  final _i22.Key? key;
+  final _i25.Key? key;
 
   final String title;
 
   final String? subtitle;
 
-  final _i22.Widget? leading;
+  final _i25.Widget? leading;
 
-  final _i22.Widget? trailing;
+  final _i25.Widget? trailing;
 
-  final void Function(_i22.BuildContext)? onAccept;
+  final void Function(_i25.BuildContext)? onAccept;
 
-  final void Function(_i22.BuildContext)? onCancel;
+  final void Function(_i25.BuildContext)? onCancel;
 
   final bool withEasterEgg;
 
-  final _i23.AlertLevel level;
+  final _i26.AlertLevel level;
 
   final bool autoPop;
 
@@ -164,8 +169,8 @@ class AlertDialogRouteArgs {
 
 /// generated route for
 /// [_i3.AppRootPage]
-class AppRootRoute extends _i21.PageRouteInfo<AppRootRouteArgs> {
-  AppRootRoute({_i22.Key? key, List<_i21.PageRouteInfo>? children})
+class AppRootRoute extends _i24.PageRouteInfo<AppRootRouteArgs> {
+  AppRootRoute({_i25.Key? key, List<_i24.PageRouteInfo>? children})
     : super(
         AppRootRoute.name,
         args: AppRootRouteArgs(key: key),
@@ -174,7 +179,7 @@ class AppRootRoute extends _i21.PageRouteInfo<AppRootRouteArgs> {
 
   static const String name = 'AppRootRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<AppRootRouteArgs>(
@@ -188,7 +193,7 @@ class AppRootRoute extends _i21.PageRouteInfo<AppRootRouteArgs> {
 class AppRootRouteArgs {
   const AppRootRouteArgs({this.key});
 
-  final _i22.Key? key;
+  final _i25.Key? key;
 
   @override
   String toString() {
@@ -198,13 +203,13 @@ class AppRootRouteArgs {
 
 /// generated route for
 /// [_i4.CategoriesPage]
-class CategoriesRoute extends _i21.PageRouteInfo<void> {
-  const CategoriesRoute({List<_i21.PageRouteInfo>? children})
+class CategoriesRoute extends _i24.PageRouteInfo<void> {
+  const CategoriesRoute({List<_i24.PageRouteInfo>? children})
     : super(CategoriesRoute.name, initialChildren: children);
 
   static const String name = 'CategoriesRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       return const _i4.CategoriesPage();
@@ -215,12 +220,12 @@ class CategoriesRoute extends _i21.PageRouteInfo<void> {
 /// generated route for
 /// [_i5.CategoriesSwiperPage]
 class CategoriesSwiperRoute
-    extends _i21.PageRouteInfo<CategoriesSwiperRouteArgs> {
+    extends _i24.PageRouteInfo<CategoriesSwiperRouteArgs> {
   CategoriesSwiperRoute({
-    _i24.Key? key,
+    _i27.Key? key,
     required List<String> ids,
     required String title,
-    List<_i21.PageRouteInfo>? children,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          CategoriesSwiperRoute.name,
          args: CategoriesSwiperRouteArgs(key: key, ids: ids, title: title),
@@ -229,7 +234,7 @@ class CategoriesSwiperRoute
 
   static const String name = 'CategoriesSwiperRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<CategoriesSwiperRouteArgs>();
@@ -249,7 +254,7 @@ class CategoriesSwiperRouteArgs {
     required this.title,
   });
 
-  final _i24.Key? key;
+  final _i27.Key? key;
 
   final List<String> ids;
 
@@ -263,12 +268,12 @@ class CategoriesSwiperRouteArgs {
 
 /// generated route for
 /// [_i6.CategoryPage]
-class CategoryRoute extends _i21.PageRouteInfo<CategoryRouteArgs> {
+class CategoryRoute extends _i24.PageRouteInfo<CategoryRouteArgs> {
   CategoryRoute({
-    _i24.Key? key,
+    _i27.Key? key,
     required String categoryType,
     required String categoryName,
-    List<_i21.PageRouteInfo>? children,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          CategoryRoute.name,
          args: CategoryRouteArgs(
@@ -281,7 +286,7 @@ class CategoryRoute extends _i21.PageRouteInfo<CategoryRouteArgs> {
 
   static const String name = 'CategoryRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<CategoryRouteArgs>();
@@ -301,7 +306,7 @@ class CategoryRouteArgs {
     required this.categoryName,
   });
 
-  final _i24.Key? key;
+  final _i27.Key? key;
 
   final String categoryType;
 
@@ -315,11 +320,11 @@ class CategoryRouteArgs {
 
 /// generated route for
 /// [_i7.CategoryPageOld]
-class CategoryRouteOld extends _i21.PageRouteInfo<CategoryRouteOldArgs> {
+class CategoryRouteOld extends _i24.PageRouteInfo<CategoryRouteOldArgs> {
   CategoryRouteOld({
-    _i22.Key? key,
+    _i25.Key? key,
     required _i4.AssetCategory category,
-    List<_i21.PageRouteInfo>? children,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          CategoryRouteOld.name,
          args: CategoryRouteOldArgs(key: key, category: category),
@@ -328,7 +333,7 @@ class CategoryRouteOld extends _i21.PageRouteInfo<CategoryRouteOldArgs> {
 
   static const String name = 'CategoryRouteOld';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<CategoryRouteOldArgs>();
@@ -340,7 +345,7 @@ class CategoryRouteOld extends _i21.PageRouteInfo<CategoryRouteOldArgs> {
 class CategoryRouteOldArgs {
   const CategoryRouteOldArgs({this.key, required this.category});
 
-  final _i22.Key? key;
+  final _i25.Key? key;
 
   final _i4.AssetCategory category;
 
@@ -353,11 +358,11 @@ class CategoryRouteOldArgs {
 /// generated route for
 /// [_i8.DateTimePickerBottomSheetPage]
 class DateTimePickerBottomSheetRoute
-    extends _i21.PageRouteInfo<DateTimePickerBottomSheetRouteArgs> {
+    extends _i24.PageRouteInfo<DateTimePickerBottomSheetRouteArgs> {
   DateTimePickerBottomSheetRoute({
-    _i24.Key? key,
+    _i27.Key? key,
     DateTime? initialDate,
-    List<_i21.PageRouteInfo>? children,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          DateTimePickerBottomSheetRoute.name,
          args: DateTimePickerBottomSheetRouteArgs(
@@ -369,7 +374,7 @@ class DateTimePickerBottomSheetRoute
 
   static const String name = 'DateTimePickerBottomSheetRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<DateTimePickerBottomSheetRouteArgs>(
@@ -386,7 +391,7 @@ class DateTimePickerBottomSheetRoute
 class DateTimePickerBottomSheetRouteArgs {
   const DateTimePickerBottomSheetRouteArgs({this.key, this.initialDate});
 
-  final _i24.Key? key;
+  final _i27.Key? key;
 
   final DateTime? initialDate;
 
@@ -398,11 +403,11 @@ class DateTimePickerBottomSheetRouteArgs {
 
 /// generated route for
 /// [_i9.ErrorModalPage]
-class ErrorModalRoute extends _i21.PageRouteInfo<ErrorModalRouteArgs> {
+class ErrorModalRoute extends _i24.PageRouteInfo<ErrorModalRouteArgs> {
   ErrorModalRoute({
-    _i22.Key? key,
+    _i25.Key? key,
     required String message,
-    List<_i21.PageRouteInfo>? children,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          ErrorModalRoute.name,
          args: ErrorModalRouteArgs(key: key, message: message),
@@ -411,7 +416,7 @@ class ErrorModalRoute extends _i21.PageRouteInfo<ErrorModalRouteArgs> {
 
   static const String name = 'ErrorModalRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ErrorModalRouteArgs>();
@@ -423,7 +428,7 @@ class ErrorModalRoute extends _i21.PageRouteInfo<ErrorModalRouteArgs> {
 class ErrorModalRouteArgs {
   const ErrorModalRouteArgs({this.key, required this.message});
 
-  final _i22.Key? key;
+  final _i25.Key? key;
 
   final String message;
 
@@ -434,12 +439,44 @@ class ErrorModalRouteArgs {
 }
 
 /// generated route for
-/// [_i10.HomePage]
-class HomeRoute extends _i21.PageRouteInfo<HomeRouteArgs> {
+/// [_i10.FeedbackScreen]
+class FeedbackRoute extends _i24.PageRouteInfo<void> {
+  const FeedbackRoute({List<_i24.PageRouteInfo>? children})
+    : super(FeedbackRoute.name, initialChildren: children);
+
+  static const String name = 'FeedbackRoute';
+
+  static _i24.PageInfo page = _i24.PageInfo(
+    name,
+    builder: (data) {
+      return const _i10.FeedbackScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i11.FeedbackSuccessScreen]
+class FeedbackSuccessRoute extends _i24.PageRouteInfo<void> {
+  const FeedbackSuccessRoute({List<_i24.PageRouteInfo>? children})
+    : super(FeedbackSuccessRoute.name, initialChildren: children);
+
+  static const String name = 'FeedbackSuccessRoute';
+
+  static _i24.PageInfo page = _i24.PageInfo(
+    name,
+    builder: (data) {
+      return const _i11.FeedbackSuccessScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i12.HomePage]
+class HomeRoute extends _i24.PageRouteInfo<HomeRouteArgs> {
   HomeRoute({
-    _i24.Key? key,
+    _i27.Key? key,
     int initialTabIndex = 0,
-    List<_i21.PageRouteInfo>? children,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          HomeRoute.name,
          args: HomeRouteArgs(key: key, initialTabIndex: initialTabIndex),
@@ -448,13 +485,13 @@ class HomeRoute extends _i21.PageRouteInfo<HomeRouteArgs> {
 
   static const String name = 'HomeRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<HomeRouteArgs>(
         orElse: () => const HomeRouteArgs(),
       );
-      return _i10.HomePage(
+      return _i12.HomePage(
         key: args.key,
         initialTabIndex: args.initialTabIndex,
       );
@@ -465,7 +502,7 @@ class HomeRoute extends _i21.PageRouteInfo<HomeRouteArgs> {
 class HomeRouteArgs {
   const HomeRouteArgs({this.key, this.initialTabIndex = 0});
 
-  final _i24.Key? key;
+  final _i27.Key? key;
 
   final int initialTabIndex;
 
@@ -476,13 +513,13 @@ class HomeRouteArgs {
 }
 
 /// generated route for
-/// [_i11.ImageFullPage]
-class ImageFullRoute extends _i21.PageRouteInfo<ImageFullRouteArgs> {
+/// [_i13.ImageFullPage]
+class ImageFullRoute extends _i24.PageRouteInfo<ImageFullRouteArgs> {
   ImageFullRoute({
-    _i22.Key? key,
-    required _i25.AssetEntity entity,
-    required _i25.ThumbnailOption option,
-    List<_i21.PageRouteInfo>? children,
+    _i25.Key? key,
+    required _i28.AssetEntity entity,
+    required _i28.ThumbnailOption option,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          ImageFullRoute.name,
          args: ImageFullRouteArgs(key: key, entity: entity, option: option),
@@ -491,11 +528,11 @@ class ImageFullRoute extends _i21.PageRouteInfo<ImageFullRouteArgs> {
 
   static const String name = 'ImageFullRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ImageFullRouteArgs>();
-      return _i11.ImageFullPage(
+      return _i13.ImageFullPage(
         key: args.key,
         entity: args.entity,
         option: args.option,
@@ -511,11 +548,11 @@ class ImageFullRouteArgs {
     required this.option,
   });
 
-  final _i22.Key? key;
+  final _i25.Key? key;
 
-  final _i25.AssetEntity entity;
+  final _i28.AssetEntity entity;
 
-  final _i25.ThumbnailOption option;
+  final _i28.ThumbnailOption option;
 
   @override
   String toString() {
@@ -524,12 +561,12 @@ class ImageFullRouteArgs {
 }
 
 /// generated route for
-/// [_i12.InfoModalPage]
-class InfoModalRoute extends _i21.PageRouteInfo<InfoModalRouteArgs> {
+/// [_i14.InfoModalPage]
+class InfoModalRoute extends _i24.PageRouteInfo<InfoModalRouteArgs> {
   InfoModalRoute({
-    _i22.Key? key,
+    _i25.Key? key,
     required String message,
-    List<_i21.PageRouteInfo>? children,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          InfoModalRoute.name,
          args: InfoModalRouteArgs(key: key, message: message),
@@ -538,11 +575,11 @@ class InfoModalRoute extends _i21.PageRouteInfo<InfoModalRouteArgs> {
 
   static const String name = 'InfoModalRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<InfoModalRouteArgs>();
-      return _i12.InfoModalPage(key: args.key, message: args.message);
+      return _i14.InfoModalPage(key: args.key, message: args.message);
     },
   );
 }
@@ -550,7 +587,7 @@ class InfoModalRoute extends _i21.PageRouteInfo<InfoModalRouteArgs> {
 class InfoModalRouteArgs {
   const InfoModalRouteArgs({this.key, required this.message});
 
-  final _i22.Key? key;
+  final _i25.Key? key;
 
   final String message;
 
@@ -561,12 +598,12 @@ class InfoModalRouteArgs {
 }
 
 /// generated route for
-/// [_i13.MediaPreviewPage]
-class MediaPreviewRoute extends _i21.PageRouteInfo<MediaPreviewRouteArgs> {
+/// [_i15.MediaPreviewPage]
+class MediaPreviewRoute extends _i24.PageRouteInfo<MediaPreviewRouteArgs> {
   MediaPreviewRoute({
-    _i22.Key? key,
-    required _i26.MediaFile file,
-    List<_i21.PageRouteInfo>? children,
+    _i25.Key? key,
+    required _i29.MediaFile file,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          MediaPreviewRoute.name,
          args: MediaPreviewRouteArgs(key: key, file: file),
@@ -575,11 +612,11 @@ class MediaPreviewRoute extends _i21.PageRouteInfo<MediaPreviewRouteArgs> {
 
   static const String name = 'MediaPreviewRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MediaPreviewRouteArgs>();
-      return _i13.MediaPreviewPage(key: args.key, file: args.file);
+      return _i15.MediaPreviewPage(key: args.key, file: args.file);
     },
   );
 }
@@ -587,9 +624,9 @@ class MediaPreviewRoute extends _i21.PageRouteInfo<MediaPreviewRouteArgs> {
 class MediaPreviewRouteArgs {
   const MediaPreviewRouteArgs({this.key, required this.file});
 
-  final _i22.Key? key;
+  final _i25.Key? key;
 
-  final _i26.MediaFile file;
+  final _i29.MediaFile file;
 
   @override
   String toString() {
@@ -598,134 +635,124 @@ class MediaPreviewRouteArgs {
 }
 
 /// generated route for
-/// [_i14.PermissionRequestPage]
-class PermissionRequestRoute extends _i21.PageRouteInfo<void> {
-  const PermissionRequestRoute({List<_i21.PageRouteInfo>? children})
+/// [_i16.PaywallScreen]
+class PaywallRoute extends _i24.PageRouteInfo<void> {
+  const PaywallRoute({List<_i24.PageRouteInfo>? children})
+    : super(PaywallRoute.name, initialChildren: children);
+
+  static const String name = 'PaywallRoute';
+
+  static _i24.PageInfo page = _i24.PageInfo(
+    name,
+    builder: (data) {
+      return const _i16.PaywallScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i17.PermissionRequestPage]
+class PermissionRequestRoute extends _i24.PageRouteInfo<void> {
+  const PermissionRequestRoute({List<_i24.PageRouteInfo>? children})
     : super(PermissionRequestRoute.name, initialChildren: children);
 
   static const String name = 'PermissionRequestRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
-      return const _i14.PermissionRequestPage();
+      return const _i17.PermissionRequestPage();
     },
   );
 }
 
 /// generated route for
-/// [_i15.PrivacyPolicyPage]
-class PrivacyPolicyRoute extends _i21.PageRouteInfo<void> {
-  const PrivacyPolicyRoute({List<_i21.PageRouteInfo>? children})
+/// [_i18.PrivacyPolicyPage]
+class PrivacyPolicyRoute extends _i24.PageRouteInfo<void> {
+  const PrivacyPolicyRoute({List<_i24.PageRouteInfo>? children})
     : super(PrivacyPolicyRoute.name, initialChildren: children);
 
   static const String name = 'PrivacyPolicyRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
-      return const _i15.PrivacyPolicyPage();
+      return const _i18.PrivacyPolicyPage();
     },
   );
 }
 
 /// generated route for
-/// [_i16.SettingsPage]
-class SettingsRoute extends _i21.PageRouteInfo<SettingsRouteArgs> {
-  SettingsRoute({
-    _i22.Key? key,
-    _i27.Future<void> Function()? onLogoutCallback,
-    List<_i21.PageRouteInfo>? children,
-  }) : super(
-         SettingsRoute.name,
-         args: SettingsRouteArgs(key: key, onLogoutCallback: onLogoutCallback),
-         initialChildren: children,
-       );
+/// [_i19.SettingsScreen]
+class SettingsRoute extends _i24.PageRouteInfo<void> {
+  const SettingsRoute({List<_i24.PageRouteInfo>? children})
+    : super(SettingsRoute.name, initialChildren: children);
 
   static const String name = 'SettingsRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<SettingsRouteArgs>(
-        orElse: () => const SettingsRouteArgs(),
-      );
-      return _i16.SettingsPage(
-        key: args.key,
-        onLogoutCallback: args.onLogoutCallback,
-      );
+      return const _i19.SettingsScreen();
     },
   );
 }
 
-class SettingsRouteArgs {
-  const SettingsRouteArgs({this.key, this.onLogoutCallback});
-
-  final _i22.Key? key;
-
-  final _i27.Future<void> Function()? onLogoutCallback;
-
-  @override
-  String toString() {
-    return 'SettingsRouteArgs{key: $key, onLogoutCallback: $onLogoutCallback}';
-  }
-}
-
 /// generated route for
-/// [_i17.SettingsShellPage]
-class SettingsShellRoute extends _i21.PageRouteInfo<void> {
-  const SettingsShellRoute({List<_i21.PageRouteInfo>? children})
+/// [_i20.SettingsShellPage]
+class SettingsShellRoute extends _i24.PageRouteInfo<void> {
+  const SettingsShellRoute({List<_i24.PageRouteInfo>? children})
     : super(SettingsShellRoute.name, initialChildren: children);
 
   static const String name = 'SettingsShellRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
-      return const _i17.SettingsShellPage();
+      return const _i20.SettingsShellPage();
     },
   );
 }
 
 /// generated route for
-/// [_i18.SplashScreenPage]
-class SplashRouteRoute extends _i21.PageRouteInfo<void> {
-  const SplashRouteRoute({List<_i21.PageRouteInfo>? children})
+/// [_i21.SplashScreenPage]
+class SplashRouteRoute extends _i24.PageRouteInfo<void> {
+  const SplashRouteRoute({List<_i24.PageRouteInfo>? children})
     : super(SplashRouteRoute.name, initialChildren: children);
 
   static const String name = 'SplashRouteRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
-      return const _i18.SplashScreenPage();
+      return const _i21.SplashScreenPage();
     },
   );
 }
 
 /// generated route for
-/// [_i19.SwipeScreen]
-class SwipeRoute extends _i21.PageRouteInfo<void> {
-  const SwipeRoute({List<_i21.PageRouteInfo>? children})
+/// [_i22.SwipeScreen]
+class SwipeRoute extends _i24.PageRouteInfo<void> {
+  const SwipeRoute({List<_i24.PageRouteInfo>? children})
     : super(SwipeRoute.name, initialChildren: children);
 
   static const String name = 'SwipeRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
-      return const _i19.SwipeScreen();
+      return const _i22.SwipeScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i20.VideoFullPage]
-class VideoFullRoute extends _i21.PageRouteInfo<VideoFullRouteArgs> {
+/// [_i23.VideoFullPage]
+class VideoFullRoute extends _i24.PageRouteInfo<VideoFullRouteArgs> {
   VideoFullRoute({
-    _i22.Key? key,
-    required _i25.AssetEntity entity,
-    List<_i21.PageRouteInfo>? children,
+    _i25.Key? key,
+    required _i28.AssetEntity entity,
+    List<_i24.PageRouteInfo>? children,
   }) : super(
          VideoFullRoute.name,
          args: VideoFullRouteArgs(key: key, entity: entity),
@@ -734,11 +761,11 @@ class VideoFullRoute extends _i21.PageRouteInfo<VideoFullRouteArgs> {
 
   static const String name = 'VideoFullRoute';
 
-  static _i21.PageInfo page = _i21.PageInfo(
+  static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<VideoFullRouteArgs>();
-      return _i20.VideoFullPage(key: args.key, entity: args.entity);
+      return _i23.VideoFullPage(key: args.key, entity: args.entity);
     },
   );
 }
@@ -746,9 +773,9 @@ class VideoFullRoute extends _i21.PageRouteInfo<VideoFullRouteArgs> {
 class VideoFullRouteArgs {
   const VideoFullRouteArgs({this.key, required this.entity});
 
-  final _i22.Key? key;
+  final _i25.Key? key;
 
-  final _i25.AssetEntity entity;
+  final _i28.AssetEntity entity;
 
   @override
   String toString() {

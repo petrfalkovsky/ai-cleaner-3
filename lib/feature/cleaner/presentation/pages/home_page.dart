@@ -71,10 +71,63 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return Scaffold(
           backgroundColor: const Color(0xFF0A0E27), // Темный фон для контраста
           appBar: AppBar(
+            leading: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => context.router.push(const SettingsRoute()),
+              child: const Icon(
+                CupertinoIcons.settings,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
             title: Text(
               Locales.current.ai_cleaner,
               style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
             ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFFD700).withOpacity(0.3),
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: CupertinoButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    minSize: 0,
+                    onPressed: () => context.router.push(const PaywallRoute()),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                         Icon(
+                          Icons.compare_arrows_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 4),
+                        const Text(
+                          'PRO',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),

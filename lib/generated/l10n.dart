@@ -18,17 +18,20 @@ class Locales {
   static Locales? _current;
 
   static Locales get current {
-    assert(_current != null,
-        'No instance of Locales was loaded. Try to initialize the Locales delegate before accessing Locales.current.');
+    assert(
+      _current != null,
+      'No instance of Locales was loaded. Try to initialize the Locales delegate before accessing Locales.current.',
+    );
     return _current!;
   }
 
   static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
 
   static Future<Locales> load(Locale locale) {
-    final name = (locale.countryCode?.isEmpty ?? false)
-        ? locale.languageCode
-        : locale.toString();
+    final name =
+        (locale.countryCode?.isEmpty ?? false)
+            ? locale.languageCode
+            : locale.toString();
     final localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
@@ -41,8 +44,10 @@ class Locales {
 
   static Locales of(BuildContext context) {
     final instance = Locales.maybeOf(context);
-    assert(instance != null,
-        'No instance of Locales present in the widget tree. Did you add Locales.delegate in localizationsDelegates?');
+    assert(
+      instance != null,
+      'No instance of Locales present in the widget tree. Did you add Locales.delegate in localizationsDelegates?',
+    );
     return instance!;
   }
 
@@ -62,42 +67,22 @@ class Locales {
 
   /// `Select`
   String get select {
-    return Intl.message(
-      'Select',
-      name: 'select',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Select', name: 'select', desc: '', args: []);
   }
 
   /// `Keep`
   String get keep {
-    return Intl.message(
-      'Keep',
-      name: 'keep',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Keep', name: 'keep', desc: '', args: []);
   }
 
   /// `Cancel`
   String get cancel {
-    return Intl.message(
-      'Cancel',
-      name: 'cancel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Cancel', name: 'cancel', desc: '', args: []);
   }
 
   /// `Select all`
   String get select_all {
-    return Intl.message(
-      'Select all',
-      name: 'select_all',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Select all', name: 'select_all', desc: '', args: []);
   }
 
   /// `No files in this category`
@@ -112,52 +97,27 @@ class Locales {
 
   /// `Delete`
   String get delete {
-    return Intl.message(
-      'Delete',
-      name: 'delete',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Delete', name: 'delete', desc: '', args: []);
   }
 
   /// `AI Cleaner`
   String get ai_cleaner {
-    return Intl.message(
-      'AI Cleaner',
-      name: 'ai_cleaner',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('AI Cleaner', name: 'ai_cleaner', desc: '', args: []);
   }
 
   /// `Photos`
   String get photos {
-    return Intl.message(
-      'Photos',
-      name: 'photos',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Photos', name: 'photos', desc: '', args: []);
   }
 
   /// `Videos`
   String get videos {
-    return Intl.message(
-      'Videos',
-      name: 'videos',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Videos', name: 'videos', desc: '', args: []);
   }
 
   /// `Loading...`
   String get loading {
-    return Intl.message(
-      'Loading...',
-      name: 'loading',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Loading...', name: 'loading', desc: '', args: []);
   }
 
   /// `An error occurred`
@@ -212,22 +172,12 @@ class Locales {
 
   /// `Updated:`
   String get updated {
-    return Intl.message(
-      'Updated:',
-      name: 'updated',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Updated:', name: 'updated', desc: '', args: []);
   }
 
   /// `Rescan`
   String get rescan {
-    return Intl.message(
-      'Rescan',
-      name: 'rescan',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Rescan', name: 'rescan', desc: '', args: []);
   }
 
   /// `Clean videos`
@@ -282,12 +232,7 @@ class Locales {
 
   /// `View`
   String get view {
-    return Intl.message(
-      'View',
-      name: 'view',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('View', name: 'view', desc: '', args: []);
   }
 
   /// `Unnamed file`
@@ -322,32 +267,17 @@ class Locales {
 
   /// `Start scan`
   String get start_scan {
-    return Intl.message(
-      'Start scan',
-      name: 'start_scan',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Start scan', name: 'start_scan', desc: '', args: []);
   }
 
   /// `Scanning...`
   String get scanning {
-    return Intl.message(
-      'Scanning...',
-      name: 'scanning',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Scanning...', name: 'scanning', desc: '', args: []);
   }
 
   /// `from`
   String get from {
-    return Intl.message(
-      'from',
-      name: 'from',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('from', name: 'from', desc: '', args: []);
   }
 
   /// `Please wait until the scan is complete for stable app performance.\nYour device may heat up. You can pause the scan for charging or cooling (feature in development).`
@@ -452,42 +382,22 @@ class Locales {
 
   /// `Done`
   String get done {
-    return Intl.message(
-      'Done',
-      name: 'done',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Done', name: 'done', desc: '', args: []);
   }
 
   /// `Close`
   String get close {
-    return Intl.message(
-      'Close',
-      name: 'close',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Close', name: 'close', desc: '', args: []);
   }
 
   /// `Not found`
   String get not_found {
-    return Intl.message(
-      'Not found',
-      name: 'not_found',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Not found', name: 'not_found', desc: '', args: []);
   }
 
   /// `Tra again`
   String get try_again {
-    return Intl.message(
-      'Tra again',
-      name: 'try_again',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Tra again', name: 'try_again', desc: '', args: []);
   }
 
   /// `Give gallery access`
@@ -522,42 +432,22 @@ class Locales {
 
   /// `Файл`
   String get file {
-    return Intl.message(
-      'Файл',
-      name: 'file',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Файл', name: 'file', desc: '', args: []);
   }
 
   /// `Файлов`
   String get files {
-    return Intl.message(
-      'Файлов',
-      name: 'files',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Файлов', name: 'files', desc: '', args: []);
   }
 
   /// `Файла`
   String get a_file {
-    return Intl.message(
-      'Файла',
-      name: 'a_file',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Файла', name: 'a_file', desc: '', args: []);
   }
 
   /// `Similar`
   String get similar {
-    return Intl.message(
-      'Similar',
-      name: 'similar',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Similar', name: 'similar', desc: '', args: []);
   }
 
   /// `Photo bursts`
@@ -572,22 +462,12 @@ class Locales {
 
   /// `Screenshots`
   String get screenshots {
-    return Intl.message(
-      'Screenshots',
-      name: 'screenshots',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Screenshots', name: 'screenshots', desc: '', args: []);
   }
 
   /// `Blurry`
   String get blurry {
-    return Intl.message(
-      'Blurry',
-      name: 'blurry',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Blurry', name: 'blurry', desc: '', args: []);
   }
 
   /// `Similar photos`
@@ -632,12 +512,7 @@ class Locales {
 
   /// `Duplicates`
   String get duplicates {
-    return Intl.message(
-      'Duplicates',
-      name: 'duplicates',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Duplicates', name: 'duplicates', desc: '', args: []);
   }
 
   /// `Screen recordings`
@@ -722,12 +597,7 @@ class Locales {
 
   /// `Found`
   String get found {
-    return Intl.message(
-      'Found',
-      name: 'found',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Found', name: 'found', desc: '', args: []);
   }
 
   /// `Screenshots`
@@ -802,12 +672,7 @@ class Locales {
 
   /// `New`
   String get new_word {
-    return Intl.message(
-      'New',
-      name: 'new_word',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('New', name: 'new_word', desc: '', args: []);
   }
 
   /// `Screen recordings`
@@ -858,6 +723,286 @@ class Locales {
       desc: '',
       args: [],
     );
+  }
+
+  /// `Settings`
+  String get settings {
+    return Intl.message('Settings', name: 'settings', desc: '', args: []);
+  }
+
+  /// `Account`
+  String get account {
+    return Intl.message('Account', name: 'account', desc: '', args: []);
+  }
+
+  /// `Restore purchases`
+  String get restore_purchases {
+    return Intl.message(
+      'Restore purchases',
+      name: 'restore_purchases',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Feedback`
+  String get feedback {
+    return Intl.message('Feedback', name: 'feedback', desc: '', args: []);
+  }
+
+  /// `Contact & Feedback`
+  String get contact_and_feedback {
+    return Intl.message(
+      'Contact & Feedback',
+      name: 'contact_and_feedback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rate app`
+  String get rate_app {
+    return Intl.message('Rate app', name: 'rate_app', desc: '', args: []);
+  }
+
+  /// `Share app`
+  String get share_app {
+    return Intl.message('Share app', name: 'share_app', desc: '', args: []);
+  }
+
+  /// `Policy`
+  String get policy {
+    return Intl.message('Policy', name: 'policy', desc: '', args: []);
+  }
+
+  /// `Terms & Privacy`
+  String get terms_and_privacy {
+    return Intl.message(
+      'Terms & Privacy',
+      name: 'terms_and_privacy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Privacy Policy`
+  String get privacy_policy {
+    return Intl.message(
+      'Privacy Policy',
+      name: 'privacy_policy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Version`
+  String get version {
+    return Intl.message('Version', name: 'version', desc: '', args: []);
+  }
+
+  /// `Error`
+  String get error {
+    return Intl.message('Error', name: 'error', desc: '', args: []);
+  }
+
+  /// `No purchases to restore`
+  String get no_purchases_to_restore {
+    return Intl.message(
+      'No purchases to restore',
+      name: 'no_purchases_to_restore',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `We'd love to hear from you!`
+  String get we_love_to_hear_from_you {
+    return Intl.message(
+      'We\'d love to hear from you!',
+      name: 'we_love_to_hear_from_you',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send us your feedback or questions`
+  String get send_us_your_feedback {
+    return Intl.message(
+      'Send us your feedback or questions',
+      name: 'send_us_your_feedback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name`
+  String get name {
+    return Intl.message('Name', name: 'name', desc: '', args: []);
+  }
+
+  /// `Enter your name`
+  String get enter_your_name {
+    return Intl.message(
+      'Enter your name',
+      name: 'enter_your_name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Email`
+  String get email {
+    return Intl.message('Email', name: 'email', desc: '', args: []);
+  }
+
+  /// `Enter your email`
+  String get enter_your_email {
+    return Intl.message(
+      'Enter your email',
+      name: 'enter_your_email',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Message`
+  String get message {
+    return Intl.message('Message', name: 'message', desc: '', args: []);
+  }
+
+  /// `Enter your message`
+  String get enter_your_message {
+    return Intl.message(
+      'Enter your message',
+      name: 'enter_your_message',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send Feedback`
+  String get send_feedback {
+    return Intl.message(
+      'Send Feedback',
+      name: 'send_feedback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please fill in all fields`
+  String get please_fill_all_fields {
+    return Intl.message(
+      'Please fill in all fields',
+      name: 'please_fill_all_fields',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to send feedback. Please try again.`
+  String get failed_to_send_feedback {
+    return Intl.message(
+      'Failed to send feedback. Please try again.',
+      name: 'failed_to_send_feedback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Thank You!`
+  String get thank_you {
+    return Intl.message('Thank You!', name: 'thank_you', desc: '', args: []);
+  }
+
+  /// `Your feedback has been sent successfully. We'll get back to you soon!`
+  String get feedback_sent_successfully {
+    return Intl.message(
+      'Your feedback has been sent successfully. We\'ll get back to you soon!',
+      name: 'feedback_sent_successfully',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Back to Home`
+  String get back_to_home {
+    return Intl.message(
+      'Back to Home',
+      name: 'back_to_home',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlock Premium`
+  String get unlock_premium {
+    return Intl.message(
+      'Unlock Premium',
+      name: 'unlock_premium',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Storage`
+  String get storage {
+    return Intl.message('Storage', name: 'storage', desc: '', args: []);
+  }
+
+  /// `Trial version enabled`
+  String get trial_enabled {
+    return Intl.message(
+      'Trial version enabled',
+      name: 'trial_enabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start Free Trial`
+  String get start_trial {
+    return Intl.message(
+      'Start Free Trial',
+      name: 'start_trial',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel anytime. Payment will be charged to your iTunes account. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.`
+  String get subscription_terms {
+    return Intl.message(
+      'Cancel anytime. Payment will be charged to your iTunes account. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.',
+      name: 'subscription_terms',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Success`
+  String get success {
+    return Intl.message('Success', name: 'success', desc: '', args: []);
+  }
+
+  /// `Your trial has been activated successfully!`
+  String get trial_activated {
+    return Intl.message(
+      'Your trial has been activated successfully!',
+      name: 'trial_activated',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `then`
+  String get then {
+    return Intl.message('then', name: 'then', desc: '', args: []);
+  }
+
+  /// `on`
+  String get on {
+    return Intl.message('on', name: 'on', desc: '', args: []);
   }
 }
 
