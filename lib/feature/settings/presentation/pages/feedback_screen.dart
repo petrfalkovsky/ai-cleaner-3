@@ -19,6 +19,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   final _emailController = TextEditingController();
   final _messageController = TextEditingController();
   bool _isSending = false;
+  bool _isFormValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Слушаем изменения в полях для валидации
+    _nameController.addListener(_validateForm);
+    _emailController.addListener(_validateForm);
+    _messageController.addListener(_validateForm);
+  }
 
   @override
   void dispose() {
@@ -26,6 +36,38 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     _emailController.dispose();
     _messageController.dispose();
     super.dispose();
+  }
+
+  /// Проверка валидности формы
+  void _validateForm() {
+    final isValid = _isNameValid() && _isEmailValid() && _isMessageValid();
+    if (isValid != _isFormValid) {
+      setState(() {
+        _isFormValid = isValid;
+      });
+    }
+  }
+
+  /// Проверка имени
+  bool _isNameValid() {
+    return _nameController.text.trim().isNotEmpty;
+  }
+
+  /// Проверка email
+  bool _isEmailValid() {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) return false;
+
+    // Регулярное выражение для валидации email
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+  /// Проверка сообщения
+  bool _isMessageValid() {
+    return _messageController.text.trim().isNotEmpty;
   }
 
   Future<void> _sendFeedback() async {
@@ -94,25 +136,28 @@ ${_messageController.text}
   Widget build(BuildContext context) {
     return Material(
       color: const Color(0xFF0A0E27),
-      child: CupertinoPageScaffold(
-        backgroundColor: const Color(0xFF0A0E27),
-        navigationBar: CupertinoNavigationBar(
-          backgroundColor: Colors.transparent,
-          border: null,
-          leading: CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: () => context.router.maybePop(),
-            child: const Icon(CupertinoIcons.back, color: Colors.white),
+      child: GestureDetector(
+        // Скрываем клавиатуру при тапе на пустое место
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: CupertinoPageScaffold(
+          backgroundColor: const Color(0xFF0A0E27),
+          navigationBar: CupertinoNavigationBar(
+            backgroundColor: Colors.transparent,
+            border: null,
+            leading: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => context.router.maybePop(),
+              child: const Icon(CupertinoIcons.back, color: Colors.white),
+            ),
+            middle: Text(
+              Locales.current.contact_and_feedback,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
-          middle: Text(
-            Locales.current.contact_and_feedback,
-            style: const TextStyle(color: Colors.white),
-          ),
-        ),
-        child: SafeArea(
-          child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
+          child: SafeArea(
+            child: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
             const SizedBox(height: 20),
             Text(
               Locales.current.we_love_to_hear_from_you,
@@ -143,13 +188,42 @@ ${_messageController.text}
             ),
             const SizedBox(height: 16),
 
-            // Email
-            _buildInputField(
-              label: Locales.current.email,
-              controller: _emailController,
-              placeholder: Locales.current.enter_your_email,
-              icon: CupertinoIcons.mail,
-              keyboardType: TextInputType.emailAddress,
+            // Email с индикатором валидности
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInputField(
+                  label: Locales.current.email,
+                  controller: _emailController,
+                  placeholder: Locales.current.enter_your_email,
+                  icon: CupertinoIcons.mail,
+                  keyboardType: TextInputType.emailAddress,
+                  suffixIcon: _emailController.text.isNotEmpty
+                      ? (_isEmailValid()
+                          ? const Icon(
+                              CupertinoIcons.check_mark_circled_solid,
+                              color: Color(0xFF34C759),
+                              size: 20,
+                            )
+                          : const Icon(
+                              CupertinoIcons.xmark_circle_fill,
+                              color: Color(0xFFFF3B30),
+                              size: 20,
+                            ))
+                      : null,
+                ),
+                if (_emailController.text.isNotEmpty && !_isEmailValid())
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, top: 4),
+                    child: Text(
+                      'Введите корректный email',
+                      style: TextStyle(
+                        color: const Color(0xFFFF3B30).withOpacity(0.8),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 16),
 
@@ -164,38 +238,41 @@ ${_messageController.text}
             const SizedBox(height: 32),
 
             // Кнопка отправки
-            Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            Opacity(
+              opacity: _isFormValid && !_isSending ? 1.0 : 0.5,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: CupertinoButton(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                onPressed: _isSending ? null : _sendFeedback,
-                child: _isSending
-                    ? const CupertinoActivityIndicator(color: Colors.white)
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            CupertinoIcons.paperplane,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            Locales.current.send_feedback,
-                            style: const TextStyle(
+                child: CupertinoButton(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  onPressed: (_isFormValid && !_isSending) ? _sendFeedback : null,
+                  child: _isSending
+                      ? const CupertinoActivityIndicator(color: Colors.white)
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              CupertinoIcons.paperplane,
                               color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
                             ),
-                          ),
-                        ],
-                      ),
+                            const SizedBox(width: 8),
+                            Text(
+                              Locales.current.send_feedback,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
               ),
             ),
           ],
@@ -212,6 +289,7 @@ ${_messageController.text}
     required IconData icon,
     int maxLines = 1,
     TextInputType keyboardType = TextInputType.text,
+    Widget? suffixIcon,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,6 +341,12 @@ ${_messageController.text}
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   maxLines: maxLines,
                   keyboardType: keyboardType,
+                  suffix: suffixIcon != null
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: suffixIcon,
+                        )
+                      : null,
                 ),
               ),
             ],
