@@ -10,9 +10,11 @@ class FeedbackSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      backgroundColor: const Color(0xFF0A0E27),
-      child: SafeArea(
+    return Material(
+      color: const Color(0xFF0A0E27),
+      child: CupertinoPageScaffold(
+        backgroundColor: const Color(0xFF0A0E27),
+        child: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -112,6 +114,7 @@ class FeedbackSuccessScreen extends StatelessWidget {
                 .slideY(begin: 0.3, end: 0),
           ],
         ),
+      ),
       ),
     );
   }

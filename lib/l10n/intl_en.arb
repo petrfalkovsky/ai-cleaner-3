@@ -122,5 +122,6 @@
     "success": "Success",
     "trial_activated": "Your trial has been activated successfully!",
     "then": "then",
-    "on": "on"
+    "on": "on",
+    "freed": "freed"
 }

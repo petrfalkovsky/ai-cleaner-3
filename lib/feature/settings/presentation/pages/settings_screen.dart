@@ -75,9 +75,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _shareApp() async {
+    final box = context.findRenderObject() as RenderBox?;
     await Share.share(
       'Check out AI Cleaner - the perfect app for cleaning your photo gallery!',
       subject: 'AI Cleaner App',
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
   }
 
@@ -97,23 +99,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      backgroundColor: const Color(0xFF0A0E27),
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: Colors.transparent,
-        border: null,
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => context.router.maybePop(),
-          child: const Icon(CupertinoIcons.back, color: Colors.white),
+    return Material(
+      color: const Color(0xFF0A0E27),
+      child: CupertinoPageScaffold(
+        backgroundColor: const Color(0xFF0A0E27),
+        navigationBar: CupertinoNavigationBar(
+          backgroundColor: Colors.transparent,
+          border: null,
+          leading: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => context.router.maybePop(),
+            child: const Icon(CupertinoIcons.back, color: Colors.white),
+          ),
+          middle: Text(
+            Locales.current.settings,
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
-        middle: Text(
-          Locales.current.settings,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      child: SafeArea(
-        child: ListView(
+        child: SafeArea(
+          child: ListView(
           children: [
             const SizedBox(height: 20),
 
@@ -180,6 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 30),
           ],
         ),
+      ),
       ),
     );
   }

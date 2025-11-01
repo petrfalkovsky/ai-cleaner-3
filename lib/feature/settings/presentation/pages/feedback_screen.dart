@@ -53,7 +53,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     try {
       // Создаем mailto ссылку
       final mailtoLink = Mailto(
-        to: ['support@example.com'],
+        to: ['petrfalkovsky@gmail.com'],
         subject: 'AI Cleaner Feedback from ${_nameController.text}',
         body: '''
 Name: ${_nameController.text}
@@ -92,23 +92,25 @@ ${_messageController.text}
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      backgroundColor: const Color(0xFF0A0E27),
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: Colors.transparent,
-        border: null,
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => context.router.maybePop(),
-          child: const Icon(CupertinoIcons.back, color: Colors.white),
+    return Material(
+      color: const Color(0xFF0A0E27),
+      child: CupertinoPageScaffold(
+        backgroundColor: const Color(0xFF0A0E27),
+        navigationBar: CupertinoNavigationBar(
+          backgroundColor: Colors.transparent,
+          border: null,
+          leading: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => context.router.maybePop(),
+            child: const Icon(CupertinoIcons.back, color: Colors.white),
+          ),
+          middle: Text(
+            Locales.current.contact_and_feedback,
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
-        middle: Text(
-          Locales.current.contact_and_feedback,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      child: SafeArea(
-        child: ListView(
+        child: SafeArea(
+          child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             const SizedBox(height: 20),
@@ -198,6 +200,7 @@ ${_messageController.text}
             ),
           ],
         ),
+      ),
       ),
     );
   }

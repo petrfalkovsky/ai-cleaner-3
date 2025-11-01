@@ -29,20 +29,20 @@ class _PaywallScreenState extends State<PaywallScreen>
   void initState() {
     super.initState();
 
-    // Storage animation
+    // Storage animation - показывает как освобождается место (от заполненного к свободному)
     _storageAnimationController = AnimationController(
       duration: const Duration(seconds: 3),
       vsync: this,
     );
 
-    _storageAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _storageAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _storageAnimationController,
         curve: Curves.easeInOut,
       ),
     );
 
-    _storageAnimationController.repeat();
+    _storageAnimationController.repeat(reverse: true);
 
     // Initialize in-app purchases
     _initializeInAppPurchase();
@@ -189,9 +189,11 @@ class _PaywallScreenState extends State<PaywallScreen>
   Widget build(BuildContext context) {
     final trialDate = DateTime.now().add(const Duration(days: 3));
 
-    return CupertinoPageScaffold(
-      backgroundColor: const Color(0xFF0A0E27),
-      child: Stack(
+    return Material(
+      color: const Color(0xFF0A0E27),
+      child: CupertinoPageScaffold(
+        backgroundColor: const Color(0xFF0A0E27),
+        child: Stack(
         children: [
           // Animated background gradient
           Positioned.fill(
@@ -363,6 +365,7 @@ class _PaywallScreenState extends State<PaywallScreen>
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -392,10 +395,12 @@ class _PaywallScreenState extends State<PaywallScreen>
 
           const SizedBox(height: 24),
 
-          // Storage progress bar
+          // Storage progress bar - показывает освобождение места
           AnimatedBuilder(
             animation: _storageAnimation,
             builder: (context, child) {
+              // Инвертируем значение для отображения освобожденного места
+              final freedSpace = 1.0 - _storageAnimation.value;
               return Column(
                 children: [
                   Row(
@@ -409,9 +414,13 @@ class _PaywallScreenState extends State<PaywallScreen>
                         ),
                       ),
                       Text(
-                        '${((_storageAnimation.value) * 100).toInt()}%',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        '${((freedSpace) * 100).toInt()}% ${Locales.current.freed}',
+                        style: TextStyle(
+                          color: Color.lerp(
+                            Colors.red,
+                            Colors.green,
+                            freedSpace,
+                          ),
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -422,13 +431,13 @@ class _PaywallScreenState extends State<PaywallScreen>
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: LinearProgressIndicator(
-                      value: _storageAnimation.value,
+                      value: freedSpace,
                       backgroundColor: Colors.white.withOpacity(0.1),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         Color.lerp(
-                          Colors.green,
                           Colors.red,
-                          1 - _storageAnimation.value,
+                          Colors.green,
+                          freedSpace,
                         )!,
                       ),
                       minHeight: 8,
