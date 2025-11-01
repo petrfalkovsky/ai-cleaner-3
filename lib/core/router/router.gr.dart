@@ -47,6 +47,14 @@ import 'package:ai_cleaner_2/feature/gallery/presentation/pages/video_full_scree
     as _i20;
 import 'package:ai_cleaner_2/feature/swipe/presentation/pages/swipe_screen.dart'
     as _i19;
+import 'package:ai_cleaner_2/feature/settings/presentation/pages/settings_screen.dart'
+    as _i28;
+import 'package:ai_cleaner_2/feature/settings/presentation/pages/feedback_screen.dart'
+    as _i29;
+import 'package:ai_cleaner_2/feature/settings/presentation/pages/feedback_success_screen.dart'
+    as _i30;
+import 'package:ai_cleaner_2/feature/premium/presentation/pages/paywall_screen.dart'
+    as _i31;
 import 'package:auto_route/auto_route.dart' as _i21;
 import 'package:flutter/cupertino.dart' as _i24;
 import 'package:flutter/material.dart' as _i22;
@@ -754,4 +762,68 @@ class VideoFullRouteArgs {
   String toString() {
     return 'VideoFullRouteArgs{key: $key, entity: $entity}';
   }
+}
+
+/// generated route for
+/// [_i28.SettingsScreen]
+class SettingsRoute extends _i21.PageRouteInfo<void> {
+  const SettingsRoute({List<_i21.PageRouteInfo>? children})
+    : super(SettingsRoute.name, initialChildren: children);
+
+  static const String name = 'SettingsRoute';
+
+  static _i21.PageInfo page = _i21.PageInfo(
+    name,
+    builder: (data) {
+      return const _i28.SettingsScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i29.FeedbackScreen]
+class FeedbackRoute extends _i21.PageRouteInfo<void> {
+  const FeedbackRoute({List<_i21.PageRouteInfo>? children})
+    : super(FeedbackRoute.name, initialChildren: children);
+
+  static const String name = 'FeedbackRoute';
+
+  static _i21.PageInfo page = _i21.PageInfo(
+    name,
+    builder: (data) {
+      return const _i29.FeedbackScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i30.FeedbackSuccessScreen]
+class FeedbackSuccessRoute extends _i21.PageRouteInfo<void> {
+  const FeedbackSuccessRoute({List<_i21.PageRouteInfo>? children})
+    : super(FeedbackSuccessRoute.name, initialChildren: children);
+
+  static const String name = 'FeedbackSuccessRoute';
+
+  static _i21.PageInfo page = _i21.PageInfo(
+    name,
+    builder: (data) {
+      return const _i30.FeedbackSuccessScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i31.PaywallScreen]
+class PaywallRoute extends _i21.PageRouteInfo<void> {
+  const PaywallRoute({List<_i21.PageRouteInfo>? children})
+    : super(PaywallRoute.name, initialChildren: children);
+
+  static const String name = 'PaywallRoute';
+
+  static _i21.PageInfo page = _i21.PageInfo(
+    name,
+    builder: (data) {
+      return const _i31.PaywallScreen();
+    },
+  );
 }
