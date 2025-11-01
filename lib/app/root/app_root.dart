@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../feature/gallery/presentation/cubit/gallery_assets/gallery_assets_cubit.dart';
+import '../../feature/premium/domain/premium_service.dart';
 import '../../core/limiters/throttler.dart';
 
 @RoutePage()
@@ -22,6 +23,9 @@ class _AppRootPageState extends State<AppRootPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // Инициализируем Premium Service
+    PremiumService().initialize();
   }
 
   @override

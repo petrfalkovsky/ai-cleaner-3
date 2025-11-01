@@ -11,6 +11,7 @@ class PhotoCategoryCard extends StatefulWidget {
   final int count;
   final int selectedCount;
   final VoidCallback onTap;
+  final bool isLocked;
 
   const PhotoCategoryCard({
     super.key,
@@ -18,6 +19,7 @@ class PhotoCategoryCard extends StatefulWidget {
     required this.count,
     required this.selectedCount,
     required this.onTap,
+    this.isLocked = false,
   });
 
   @override
@@ -62,11 +64,37 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
-                        // Иконка
+                        // Иконка с замочком для заблокированных категорий
                         SizedBox(
                           width: 56,
                           height: 56,
-                          child: Icon(widget.category.icon, color: Colors.white, size: 28),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Icon(widget.category.icon, color: Colors.white, size: 28),
+                              if (widget.isLocked)
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFD700),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: const Color(0xFF0A0E27),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      CupertinoIcons.lock_fill,
+                                      size: 12,
+                                      color: Color(0xFF0A0E27),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                         const SizedBox(width: 16),
 

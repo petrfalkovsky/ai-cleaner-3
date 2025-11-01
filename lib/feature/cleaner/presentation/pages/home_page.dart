@@ -6,6 +6,7 @@ import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_button.da
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_status_banner.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selected_files_counter.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/animated_background.dart';
+import 'package:ai_cleaner_2/feature/premium/domain/premium_service.dart';
 import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
@@ -489,6 +490,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               final (count, selectedCount) = categoryCounts[category]!;
               final isNew = newCategories.contains(category);
 
+              // Проверяем премиум-статус для категории blurry
+              final bool isPremium = PremiumService().isPremium;
+              final bool isLocked = category == PhotoCategory.blurry && !isPremium;
+
               return Padding(
                 padding: EdgeInsets.only(bottom: index < currentCategories.length - 1 ? 12 : 0),
                 child:
@@ -497,6 +502,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           category: category,
                           count: count,
                           selectedCount: selectedCount,
+                          isLocked: isLocked,
                           onTap: isScanningInBackground
                               ? () {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -507,6 +513,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     ),
                                   );
                                   return;
+                                }
+                              : isLocked
+                              ? () {
+                                  // Открываем paywall для заблокированной категории
+                                  context.router.push(const PaywallRoute());
                                 }
                               : () => context.router.push(
                                   CategoryRoute(categoryType: 'photo', categoryName: category.name),
