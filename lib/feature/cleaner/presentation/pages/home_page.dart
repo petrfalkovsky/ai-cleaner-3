@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/core/router/router.gr.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
@@ -115,27 +116,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               _tabController.animateTo(0);
                                             },
                                             child: _tabController.index == 0
-                                                ? LiquidGlass(
-                                                    settings: LiquidGlassSettings(
-                                                      blur: 8,
-                                                      ambientStrength: 0.5,
-                                                      lightAngle: 0.2 * math.pi,
-                                                      glassColor: Colors.black26,
-                                                      thickness: 10,
-                                                    ),
-                                                    shape: LiquidRoundedSuperellipse(
-                                                      borderRadius: const Radius.circular(10),
-                                                    ),
-                                                    glassContainsChild: false,
-                                                    child: Padding(
-                                                      padding: EdgeInsets.symmetric(vertical: 8),
-                                                      child: Center(
-                                                        child: Text(
-                                                          Locales.current.photos,
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16,
-                                                            fontWeight: FontWeight.w600,
+                                                ? ClipRRect(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    child: BackdropFilter(
+                                                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                      child: Container(
+                                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.black.withOpacity(0.35),
+                                                          borderRadius: BorderRadius.circular(10),
+                                                          border: Border.all(
+                                                            color: Colors.white.withOpacity(0.15),
+                                                            width: 1,
+                                                          ),
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            Locales.current.photos,
+                                                            style: const TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 16,
+                                                              fontWeight: FontWeight.w600,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
@@ -164,27 +166,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               _tabController.animateTo(1);
                                             },
                                             child: _tabController.index == 1
-                                                ? LiquidGlass(
-                                                    settings: LiquidGlassSettings(
-                                                      blur: 8,
-                                                      ambientStrength: 0.5,
-                                                      lightAngle: 0.2 * math.pi,
-                                                      glassColor: Colors.black26,
-                                                      thickness: 10,
-                                                    ),
-                                                    shape: LiquidRoundedSuperellipse(
-                                                      borderRadius: const Radius.circular(10),
-                                                    ),
-                                                    glassContainsChild: false,
-                                                    child: Padding(
-                                                      padding: EdgeInsets.symmetric(vertical: 8),
-                                                      child: Center(
-                                                        child: Text(
-                                                          Locales.current.videos,
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16,
-                                                            fontWeight: FontWeight.w600,
+                                                ? ClipRRect(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    child: BackdropFilter(
+                                                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                      child: Container(
+                                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.black.withOpacity(0.35),
+                                                          borderRadius: BorderRadius.circular(10),
+                                                          border: Border.all(
+                                                            color: Colors.white.withOpacity(0.15),
+                                                            width: 1,
+                                                          ),
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            Locales.current.videos,
+                                                            style: const TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 16,
+                                                              fontWeight: FontWeight.w600,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
