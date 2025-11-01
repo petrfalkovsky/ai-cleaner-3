@@ -38,6 +38,14 @@ class AppRouter extends RootStackRouter {
           transitionsBuilder: fadeTransition,
         ),
         CustomRoute(page: SwipeRoute.page, transitionsBuilder: fadeTransition),
+        CustomRoute(page: SettingsRoute.page, transitionsBuilder: fadeTransition),
+        CustomRoute(page: FeedbackRoute.page, transitionsBuilder: fadeTransition),
+        CustomRoute(page: FeedbackSuccessRoute.page, transitionsBuilder: fadeTransition),
+        CustomRoute(
+          page: PaywallRoute.page,
+          transitionsBuilder: fadeTransition,
+          fullscreenDialog: true,
+        ),
       ],
     ),
   ];
