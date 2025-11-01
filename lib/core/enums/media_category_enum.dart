@@ -7,7 +7,7 @@ enum PhotoCategory {
   screenshots,
   blurry;
 
-  String get name {
+  String get title {
     switch (this) {
       case PhotoCategory.similar:
         return Locales.current.similar;
@@ -52,7 +52,7 @@ enum VideoCategory {
   screenRecordings,
   shortVideos;
 
-  String get name {
+  String get title {
     switch (this) {
       case VideoCategory.duplicates:
         return Locales.current.duplicates;

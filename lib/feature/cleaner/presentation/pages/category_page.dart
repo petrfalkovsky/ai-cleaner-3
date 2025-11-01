@@ -1,3 +1,4 @@
+import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/pages/media_preview_page.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/animated_background.dart';
@@ -21,6 +22,36 @@ class CategoryPage extends StatelessWidget {
 
   const CategoryPage({super.key, required this.categoryType, required this.categoryName});
 
+  // Получить PhotoCategory из строки
+  PhotoCategory? get photoCategory {
+    if (categoryType != 'photo') return null;
+    try {
+      return PhotoCategory.values.firstWhere((e) => e.name == categoryName);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Получить VideoCategory из строки
+  VideoCategory? get videoCategory {
+    if (categoryType != 'video') return null;
+    try {
+      return VideoCategory.values.firstWhere((e) => e.name == categoryName);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Получить локализованное название категории
+  String get localizedCategoryName {
+    if (categoryType == 'photo' && photoCategory != null) {
+      return photoCategory!.title;
+    } else if (categoryType == 'video' && videoCategory != null) {
+      return videoCategory!.title;
+    }
+    return categoryName; // fallback
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +60,7 @@ class CategoryPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(categoryName, style: const TextStyle(color: Colors.white)),
+        title: Text(localizedCategoryName, style: const TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
@@ -110,7 +141,7 @@ class CategoryPage extends StatelessWidget {
           return Stack(
             children: [
               // Градиентный фон для похожих фото
-              if (categoryName == 'Похожие' || categoryName == 'Серии снимков')
+              if ((photoCategory == PhotoCategory.similar || photoCategory == PhotoCategory.series))
                 const Positioned.fill(child: AnimatedBackground()),
 
               // Полноэкранный grid
@@ -141,7 +172,7 @@ class CategoryPage extends StatelessWidget {
   Widget _buildSwipeBanner(BuildContext context, List<MediaFile> files) {
     return SwipeModeBanner(
       mediaIds: files.map((file) => file.entity.id).toList(),
-      title: categoryName,
+      title: localizedCategoryName,
     );
   }
 
@@ -309,35 +340,32 @@ class CategoryPage extends StatelessWidget {
 
   // Получает файлы для выбранной категории
   List<MediaFile> _getCategoryFiles(MediaCleanerReady state) {
-    if (categoryType == 'photo') {
-      switch (categoryName) {
-        case 'Похожие':
+    if (categoryType == 'photo' && photoCategory != null) {
+      switch (photoCategory!) {
+        case PhotoCategory.similar:
           return state.similarGroups.expand((group) => group.files).toList();
-        case 'Серии снимков':
+        case PhotoCategory.series:
           return state.photoDuplicateGroups.expand((group) => group.files).toList();
-        case 'Снимки экрана':
+        case PhotoCategory.screenshots:
           return state.screenshots;
-        case 'Размытые':
+        case PhotoCategory.blurry:
           return state.blurry;
-        default:
-          return [];
       }
-    } else {
-      switch (categoryName) {
-        case 'Дубликаты':
+    } else if (categoryType == 'video' && videoCategory != null) {
+      switch (videoCategory!) {
+        case VideoCategory.duplicates:
           return state.videoDuplicateGroups.expand((group) => group.files).toList();
-        case 'Записи экрана':
+        case VideoCategory.screenRecordings:
           return state.screenRecordings;
-        case 'Короткие записи':
+        case VideoCategory.shortVideos:
           return state.shortVideos;
-        default:
-          return [];
       }
     }
+    return [];
   }
 
   Widget _buildCategoryContent(BuildContext context, MediaCleanerReady state) {
-    if (categoryName == 'Размытые') {
+    if (photoCategory == PhotoCategory.blurry) {
       final blurryFiles = state.blurry;
 
       return GridView.builder(
@@ -365,19 +393,19 @@ class CategoryPage extends StatelessWidget {
       );
     }
 
-    if (categoryName == 'Похожие' || categoryName == 'Серии снимков') {
+    if (photoCategory == PhotoCategory.similar || photoCategory == PhotoCategory.series || videoCategory == VideoCategory.duplicates) {
       final List<MediaGroup> groups;
 
-      if (categoryName == 'Похожие') {
+      if (photoCategory == PhotoCategory.similar) {
         groups = state.similarGroups;
-      } else if (categoryType == 'photo') {
+      } else if (photoCategory == PhotoCategory.series) {
         groups = state.photoDuplicateGroups;
       } else {
         groups = state.videoDuplicateGroups;
       }
 
       if (groups.isEmpty) {
-        return Center(child: Text('$categoryName ${Locales.current.not_found.toLowerCase()}'));
+        return Center(child: Text('$localizedCategoryName ${Locales.current.not_found.toLowerCase()}'));
       }
 
       return ListView.builder(

@@ -76,7 +76,7 @@ class _VideoCategoryCardState extends State<VideoCategoryCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.category.name,
+                                widget.category.title,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 17,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_scanner.dart';
 import 'package:ai_cleaner_2/generated/l10n.dart';
@@ -630,35 +631,45 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
     // Определяем файлы категории
     List<MediaFile> categoryFiles = [];
     if (event.isPhoto) {
-      switch (event.category) {
-        case 'Похожие':
-          categoryFiles = currentState.similarGroups.expand((group) => group.files).toList();
-          break;
-        case 'Серии снимков':
-          // Логика для дубликатов
-          break;
-        case 'Снимки экрана':
-          categoryFiles = currentState.screenshots;
-          break;
-        case 'Размытые':
-          // Логика для размытых
-          break;
-        default:
-          break;
+      // Парсим PhotoCategory из строки
+      try {
+        final photoCategory = PhotoCategory.values.firstWhere((e) => e.name == event.category);
+        switch (photoCategory) {
+          case PhotoCategory.similar:
+            categoryFiles = currentState.similarGroups.expand((group) => group.files).toList();
+            break;
+          case PhotoCategory.series:
+            categoryFiles = currentState.photoDuplicateGroups.expand((group) => group.files).toList();
+            break;
+          case PhotoCategory.screenshots:
+            categoryFiles = currentState.screenshots;
+            break;
+          case PhotoCategory.blurry:
+            categoryFiles = currentState.blurry;
+            break;
+        }
+      } catch (e) {
+        // Неизвестная категория
+        return;
       }
     } else {
-      switch (event.category) {
-        case 'Дубликаты':
-          // Логика для дубликатов видео
-          break;
-        case 'Записи экрана':
-          categoryFiles = currentState.screenRecordings;
-          break;
-        case 'Короткие записи':
-          categoryFiles = currentState.shortVideos;
-          break;
-        default:
-          break;
+      // Парсим VideoCategory из строки
+      try {
+        final videoCategory = VideoCategory.values.firstWhere((e) => e.name == event.category);
+        switch (videoCategory) {
+          case VideoCategory.duplicates:
+            categoryFiles = currentState.videoDuplicateGroups.expand((group) => group.files).toList();
+            break;
+          case VideoCategory.screenRecordings:
+            categoryFiles = currentState.screenRecordings;
+            break;
+          case VideoCategory.shortVideos:
+            categoryFiles = currentState.shortVideos;
+            break;
+        }
+      } catch (e) {
+        // Неизвестная категория
+        return;
       }
     }
 

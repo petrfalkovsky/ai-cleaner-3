@@ -76,7 +76,7 @@ class _PhotoCategoryCardState extends State<PhotoCategoryCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.category.name,
+                                widget.category.title,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 17,
