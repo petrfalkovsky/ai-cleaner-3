@@ -52,22 +52,11 @@ class _CategoriesSwipertate extends State<CategoriesSwiperPage> {
             onTap: () => Navigator.of(context).pop(),
             child: Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: LiquidGlass(
-                settings: LiquidGlassSettings(
-                  blur: 5,
-                  ambientStrength: 0.8,
-                  lightAngle: 0.2 * math.pi,
-                  glassColor: Colors.white.withOpacity(0.15),
-                  thickness: 15,
-                ),
-                shape: const LiquidRoundedSuperellipse(borderRadius: Radius.circular(12)),
-                glassContainsChild: false,
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  alignment: Alignment.center,
-                  child: const Icon(CupertinoIcons.xmark, color: Colors.white, size: 20),
-                ),
+              child: Container(
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
+                child: const Icon(CupertinoIcons.xmark, color: Colors.white, size: 20),
               ),
             ),
           ),

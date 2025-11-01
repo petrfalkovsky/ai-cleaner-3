@@ -105,10 +105,10 @@ class CategoryPage extends StatelessWidget {
                       glassColor: Colors.white.withOpacity(0.15),
                       thickness: 12,
                     ),
-                    shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(12)),
+                    shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(25)),
                     glassContainsChild: false,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       child: Text(
                         allSelected ? Locales.current.cancel : Locales.current.select_all,
                         style: const TextStyle(fontSize: 16, color: Colors.white),
@@ -205,7 +205,7 @@ class CategoryPage extends StatelessWidget {
           glassColor: Colors.white.withOpacity(0.12),
           thickness: 25,
         ),
-        shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(20)),
+        shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(28)),
         glassContainsChild: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -256,31 +256,20 @@ class CategoryPage extends StatelessWidget {
                 onTap: () {
                   _showDeleteConfirmation(context, displayCount);
                 },
-                child: LiquidGlass(
-                  settings: LiquidGlassSettings(
-                    blur: 3,
-                    ambientStrength: 0.6,
-                    lightAngle: 0.2 * math.pi,
-                    glassColor: CupertinoColors.systemRed.withOpacity(0.4),
-                    thickness: 12,
-                  ),
-                  shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(16)),
-                  glassContainsChild: false,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          Locales.current.delete,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        Locales.current.delete,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          color: Colors.white,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

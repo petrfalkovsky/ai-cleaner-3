@@ -61,112 +61,93 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
         final countText = selectedCount.toString();
         final needsExpansion = countText.length >= 2;
 
-        return LiquidGlass(
-              settings: LiquidGlassSettings(
-                blur: 5,
-                ambientStrength: 1.0,
-                lightAngle: 0.25 * math.pi,
-                glassColor: Colors.white.withOpacity(0.12),
-                thickness: 25,
-              ),
-              shape: const LiquidRoundedSuperellipse(borderRadius: Radius.circular(0)),
-              glassContainsChild: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: SafeArea(
-                  top: false,
-                  child: Row(
-                    children: [
-                      // Анимированный счетчик
-                      AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            constraints: BoxConstraints(
-                              minWidth: needsExpansion ? 44 : 40,
-                              minHeight: 40,
-                            ),
-                            child: LiquidGlass(
-                              settings: LiquidGlassSettings(
-                                blur: 3,
-                                ambientStrength: 0.6,
-                                lightAngle: 0.2 * math.pi,
-                                glassColor: CupertinoColors.activeBlue.withOpacity(0.4),
-                                thickness: 12,
-                              ),
-                              shape: LiquidRoundedSuperellipse(
-                                borderRadius: Radius.circular(needsExpansion ? 20 : 100),
-                              ),
-                              glassContainsChild: false,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: needsExpansion ? 12 : 0,
-                                  vertical: 6,
-                                ),
-                                child: Center(
-                                  child: AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 200),
-                                    transitionBuilder: (child, animation) {
-                                      return ScaleTransition(scale: animation, child: child);
-                                    },
-                                    child: Text(
-                                      countText,
-                                      key: ValueKey(selectedCount),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child:
+              LiquidGlass(
+                    settings: LiquidGlassSettings(
+                      blur: 5,
+                      ambientStrength: 1.0,
+                      lightAngle: 0.25 * math.pi,
+                      glassColor: Colors.white.withOpacity(0.12),
+                      thickness: 25,
+                    ),
+                    shape: const LiquidRoundedSuperellipse(borderRadius: Radius.circular(22)),
+                    glassContainsChild: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      child: SafeArea(
+                        top: false,
+                        child: Row(
+                          children: [
+                            // Анимированный счетчик
+                            AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                  constraints: BoxConstraints(
+                                    minWidth: needsExpansion ? 44 : 40,
+                                    minHeight: 40,
+                                  ),
+
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: needsExpansion ? 12 : 0,
+                                      vertical: 0,
+                                    ),
+                                    child: Center(
+                                      child: AnimatedSwitcher(
+                                        duration: const Duration(milliseconds: 200),
+                                        transitionBuilder: (child, animation) {
+                                          return ScaleTransition(scale: animation, child: child);
+                                        },
+                                        child: Text(
+                                          countText,
+                                          key: ValueKey(selectedCount),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
+                                )
+                                .animate(
+                                  onPlay: (controller) => controller.forward(),
+                                  autoPlay: false,
+                                )
+                                .scale(
+                                  begin: const Offset(0.8, 0.8),
+                                  end: const Offset(1.0, 1.0),
+                                  duration: 200.ms,
+                                  curve: Curves.elasticOut,
+                                ),
+
+                            const SizedBox(width: 12),
+
+                            // Текст "Выбрано" с tap gesture для очистки выбора
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  context.read<MediaCleanerBloc>().add(UnselectAllFiles());
+                                },
+                                child: Text(
+                                  Locales.current.cancel,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                  ),
                                 ),
                               ),
                             ),
-                          )
-                          .animate(onPlay: (controller) => controller.forward(), autoPlay: false)
-                          .scale(
-                            begin: const Offset(0.8, 0.8),
-                            end: const Offset(1.0, 1.0),
-                            duration: 200.ms,
-                            curve: Curves.elasticOut,
-                          ),
 
-                      const SizedBox(width: 12),
-
-                      // Текст "Выбрано" с tap gesture для очистки выбора
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            context.read<MediaCleanerBloc>().add(UnselectAllFiles());
-                          },
-                          child: Text(
-                            Locales.current.cancel,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              fontSize: 17,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Кнопка удаления с анимацией
-                      GestureDetector(
-                        onTap: () {
-                          _showDeleteConfirmation(context);
-                        },
-                        child:
-                            LiquidGlass(
-                                  settings: LiquidGlassSettings(
-                                    blur: 3,
-                                    ambientStrength: 0.6,
-                                    lightAngle: 0.2 * math.pi,
-                                    glassColor: CupertinoColors.systemRed.withOpacity(0.4),
-                                    thickness: 12,
-                                  ),
-                                  shape: LiquidRoundedSuperellipse(
-                                    borderRadius: const Radius.circular(16),
-                                  ),
-                                  glassContainsChild: false,
+                            // Кнопка удаления с анимацией
+                            GestureDetector(
+                                  onTap: () {
+                                    _showDeleteConfirmation(context);
+                                  },
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 20,
@@ -195,20 +176,20 @@ class _SelectedFilesCounterState extends State<SelectedFilesCounter>
                                   curve: Curves.easeOut,
                                 )
                                 .fadeIn(duration: 200.ms),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            )
-            .animate()
-            .scale(
-              begin: const Offset(0.8, 0.8),
-              end: const Offset(1.0, 1.0),
-              duration: 350.ms,
-              curve: Curves.easeOutBack,
-            )
-            .fadeIn(duration: 250.ms);
+                    ),
+                  )
+                  .animate()
+                  .scale(
+                    begin: const Offset(0.8, 0.8),
+                    end: const Offset(1.0, 1.0),
+                    duration: 350.ms,
+                    curve: Curves.easeOutBack,
+                  )
+                  .fadeIn(duration: 250.ms),
+        );
       },
     );
   }

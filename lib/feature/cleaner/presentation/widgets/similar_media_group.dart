@@ -88,7 +88,7 @@ class SimilarMediaGroup extends StatelessWidget {
     );
   }
 
-  // Кнопка "Выбрать все" - полностью переписан
+  // Кнопка "Выбрать все"
   Widget _buildSelectAllButton(BuildContext context) {
     return BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
       builder: (context, state) {
@@ -123,32 +123,18 @@ class SimilarMediaGroup extends StatelessWidget {
               }
             }
           },
-          child: LiquidGlass(
-            settings: LiquidGlassSettings(
-              blur: 3,
-              ambientStrength: 0.6,
-              lightAngle: 0.2 * math.pi,
-              glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
-              thickness: 12,
-            ),
-            shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(12)),
-            glassContainsChild: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    allSelected ? Locales.current.cancel : Locales.current.select_all,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                allSelected ? Locales.current.cancel : Locales.current.select_all,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
+            ],
           ),
         );
       },

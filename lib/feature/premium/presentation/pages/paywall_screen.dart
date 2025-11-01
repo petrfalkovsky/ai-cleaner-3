@@ -250,34 +250,34 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                             .shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.3))
                             .shake(hz: 0.5, curve: Curves.easeInOut),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
 
                         Text(
                           Locales.current.unlock_premium,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 32,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
                         ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.3, end: 0),
 
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 10),
 
                         // Storage animation
                         _buildStorageAnimation(),
 
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 20),
 
                         // Trial toggle
                         _buildTrialToggle(),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
 
                         // Pricing
                         _buildPricing(trialDate),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
 
                         // Start trial button
                         Container(
@@ -324,7 +324,7 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                           ),
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
 
                         // Terms text
                         Text(
@@ -333,7 +333,7 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                           textAlign: TextAlign.center,
                         ),
 
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -460,7 +460,7 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
 
   Widget _buildPricing(DateTime trialDate) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -475,9 +475,8 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
         children: [
           const Text(
             '\$0.00',
-            style: TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
           Text(
             '${Locales.current.then} \$9.99 ${Locales.current.on} ${trialDate.day}/${trialDate.month}/${trialDate.year}',
             style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14),
