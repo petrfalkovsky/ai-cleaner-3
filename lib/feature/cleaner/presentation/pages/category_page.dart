@@ -216,33 +216,21 @@ class CategoryPage extends StatelessWidget {
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
                 constraints: BoxConstraints(minWidth: needsExpansion ? 44 : 40, minHeight: 40),
-                child: LiquidGlass(
-                  settings: LiquidGlassSettings(
-                    blur: 3,
-                    ambientStrength: 0.6,
-                    lightAngle: 0.2 * math.pi,
-                    glassColor: CupertinoColors.activeBlue.withOpacity(0.4),
-                    thickness: 12,
-                  ),
-                  shape: LiquidRoundedSuperellipse(
-                    borderRadius: Radius.circular(needsExpansion ? 20 : 100),
-                  ),
-                  glassContainsChild: false,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: needsExpansion ? 12 : 0, vertical: 6),
-                    child: Center(
-                      child: Text(
-                        countText,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: needsExpansion ? 12 : 0, vertical: 6),
+                  child: Center(
+                    child: Text(
+                      countText,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
               ),
+              // ),
               const SizedBox(width: 12),
               // Текст "Выбрано" с tap для очистки
               Expanded(
@@ -393,7 +381,9 @@ class CategoryPage extends StatelessWidget {
       );
     }
 
-    if (photoCategory == PhotoCategory.similar || photoCategory == PhotoCategory.series || videoCategory == VideoCategory.duplicates) {
+    if (photoCategory == PhotoCategory.similar ||
+        photoCategory == PhotoCategory.series ||
+        videoCategory == VideoCategory.duplicates) {
       final List<MediaGroup> groups;
 
       if (photoCategory == PhotoCategory.similar) {
@@ -405,7 +395,9 @@ class CategoryPage extends StatelessWidget {
       }
 
       if (groups.isEmpty) {
-        return Center(child: Text('$localizedCategoryName ${Locales.current.not_found.toLowerCase()}'));
+        return Center(
+          child: Text('$localizedCategoryName ${Locales.current.not_found.toLowerCase()}'),
+        );
       }
 
       return ListView.builder(

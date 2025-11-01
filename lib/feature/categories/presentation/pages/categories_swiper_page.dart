@@ -12,11 +12,7 @@ import 'package:photo_manager/photo_manager.dart';
 
 @RoutePage()
 class CategoriesSwiperPage extends StatefulWidget {
-  const CategoriesSwiperPage({
-    super.key,
-    required this.ids,
-    required this.title,
-  });
+  const CategoriesSwiperPage({super.key, required this.ids, required this.title});
 
   final String title;
   final List<String> ids;
@@ -31,65 +27,31 @@ class _CategoriesSwipertate extends State<CategoriesSwiperPage> {
   @override
   Widget build(BuildContext context) {
     final allAssets = context.watch<GalleryAssetsCubit>().state.assets;
-    final assets =
-        widget.ids
-            .map((id) {
-              try {
-                return allAssets.firstWhere((asset) => asset.id == id);
-              } catch (e) {
-                return null;
-              }
-            })
-            .whereType<AssetEntity>()
-            .toList();
+    final assets = widget.ids
+        .map((id) {
+          try {
+            return allAssets.firstWhere((asset) => asset.id == id);
+          } catch (e) {
+            return null;
+          }
+        })
+        .whereType<AssetEntity>()
+        .toList();
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E27),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: LiquidGlass(
-              settings: LiquidGlassSettings(
-                blur: 5,
-                ambientStrength: 0.8,
-                lightAngle: 0.2 * math.pi,
-                glassColor: Colors.white.withOpacity(0.15),
-                thickness: 15,
-              ),
-              shape: const LiquidRoundedSuperellipse(
-                borderRadius: Radius.circular(12),
-              ),
-              glassContainsChild: false,
-              child: Container(
-                width: 44,
-                height: 44,
-                alignment: Alignment.center,
-                child: const Icon(
-                  CupertinoIcons.back,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-            ),
-          ),
-        ),
         title: Text(
           widget.title,
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8),
               child: LiquidGlass(
                 settings: LiquidGlassSettings(
                   blur: 5,
@@ -98,19 +60,13 @@ class _CategoriesSwipertate extends State<CategoriesSwiperPage> {
                   glassColor: Colors.white.withOpacity(0.15),
                   thickness: 15,
                 ),
-                shape: const LiquidRoundedSuperellipse(
-                  borderRadius: Radius.circular(12),
-                ),
+                shape: const LiquidRoundedSuperellipse(borderRadius: Radius.circular(12)),
                 glassContainsChild: false,
                 child: Container(
                   width: 44,
                   height: 44,
                   alignment: Alignment.center,
-                  child: const Icon(
-                    CupertinoIcons.xmark,
-                    color: Colors.white,
-                    size: 20,
-                  ),
+                  child: const Icon(CupertinoIcons.xmark, color: Colors.white, size: 20),
                 ),
               ),
             ),

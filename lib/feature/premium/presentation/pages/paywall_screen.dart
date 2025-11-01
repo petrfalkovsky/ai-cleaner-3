@@ -28,18 +28,18 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
   void initState() {
     super.initState();
 
-    // Storage animation
+    // Storage animation - показывает как освобождается место (от заполненного к свободному)
     _storageAnimationController = AnimationController(
       duration: const Duration(seconds: 3),
       vsync: this,
     );
 
     _storageAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+      begin: 1.0,
+      end: 0.0,
     ).animate(CurvedAnimation(parent: _storageAnimationController, curve: Curves.easeInOut));
 
-    _storageAnimationController.repeat();
+    _storageAnimationController.repeat(reverse: true);
 
     // Initialize in-app purchases
     _initializeInAppPurchase();
@@ -184,6 +184,7 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
     final trialDate = DateTime.now().add(const Duration(days: 3));
 
     return Material(
+      color: const Color(0xFF0A0E27),
       child: CupertinoPageScaffold(
         backgroundColor: const Color(0xFF0A0E27),
         child: Stack(
@@ -200,7 +201,7 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                 ),
               ),
             ),
-      
+
             SafeArea(
               child: Column(
                 children: [
@@ -216,17 +217,16 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                       ),
                     ),
                   ),
-      
+
                   Expanded(
                     child: ListView(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       children: [
-                        const SizedBox(height: 30),
-      
+                        const SizedBox(height: 25),
                         // Crown icon with animation
                         Container(
-                              width: 80,
-                              height: 80,
+                              width: 50,
+                              height: 50,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: const LinearGradient(
@@ -235,19 +235,23 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(0xFFFFD700).withOpacity(0.5),
-                                    blurRadius: 30,
+                                    blurRadius: 20,
                                     spreadRadius: 5,
                                   ),
                                 ],
                               ),
-                              child: Icon(CupertinoIcons.chevron_down, size: 40, color: Colors.white),
+                              child: const Icon(
+                                CupertinoIcons.sun_dust_fill,
+                                size: 20,
+                                color: Colors.white,
+                              ),
                             )
                             .animate(onPlay: (controller) => controller.repeat())
                             .shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.3))
                             .shake(hz: 0.5, curve: Curves.easeInOut),
-      
+
                         const SizedBox(height: 24),
-      
+
                         Text(
                           Locales.current.unlock_premium,
                           style: const TextStyle(
@@ -257,24 +261,24 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                           ),
                           textAlign: TextAlign.center,
                         ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.3, end: 0),
-      
+
                         const SizedBox(height: 40),
-      
+
                         // Storage animation
                         _buildStorageAnimation(),
-      
+
                         const SizedBox(height: 40),
-      
+
                         // Trial toggle
                         _buildTrialToggle(),
-      
+
                         const SizedBox(height: 24),
-      
+
                         // Pricing
                         _buildPricing(trialDate),
-      
+
                         const SizedBox(height: 32),
-      
+
                         // Start trial button
                         Container(
                               decoration: BoxDecoration(
@@ -308,9 +312,9 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                             .animate()
                             .fadeIn(delay: 400.ms, duration: 600.ms)
                             .slideY(begin: 0.3, end: 0),
-      
+
                         const SizedBox(height: 16),
-      
+
                         // Restore purchases button
                         CupertinoButton(
                           onPressed: _isLoading ? null : _restorePurchases,
@@ -319,16 +323,16 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                             style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
                           ),
                         ),
-      
+
                         const SizedBox(height: 24),
-      
+
                         // Terms text
                         Text(
                           Locales.current.subscription_terms,
                           style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
                           textAlign: TextAlign.center,
                         ),
-      
+
                         const SizedBox(height: 40),
                       ],
                     ),
@@ -366,10 +370,12 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
 
           const SizedBox(height: 24),
 
-          // Storage progress bar
+          // Storage progress bar - показывает освобождение места
           AnimatedBuilder(
             animation: _storageAnimation,
             builder: (context, child) {
+              // Инвертируем значение для отображения освобожденного места
+              final freedSpace = 1.0 - _storageAnimation.value;
               return Column(
                 children: [
                   Row(
@@ -380,9 +386,9 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                         style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
                       ),
                       Text(
-                        '${((_storageAnimation.value) * 100).toInt()}%',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        '${((freedSpace) * 100).toInt()}% ${Locales.current.freed}',
+                        style: TextStyle(
+                          color: Color.lerp(Colors.red, Colors.green, freedSpace),
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -393,10 +399,10 @@ class _PaywallScreenState extends State<PaywallScreen> with TickerProviderStateM
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: LinearProgressIndicator(
-                      value: _storageAnimation.value,
+                      value: freedSpace,
                       backgroundColor: Colors.white.withOpacity(0.1),
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        Color.lerp(Colors.green, Colors.red, 1 - _storageAnimation.value)!,
+                        Color.lerp(Colors.red, Colors.green, freedSpace)!,
                       ),
                       minHeight: 8,
                     ),

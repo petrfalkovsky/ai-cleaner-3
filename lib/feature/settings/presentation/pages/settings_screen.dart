@@ -75,9 +75,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _shareApp() async {
+    final box = context.findRenderObject() as RenderBox?;
     await Share.share(
       'Check out AI Cleaner - the perfect app for cleaning your photo gallery!',
       subject: 'AI Cleaner App',
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
   }
 
@@ -98,6 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: const Color(0xFF0A0E27),
       child: CupertinoPageScaffold(
         backgroundColor: const Color(0xFF0A0E27),
         navigationBar: CupertinoNavigationBar(
@@ -115,73 +118,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         child: SafeArea(
           child: ListView(
-            children: [
-              const SizedBox(height: 20),
-      
-              // Аккаунт
-              _buildSectionHeader(Locales.current.account),
-              _buildSettingsTile(
-                icon: CupertinoIcons.arrow_clockwise,
-                title: Locales.current.restore_purchases,
-                onTap: _restorePurchases,
-              ),
-      
-              const SizedBox(height: 30),
-      
-              // Обратная связь
-              _buildSectionHeader(Locales.current.feedback),
-              _buildSettingsTile(
-                icon: CupertinoIcons.mail,
-                title: Locales.current.contact_and_feedback,
-                onTap: () => context.router.push(const FeedbackRoute()),
-                showChevron: true,
-              ),
-              _buildSettingsTile(
-                icon: CupertinoIcons.star,
-                title: Locales.current.rate_app,
-                onTap: _rateApp,
-              ),
-              _buildSettingsTile(
-                icon: CupertinoIcons.square_arrow_up,
-                title: Locales.current.share_app,
-                onTap: _shareApp,
-              ),
-      
-              const SizedBox(height: 30),
-      
-              // Политика
-              _buildSectionHeader(Locales.current.policy),
-              _buildSettingsTile(
-                icon: CupertinoIcons.doc_text,
-                title: Locales.current.terms_and_privacy,
-                onTap: _openTermsOfService,
-                showChevron: true,
-              ),
-              _buildSettingsTile(
-                icon: CupertinoIcons.lock_shield,
-                title: Locales.current.privacy_policy,
-                onTap: _openPrivacyPolicy,
-                showChevron: true,
-              ),
-      
-              const SizedBox(height: 30),
-      
-              // Версия приложения
-              if (_appVersion.isNotEmpty)
-                Center(
-                  child: Text(
-                    '${Locales.current.version} $_appVersion',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.3),
-                      fontSize: 12,
-                    ),
+          children: [
+            const SizedBox(height: 20),
+
+            // Аккаунт
+            _buildSectionHeader(Locales.current.account),
+            _buildSettingsTile(
+              icon: CupertinoIcons.arrow_clockwise,
+              title: Locales.current.restore_purchases,
+              onTap: _restorePurchases,
+            ),
+
+            const SizedBox(height: 30),
+
+            // Обратная связь
+            _buildSectionHeader(Locales.current.feedback),
+            _buildSettingsTile(
+              icon: CupertinoIcons.mail,
+              title: Locales.current.contact_and_feedback,
+              onTap: () => context.router.push(const FeedbackRoute()),
+              showChevron: true,
+            ),
+            _buildSettingsTile(
+              icon: CupertinoIcons.star,
+              title: Locales.current.rate_app,
+              onTap: _rateApp,
+            ),
+            _buildSettingsTile(
+              icon: CupertinoIcons.square_arrow_up,
+              title: Locales.current.share_app,
+              onTap: _shareApp,
+            ),
+
+            const SizedBox(height: 30),
+
+            // Политика
+            _buildSectionHeader(Locales.current.policy),
+            _buildSettingsTile(
+              icon: CupertinoIcons.doc_text,
+              title: Locales.current.terms_and_privacy,
+              onTap: _openTermsOfService,
+              showChevron: true,
+            ),
+            _buildSettingsTile(
+              icon: CupertinoIcons.lock_shield,
+              title: Locales.current.privacy_policy,
+              onTap: _openPrivacyPolicy,
+              showChevron: true,
+            ),
+
+            const SizedBox(height: 30),
+
+            // Версия приложения
+            if (_appVersion.isNotEmpty)
+              Center(
+                child: Text(
+                  '${Locales.current.version} $_appVersion',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.3),
+                    fontSize: 12,
                   ),
                 ),
-      
-              const SizedBox(height: 30),
-            ],
-          ),
+              ),
+
+            const SizedBox(height: 30),
+          ],
         ),
+      ),
       ),
     );
   }

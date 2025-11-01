@@ -22,233 +22,194 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-    "a_file": MessageLookupByLibrary.simpleMessage("Файла"),
-    "account": MessageLookupByLibrary.simpleMessage("Аккаунт"),
-    "action_cannot_be_undone": MessageLookupByLibrary.simpleMessage(
-      "Это действие нельзя отменить.",
-    ),
-    "ai_cleaner": MessageLookupByLibrary.simpleMessage("AI Cleaner"),
-    "ai_cleaner_description": MessageLookupByLibrary.simpleMessage(
-      "AI Cleaner анализирует фото и видео для поиска дубликатов, размытых изображений и освобождения места.",
-    ),
-    "ai_model_analyzing_videos": MessageLookupByLibrary.simpleMessage(
-      "Ai-модель анализирует видео...",
-    ),
-    "ai_model_grouping_similar_photos": MessageLookupByLibrary.simpleMessage(
-      "Ai-модель группирует похожие фотографии...",
-    ),
-    "ai_model_searching_blurry_photos": MessageLookupByLibrary.simpleMessage(
-      "Ai-модель ищет заблюренные фото...",
-    ),
-    "ai_model_searching_screenshots": MessageLookupByLibrary.simpleMessage(
-      "Ai-модель ищет снимки экрана...",
-    ),
-    "all_videos_ok": MessageLookupByLibrary.simpleMessage(
-      "Все видео в порядке!",
-    ),
-    "analyzing_videos_processed": MessageLookupByLibrary.simpleMessage(
-      "Анализ видео (обработано",
-    ),
-    "are_you_sure_delete": MessageLookupByLibrary.simpleMessage(
-      "Вы уверены, что хотите удалить",
-    ),
-    "back_to_home": MessageLookupByLibrary.simpleMessage("На главную"),
-    "blurry": MessageLookupByLibrary.simpleMessage("Размытые"),
-    "blurry_not_clear_photos": MessageLookupByLibrary.simpleMessage(
-      "Нечеткие и размытые фотографии",
-    ),
-    "blurry_photos": MessageLookupByLibrary.simpleMessage("Размытых фото"),
-    "cancel": MessageLookupByLibrary.simpleMessage("Отмена"),
-    "clean_videos": MessageLookupByLibrary.simpleMessage("Очистите видео"),
-    "clean_your_gallery": MessageLookupByLibrary.simpleMessage(
-      "Очистите галерею",
-    ),
-    "close": MessageLookupByLibrary.simpleMessage("Закрыть"),
-    "contact_and_feedback": MessageLookupByLibrary.simpleMessage(
-      "Контакты и обратная связь",
-    ),
-    "delete": MessageLookupByLibrary.simpleMessage("Удалить"),
-    "delete_files": MessageLookupByLibrary.simpleMessage("Удалить файлы"),
-    "device_screen_recordings": MessageLookupByLibrary.simpleMessage(
-      "Записи с экрана устройства",
-    ),
-    "device_screenshots": MessageLookupByLibrary.simpleMessage(
-      "Снимки экрана устройства",
-    ),
-    "done": MessageLookupByLibrary.simpleMessage("Готово"),
-    "duplicate_groups": MessageLookupByLibrary.simpleMessage(
-      "Групп дубликатов",
-    ),
-    "duplicate_photo_groups": MessageLookupByLibrary.simpleMessage(
-      "Групп дубликатов фото",
-    ),
-    "duplicates": MessageLookupByLibrary.simpleMessage("Дубликаты"),
-    "email": MessageLookupByLibrary.simpleMessage("Email"),
-    "enter_your_email": MessageLookupByLibrary.simpleMessage(
-      "Введите ваш email",
-    ),
-    "enter_your_message": MessageLookupByLibrary.simpleMessage(
-      "Введите ваше сообщение",
-    ),
-    "enter_your_name": MessageLookupByLibrary.simpleMessage("Введите ваше имя"),
-    "error": MessageLookupByLibrary.simpleMessage("Ошибка"),
-    "error_occurred": MessageLookupByLibrary.simpleMessage("Произошла ошибка"),
-    "failed_to_send_feedback": MessageLookupByLibrary.simpleMessage(
-      "Не удалось отправить отзыв. Пожалуйста, попробуйте снова.",
-    ),
-    "feedback": MessageLookupByLibrary.simpleMessage("Обратная связь"),
-    "feedback_sent_successfully": MessageLookupByLibrary.simpleMessage(
-      "Ваш отзыв успешно отправлен. Мы свяжемся с вами в ближайшее время!",
-    ),
-    "file": MessageLookupByLibrary.simpleMessage("Файл"),
-    "files": MessageLookupByLibrary.simpleMessage("Файлов"),
-    "files_load_error": MessageLookupByLibrary.simpleMessage(
-      "Ошибка загрузки файлов",
-    ),
-    "find_and_delete_unnecessary_photos": MessageLookupByLibrary.simpleMessage(
-      "Найдите и удалите ненужные фотографии для освобождения места",
-    ),
-    "find_duplicate_and_unnecessary_videos":
-        MessageLookupByLibrary.simpleMessage(
-          "Найдите дубликаты и ненужные видео",
-        ),
-    "found": MessageLookupByLibrary.simpleMessage("Найдено"),
-    "from": MessageLookupByLibrary.simpleMessage("из"),
-    "gallery_in_good_shape": MessageLookupByLibrary.simpleMessage(
-      "Ваша галерея в отличном состоянии!",
-    ),
-    "gallery_permission_required": MessageLookupByLibrary.simpleMessage(
-      "Для доступа к галерее требуется разрешение",
-    ),
-    "give_gallery_access": MessageLookupByLibrary.simpleMessage(
-      "Предоставьте доступ к галерее",
-    ),
-    "identical_videos": MessageLookupByLibrary.simpleMessage(
-      "Идентичные видеофайлы",
-    ),
-    "image_load_error": MessageLookupByLibrary.simpleMessage(
-      "Ошибка загрузки изображения",
-    ),
-    "keep": MessageLookupByLibrary.simpleMessage("Оставить"),
-    "loading": MessageLookupByLibrary.simpleMessage("Загрузка..."),
-    "loading_videos": MessageLookupByLibrary.simpleMessage("Загрузка видео..."),
-    "message": MessageLookupByLibrary.simpleMessage("Сообщение"),
-    "name": MessageLookupByLibrary.simpleMessage("Имя"),
-    "new_word": MessageLookupByLibrary.simpleMessage("Новых"),
-    "no_files_in_category": MessageLookupByLibrary.simpleMessage(
-      "Нет файлов в категории",
-    ),
-    "no_issues_found": MessageLookupByLibrary.simpleMessage(
-      "Проблем не найдено",
-    ),
-    "no_purchases_to_restore": MessageLookupByLibrary.simpleMessage(
-      "Нет покупок для восстановления",
-    ),
-    "no_video_issues_yet": MessageLookupByLibrary.simpleMessage(
-      "Проблем пока не найдено",
-    ),
-    "not_found": MessageLookupByLibrary.simpleMessage("Не найдены"),
-    "on": MessageLookupByLibrary.simpleMessage("в"),
-    "photo_bursts": MessageLookupByLibrary.simpleMessage("Серии снимков"),
-    "photo_series": MessageLookupByLibrary.simpleMessage("Серии фото"),
-    "photos": MessageLookupByLibrary.simpleMessage("Фото"),
-    "please_fill_all_fields": MessageLookupByLibrary.simpleMessage(
-      "Пожалуйста, заполните все поля",
-    ),
-    "please_wait": MessageLookupByLibrary.simpleMessage(
-      "Дождитесь окончания сканирования.",
-    ),
-    "policy": MessageLookupByLibrary.simpleMessage("Политика"),
-    "preparing_for_scan": MessageLookupByLibrary.simpleMessage(
-      "Подготовка к сканированию...",
-    ),
-    "privacy_policy": MessageLookupByLibrary.simpleMessage(
-      "Политика конфиденциальности",
-    ),
-    "problem_photos": MessageLookupByLibrary.simpleMessage("Проблемные фото"),
-    "problem_videos": MessageLookupByLibrary.simpleMessage("Проблемные видео"),
-    "rate_app": MessageLookupByLibrary.simpleMessage("Оценить приложение"),
-    "rescan": MessageLookupByLibrary.simpleMessage("Повторить сканирование"),
-    "restore_purchases": MessageLookupByLibrary.simpleMessage(
-      "Восстановить покупки",
-    ),
-    "scan_warning": MessageLookupByLibrary.simpleMessage(
-      "Дождитесь окончания сканирования для стабильной работы приложения.\nУстройство может нагреться. Вы можете приостановить сканирование для зарядки или охлаждения устройства (функция в разработке).",
-    ),
-    "scanning": MessageLookupByLibrary.simpleMessage("Сканирование..."),
-    "screen_recordings": MessageLookupByLibrary.simpleMessage("Записи экрана"),
-    "screen_recordings_2": MessageLookupByLibrary.simpleMessage(
-      "Записей экрана",
-    ),
-    "screenshots": MessageLookupByLibrary.simpleMessage("Снимки экрана"),
-    "screenshots_count": MessageLookupByLibrary.simpleMessage("Скриншотов"),
-    "searching_duplicate_photos_processed":
-        MessageLookupByLibrary.simpleMessage(
-          "Поиск дубликатов фото (обработано",
-        ),
-    "searching_similar_photos_processed": MessageLookupByLibrary.simpleMessage(
-      "Поиск похожих фото (обработано",
-    ),
-    "select": MessageLookupByLibrary.simpleMessage("Выбрать"),
-    "select_all": MessageLookupByLibrary.simpleMessage("Выбрать все"),
-    "send_feedback": MessageLookupByLibrary.simpleMessage("Отправить отзыв"),
-    "send_us_your_feedback": MessageLookupByLibrary.simpleMessage(
-      "Отправьте нам свой отзыв или вопросы",
-    ),
-    "settings": MessageLookupByLibrary.simpleMessage("Настройки"),
-    "share_app": MessageLookupByLibrary.simpleMessage("Поделиться приложением"),
-    "short_recordings": MessageLookupByLibrary.simpleMessage("Короткие записи"),
-    "short_video_clips": MessageLookupByLibrary.simpleMessage(
-      "Короткие видеофрагменты",
-    ),
-    "short_videos": MessageLookupByLibrary.simpleMessage("Коротких видео"),
-    "similar": MessageLookupByLibrary.simpleMessage("Похожие"),
-    "similar_photo_groups_multiline": MessageLookupByLibrary.simpleMessage(
-      "Групп похожих фото",
-    ),
-    "similar_photos": MessageLookupByLibrary.simpleMessage(
-      "Похожие фотографии",
-    ),
-    "start_scan": MessageLookupByLibrary.simpleMessage("Начать сканирование"),
-    "start_trial": MessageLookupByLibrary.simpleMessage(
-      "Начать пробный период",
-    ),
-    "storage": MessageLookupByLibrary.simpleMessage("Хранилище"),
-    "subscription_terms": MessageLookupByLibrary.simpleMessage(
-      "Отмена в любое время. Оплата будет снята с вашего iTunes аккаунта. Подписка автоматически продлевается, если автопродление не отключено минимум за 24 часа до окончания текущего периода.",
-    ),
-    "success": MessageLookupByLibrary.simpleMessage("Успех"),
-    "swipe_hint": MessageLookupByLibrary.simpleMessage(
-      "Удаляйте или сохраняйте файлы простым свайпом",
-    ),
-    "terms_and_privacy": MessageLookupByLibrary.simpleMessage(
-      "Условия и конфиденциальность",
-    ),
-    "thank_you": MessageLookupByLibrary.simpleMessage("Спасибо!"),
-    "then": MessageLookupByLibrary.simpleMessage("затем"),
-    "trial_activated": MessageLookupByLibrary.simpleMessage(
-      "Ваш пробный период успешно активирован!",
-    ),
-    "trial_enabled": MessageLookupByLibrary.simpleMessage(
-      "Пробная версия включена",
-    ),
-    "try_again": MessageLookupByLibrary.simpleMessage("Попробовать снова"),
-    "try_swipe_mode": MessageLookupByLibrary.simpleMessage(
-      "Попробуйте режим смахивания",
-    ),
-    "unlock_premium": MessageLookupByLibrary.simpleMessage(
-      "Разблокировать Premium",
-    ),
-    "unnamed_file": MessageLookupByLibrary.simpleMessage("Файл без имени"),
-    "updated": MessageLookupByLibrary.simpleMessage("Обновлено:"),
-    "version": MessageLookupByLibrary.simpleMessage("Версия"),
-    "video_load_error": MessageLookupByLibrary.simpleMessage(
-      "Ошибка загрузки видео",
-    ),
-    "videos": MessageLookupByLibrary.simpleMessage("Видео"),
-    "view": MessageLookupByLibrary.simpleMessage("Просмотр"),
-    "we_love_to_hear_from_you": MessageLookupByLibrary.simpleMessage(
-      "Мы рады услышать от вас!",
-    ),
-  };
+        "a_file": MessageLookupByLibrary.simpleMessage("Файла"),
+        "account": MessageLookupByLibrary.simpleMessage("Аккаунт"),
+        "action_cannot_be_undone": MessageLookupByLibrary.simpleMessage(
+            "Это действие нельзя отменить."),
+        "ai_cleaner": MessageLookupByLibrary.simpleMessage("AI Cleaner"),
+        "ai_cleaner_description": MessageLookupByLibrary.simpleMessage(
+            "AI Cleaner анализирует фото и видео для поиска дубликатов, размытых изображений и освобождения места."),
+        "ai_model_analyzing_videos": MessageLookupByLibrary.simpleMessage(
+            "Ai-модель анализирует видео..."),
+        "ai_model_grouping_similar_photos":
+            MessageLookupByLibrary.simpleMessage(
+                "Ai-модель группирует похожие фотографии..."),
+        "ai_model_searching_blurry_photos":
+            MessageLookupByLibrary.simpleMessage(
+                "Ai-модель ищет заблюренные фото..."),
+        "ai_model_searching_screenshots": MessageLookupByLibrary.simpleMessage(
+            "Ai-модель ищет снимки экрана..."),
+        "all_videos_ok":
+            MessageLookupByLibrary.simpleMessage("Все видео в порядке!"),
+        "analyzing_videos_processed":
+            MessageLookupByLibrary.simpleMessage("Анализ видео (обработано"),
+        "are_you_sure_delete": MessageLookupByLibrary.simpleMessage(
+            "Вы уверены, что хотите удалить"),
+        "back_to_home": MessageLookupByLibrary.simpleMessage("На главную"),
+        "blurry": MessageLookupByLibrary.simpleMessage("Размытые"),
+        "blurry_not_clear_photos": MessageLookupByLibrary.simpleMessage(
+            "Нечеткие и размытые фотографии"),
+        "blurry_photos": MessageLookupByLibrary.simpleMessage("Размытых фото"),
+        "cancel": MessageLookupByLibrary.simpleMessage("Отмена"),
+        "clean_videos": MessageLookupByLibrary.simpleMessage("Очистите видео"),
+        "clean_your_gallery":
+            MessageLookupByLibrary.simpleMessage("Очистите галерею"),
+        "close": MessageLookupByLibrary.simpleMessage("Закрыть"),
+        "contact_and_feedback":
+            MessageLookupByLibrary.simpleMessage("Контакты и обратная связь"),
+        "delete": MessageLookupByLibrary.simpleMessage("Удалить"),
+        "delete_files": MessageLookupByLibrary.simpleMessage("Удалить файлы"),
+        "device_screen_recordings":
+            MessageLookupByLibrary.simpleMessage("Записи с экрана устройства"),
+        "device_screenshots":
+            MessageLookupByLibrary.simpleMessage("Снимки экрана устройства"),
+        "done": MessageLookupByLibrary.simpleMessage("Готово"),
+        "duplicate_groups":
+            MessageLookupByLibrary.simpleMessage("Групп дубликатов"),
+        "duplicate_photo_groups":
+            MessageLookupByLibrary.simpleMessage("Групп дубликатов фото"),
+        "duplicates": MessageLookupByLibrary.simpleMessage("Дубликаты"),
+        "email": MessageLookupByLibrary.simpleMessage("Email"),
+        "enter_your_email":
+            MessageLookupByLibrary.simpleMessage("Введите ваш email"),
+        "enter_your_message":
+            MessageLookupByLibrary.simpleMessage("Введите ваше сообщение"),
+        "enter_your_name":
+            MessageLookupByLibrary.simpleMessage("Введите ваше имя"),
+        "error": MessageLookupByLibrary.simpleMessage("Ошибка"),
+        "error_occurred":
+            MessageLookupByLibrary.simpleMessage("Произошла ошибка"),
+        "failed_to_send_feedback": MessageLookupByLibrary.simpleMessage(
+            "Не удалось отправить отзыв. Пожалуйста, попробуйте снова."),
+        "feedback": MessageLookupByLibrary.simpleMessage("Обратная связь"),
+        "feedback_sent_successfully": MessageLookupByLibrary.simpleMessage(
+            "Ваш отзыв успешно отправлен. Мы свяжемся с вами в ближайшее время!"),
+        "file": MessageLookupByLibrary.simpleMessage("Файл"),
+        "files": MessageLookupByLibrary.simpleMessage("Файлов"),
+        "files_load_error":
+            MessageLookupByLibrary.simpleMessage("Ошибка загрузки файлов"),
+        "find_and_delete_unnecessary_photos":
+            MessageLookupByLibrary.simpleMessage(
+                "Найдите и удалите ненужные фотографии для освобождения места"),
+        "find_duplicate_and_unnecessary_videos":
+            MessageLookupByLibrary.simpleMessage(
+                "Найдите дубликаты и ненужные видео"),
+        "found": MessageLookupByLibrary.simpleMessage("Найдено"),
+        "freed": MessageLookupByLibrary.simpleMessage("освобождено"),
+        "from": MessageLookupByLibrary.simpleMessage("из"),
+        "gallery_in_good_shape": MessageLookupByLibrary.simpleMessage(
+            "Ваша галерея в отличном состоянии!"),
+        "gallery_permission_required": MessageLookupByLibrary.simpleMessage(
+            "Для доступа к галерее требуется разрешение"),
+        "give_gallery_access": MessageLookupByLibrary.simpleMessage(
+            "Предоставьте доступ к галерее"),
+        "identical_videos":
+            MessageLookupByLibrary.simpleMessage("Идентичные видеофайлы"),
+        "image_load_error":
+            MessageLookupByLibrary.simpleMessage("Ошибка загрузки изображения"),
+        "keep": MessageLookupByLibrary.simpleMessage("Оставить"),
+        "loading": MessageLookupByLibrary.simpleMessage("Загрузка..."),
+        "loading_videos":
+            MessageLookupByLibrary.simpleMessage("Загрузка видео..."),
+        "message": MessageLookupByLibrary.simpleMessage("Сообщение"),
+        "name": MessageLookupByLibrary.simpleMessage("Имя"),
+        "new_word": MessageLookupByLibrary.simpleMessage("Новых"),
+        "no_files_in_category":
+            MessageLookupByLibrary.simpleMessage("Нет файлов в категории"),
+        "no_issues_found":
+            MessageLookupByLibrary.simpleMessage("Проблем не найдено"),
+        "no_purchases_to_restore": MessageLookupByLibrary.simpleMessage(
+            "Нет покупок для восстановления"),
+        "no_video_issues_yet":
+            MessageLookupByLibrary.simpleMessage("Проблем пока не найдено"),
+        "not_found": MessageLookupByLibrary.simpleMessage("Не найдены"),
+        "on": MessageLookupByLibrary.simpleMessage("в"),
+        "photo_bursts": MessageLookupByLibrary.simpleMessage("Серии снимков"),
+        "photo_series": MessageLookupByLibrary.simpleMessage("Серии фото"),
+        "photos": MessageLookupByLibrary.simpleMessage("Фото"),
+        "please_fill_all_fields": MessageLookupByLibrary.simpleMessage(
+            "Пожалуйста, заполните все поля"),
+        "please_wait": MessageLookupByLibrary.simpleMessage(
+            "Дождитесь окончания сканирования."),
+        "policy": MessageLookupByLibrary.simpleMessage("Политика"),
+        "preparing_for_scan": MessageLookupByLibrary.simpleMessage(
+            "Подготовка к сканированию..."),
+        "privacy_policy":
+            MessageLookupByLibrary.simpleMessage("Политика конфиденциальности"),
+        "problem_photos":
+            MessageLookupByLibrary.simpleMessage("Проблемные фото"),
+        "problem_videos":
+            MessageLookupByLibrary.simpleMessage("Проблемные видео"),
+        "rate_app": MessageLookupByLibrary.simpleMessage("Оценить приложение"),
+        "rescan":
+            MessageLookupByLibrary.simpleMessage("Повторить сканирование"),
+        "restore_purchases":
+            MessageLookupByLibrary.simpleMessage("Восстановить покупки"),
+        "scan_warning": MessageLookupByLibrary.simpleMessage(
+            "Дождитесь окончания сканирования для стабильной работы приложения.\nУстройство может нагреться. Вы можете приостановить сканирование для зарядки или охлаждения устройства (функция в разработке)."),
+        "scanning": MessageLookupByLibrary.simpleMessage("Сканирование..."),
+        "screen_recordings":
+            MessageLookupByLibrary.simpleMessage("Записи экрана"),
+        "screen_recordings_2":
+            MessageLookupByLibrary.simpleMessage("Записей экрана"),
+        "screenshots": MessageLookupByLibrary.simpleMessage("Снимки экрана"),
+        "screenshots_count": MessageLookupByLibrary.simpleMessage("Скриншотов"),
+        "searching_duplicate_photos_processed":
+            MessageLookupByLibrary.simpleMessage(
+                "Поиск дубликатов фото (обработано"),
+        "searching_similar_photos_processed":
+            MessageLookupByLibrary.simpleMessage(
+                "Поиск похожих фото (обработано"),
+        "select": MessageLookupByLibrary.simpleMessage("Выбрать"),
+        "select_all": MessageLookupByLibrary.simpleMessage("Выбрать все"),
+        "send_feedback":
+            MessageLookupByLibrary.simpleMessage("Отправить отзыв"),
+        "send_us_your_feedback": MessageLookupByLibrary.simpleMessage(
+            "Отправьте нам свой отзыв или вопросы"),
+        "settings": MessageLookupByLibrary.simpleMessage("Настройки"),
+        "share_app":
+            MessageLookupByLibrary.simpleMessage("Поделиться приложением"),
+        "short_recordings":
+            MessageLookupByLibrary.simpleMessage("Короткие записи"),
+        "short_video_clips":
+            MessageLookupByLibrary.simpleMessage("Короткие видеофрагменты"),
+        "short_videos": MessageLookupByLibrary.simpleMessage("Коротких видео"),
+        "similar": MessageLookupByLibrary.simpleMessage("Похожие"),
+        "similar_photo_groups_multiline":
+            MessageLookupByLibrary.simpleMessage("Групп похожих фото"),
+        "similar_photos":
+            MessageLookupByLibrary.simpleMessage("Похожие фотографии"),
+        "start_scan":
+            MessageLookupByLibrary.simpleMessage("Начать сканирование"),
+        "start_trial":
+            MessageLookupByLibrary.simpleMessage("Начать пробный период"),
+        "storage": MessageLookupByLibrary.simpleMessage("Хранилище"),
+        "subscription_terms": MessageLookupByLibrary.simpleMessage(
+            "Отмена в любое время. Оплата будет снята с вашего iTunes аккаунта. Подписка автоматически продлевается, если автопродление не отключено минимум за 24 часа до окончания текущего периода."),
+        "success": MessageLookupByLibrary.simpleMessage("Успех"),
+        "swipe_hint": MessageLookupByLibrary.simpleMessage(
+            "Удаляйте или сохраняйте файлы простым свайпом"),
+        "terms_and_privacy": MessageLookupByLibrary.simpleMessage(
+            "Условия и конфиденциальность"),
+        "thank_you": MessageLookupByLibrary.simpleMessage("Спасибо!"),
+        "then": MessageLookupByLibrary.simpleMessage("затем"),
+        "trial_activated": MessageLookupByLibrary.simpleMessage(
+            "Ваш пробный период успешно активирован!"),
+        "trial_enabled":
+            MessageLookupByLibrary.simpleMessage("Пробная версия включена"),
+        "try_again": MessageLookupByLibrary.simpleMessage("Попробовать снова"),
+        "try_swipe_mode":
+            MessageLookupByLibrary.simpleMessage("Попробуйте режим смахивания"),
+        "unlock_premium":
+            MessageLookupByLibrary.simpleMessage("Разблокировать Premium"),
+        "unnamed_file": MessageLookupByLibrary.simpleMessage("Файл без имени"),
+        "updated": MessageLookupByLibrary.simpleMessage("Обновлено:"),
+        "version": MessageLookupByLibrary.simpleMessage("Версия"),
+        "video_load_error":
+            MessageLookupByLibrary.simpleMessage("Ошибка загрузки видео"),
+        "videos": MessageLookupByLibrary.simpleMessage("Видео"),
+        "view": MessageLookupByLibrary.simpleMessage("Просмотр"),
+        "we_love_to_hear_from_you":
+            MessageLookupByLibrary.simpleMessage("Мы рады услышать от вас!")
+      };
 }

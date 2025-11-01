@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           appBar: AppBar(
             leading: CupertinoButton(
               padding: EdgeInsets.zero,
-              onPressed: () => context.router.push(const SettingsRoute()),
+              onPressed: () => context.router.push( SettingsRoute()),
               child: const Icon(
                 CupertinoIcons.settings,
                 color: Colors.white,
@@ -108,8 +108,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                         Icon(
-                          Icons.compare_arrows_rounded,
+                        const Icon(
+                     Icons.compare_arrows_rounded,
                           color: Colors.white,
                           size: 18,
                         ),

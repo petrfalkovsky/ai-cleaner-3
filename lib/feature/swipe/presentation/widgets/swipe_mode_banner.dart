@@ -22,7 +22,6 @@ class SwipeModeBanner extends StatelessWidget {
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.2)),
@@ -32,32 +31,35 @@ class SwipeModeBanner extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Row(
-              children: [
-                Icon(Icons.swipe, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        Locales.current.try_swipe_mode,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.swipe, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          Locales.current.try_swipe_mode,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        Locales.current.swipe_hint,
-                        style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.6)),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          Locales.current.swipe_hint,
+                          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.6)),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Icon(Icons.chevron_right, color: Colors.white),
-              ],
+                  Icon(Icons.chevron_right, color: Colors.white),
+                ],
+              ),
             ),
           ),
         ),
