@@ -91,6 +91,7 @@ dependencies:
   in_app_purchase: ^3.2.2
   share_plus: ^10.1.4
   in_app_review: ^2.0.10
+  shared_preferences: ^2.3.4
 
   # Сплэш и инициализация
   flutter_native_splash: 2.4.4

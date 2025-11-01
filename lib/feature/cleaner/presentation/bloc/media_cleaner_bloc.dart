@@ -8,6 +8,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'media_cleaner_event.dart';
 part 'media_cleaner_state.dart';
@@ -57,6 +58,16 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
           videoFiles: mediaFiles.where((f) => f.isVideo).toList(),
         ),
       );
+
+      // Проверяем, было ли завершено первое сканирование
+      final hasCompletedScan = await _hasCompletedFirstScan();
+
+      // Если сканирование уже было выполнено ранее, автоматически запускаем его снова
+      // чтобы пользователь сразу увидел категории вместо приветственного экрана
+      if (hasCompletedScan) {
+        debugPrint('PERSISTENCE: Автоматически запускаем сканирование, так как оно уже выполнялось ранее');
+        add(ScanForProblematicFiles());
+      }
     } catch (e) {
       emit(MediaCleanerError('${Locales.current.files_load_error} $e'));
     }
@@ -530,6 +541,9 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       if (!emit.isDone) {
         emit(currentState.copyWith(isScanningInBackground: false, lastScanTime: DateTime.now()));
         debugPrint('СКАНИРОВАНИЕ: Завершено успешно! Обработано $processedFiles файлов');
+
+        // Сохраняем флаг о завершении первого сканирования
+        await _saveFirstScanCompleted();
       } else {
         debugPrint(
           'СКАНИРОВАНИЕ: Обработчик событий завершен при попытке отправить финальный статус',
@@ -1001,6 +1015,38 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
         // Запускаем метод сканирования на продолжение
         _performIncrementalScan(resumeState, emit);
       }
+    }
+  }
+
+  // Сохраняем флаг о завершении первого сканирования
+  Future<void> _saveFirstScanCompleted() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('first_scan_completed', true);
+      await prefs.setString('last_scan_time', DateTime.now().toIso8601String());
+      debugPrint('PERSISTENCE: Первое сканирование сохранено в SharedPreferences');
+    } catch (e) {
+      debugPrint('PERSISTENCE: Ошибка при сохранении флага сканирования: $e');
+    }
+  }
+
+  // Проверяем, было ли завершено первое сканирование
+  Future<bool> _hasCompletedFirstScan() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hasCompleted = prefs.getBool('first_scan_completed') ?? false;
+
+      if (hasCompleted) {
+        final lastScanTimeStr = prefs.getString('last_scan_time');
+        debugPrint('PERSISTENCE: Найдено завершенное сканирование. Последнее сканирование: $lastScanTimeStr');
+      } else {
+        debugPrint('PERSISTENCE: Первое сканирование еще не выполнено');
+      }
+
+      return hasCompleted;
+    } catch (e) {
+      debugPrint('PERSISTENCE: Ошибка при проверке флага сканирования: $e');
+      return false;
     }
   }
 }
