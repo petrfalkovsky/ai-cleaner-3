@@ -16,6 +16,7 @@ class AppRootPage extends StatefulWidget {
 
 class _AppRootPageState extends State<AppRootPage> with WidgetsBindingObserver {
   final throttler = Throttler(3.seconds);
+  MediaCleanerBloc? _mediaCleanerBloc;
 
   @override
   void initState() {
@@ -31,34 +32,38 @@ class _AppRootPageState extends State<AppRootPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final mediaBloc = context.read<MediaCleanerBloc>();
-    
+    // Проверяем что блок уже создан
+    if (_mediaCleanerBloc == null) return;
+
     if (state == AppLifecycleState.paused) {
       // Приложение ушло в фон
       debugPrint('Приложение ушло в фон, приостанавливаем сканирование');
-      
+
       // Приостанавливаем сканирование
-      if (mediaBloc.state is MediaCleanerScanning) {
-        mediaBloc.add(PauseScanningEvent());
+      if (_mediaCleanerBloc!.state is MediaCleanerScanning) {
+        _mediaCleanerBloc!.add(PauseScanningEvent());
       }
     } else if (state == AppLifecycleState.resumed) {
       // Приложение вернулось на передний план
       debugPrint('Приложение вернулось на передний план, возобновляем сканирование');
-      
+
       // Возобновляем сканирование, если оно было приостановлено
-      if (mediaBloc.state is MediaCleanerScanning && 
-          (mediaBloc.state as MediaCleanerScanning).isPaused) {
-        mediaBloc.add(ResumeScanningEvent());
+      if (_mediaCleanerBloc!.state is MediaCleanerScanning &&
+          (_mediaCleanerBloc!.state as MediaCleanerScanning).isPaused) {
+        _mediaCleanerBloc!.add(ResumeScanningEvent());
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Создаем блок один раз
+    _mediaCleanerBloc ??= MediaCleanerBloc();
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => GalleryAssetsCubit()),
-        BlocProvider(create: (context) => MediaCleanerBloc()),
+        BlocProvider.value(value: _mediaCleanerBloc!),
       ],
       child: const AutoRouter(),
     );
