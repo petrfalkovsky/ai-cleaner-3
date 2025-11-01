@@ -65,8 +65,9 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       // Если сканирование уже было выполнено ранее, автоматически запускаем его снова
       // чтобы пользователь сразу увидел категории вместо приветственного экрана
       if (hasCompletedScan) {
-        debugPrint('PERSISTENCE: Автоматически запускаем сканирование, так как оно уже выполнялось ранее');
-        add(ScanForProblematicFiles());
+        debugPrint('PERSISTENCE: Отображаем экран с ранее найденными группами');
+        // debugPrint('PERSISTENCE: Автоматически запускаем сканирование, так как оно уже выполнялось ранее');
+        // add(ScanForProblematicFiles());
       }
     } catch (e) {
       emit(MediaCleanerError('${Locales.current.files_load_error} $e'));

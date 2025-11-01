@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/core/router/router.gr.dart';
+import 'package:ai_cleaner_2/core/widgets/ios_notification.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_button.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_status_banner.dart';
@@ -505,12 +506,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           isLocked: isLocked,
                           onTap: isScanningInBackground
                               ? () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(Locales.current.please_wait),
-                                      duration: Duration(seconds: 2),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
+                                  IOSNotification.showInfo(
+                                    context,
+                                    title: Locales.current.please_wait,
+                                    message: 'Сканирование уже выполняется...',
                                   );
                                   return;
                                 }
@@ -710,12 +709,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           selectedCount: selectedCount,
                           onTap: isScanningInBackground
                               ? () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(Locales.current.from),
-                                      duration: Duration(seconds: 2),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
+                                  IOSNotification.showInfo(
+                                    context,
+                                    title: Locales.current.please_wait,
+                                    message: 'Сканирование уже выполняется...',
                                   );
                                   return;
                                 }
