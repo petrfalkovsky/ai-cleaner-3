@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../../../core/router/router.gr.dart';
+import '../../../../core/widgets/tab_view/ios26_reference_view.dart';
 import '../../../../generated/l10n.dart';
 import '../../../premium/domain/apphud_service.dart';
 
@@ -259,8 +260,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildSectionHeader('🧪 DEV'),
                 _buildSettingsTile(
                   icon: CupertinoIcons.device_phone_portrait,
-                  title: 'iOS 26 Reference Screen',
+                  title: 'iOS 26 Reference Screen (UIKit)',
                   onTap: () => context.router.push(const iOS26ReferenceRoute()),
+                  showChevron: true,
+                ),
+                _buildSettingsTile(
+                  icon: CupertinoIcons.sparkles,
+                  title: 'Original SwiftUI Screen',
+                  onTap: () async {
+                    try {
+                      await iOS26ReferenceHelper.openOriginalSwiftUIScreen();
+                    } catch (e) {
+                      if (context.mounted) {
+                        showCupertinoDialog(
+                          context: context,
+                          builder: (context) => CupertinoAlertDialog(
+                            title: const Text('Error'),
+                            content: Text('Failed to open screen: $e'),
+                            actions: [
+                              CupertinoDialogAction(
+                                child: const Text('OK'),
+                                onPressed: () => Navigator.of(context).pop(),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    }
+                  },
                   showChevron: true,
                 ),
                 const SizedBox(height: 30),

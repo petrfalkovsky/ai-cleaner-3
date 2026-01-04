@@ -205,12 +205,38 @@ class NativeSegmentedControlView: NSObject, FlutterPlatformView {
 
       switch call.method {
       case "openNativeScreen":
-        // Открываем нативный iOS 26 экран модально
+        // Открываем нативный iOS 26 экран модально (UIKit версия)
         let nativeVC = iOS26ReferenceViewController()
         let navController = UINavigationController(rootViewController: nativeVC)
         navController.modalPresentationStyle = .fullScreen
         controller.present(navController, animated: true)
         result(nil)
+
+      case "openOriginalSwiftUIScreen":
+        // Открываем ОРИГИНАЛЬНЫЙ SwiftUI экран из iOS-26-by-Examples
+        if #available(iOS 18.0, *) {
+          let swiftUIView = NewTabView()
+          let hostingController = UIHostingController(rootView: swiftUIView)
+          let navController = UINavigationController(rootViewController: hostingController)
+          navController.modalPresentationStyle = .fullScreen
+
+          // Добавляем кнопку закрытия
+          hostingController.navigationItem.leftBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .close,
+            target: controller,
+            action: #selector(FlutterViewController.dismissViewController)
+          )
+
+          controller.present(navController, animated: true)
+          result(nil)
+        } else {
+          result(FlutterError(
+            code: "UNSUPPORTED_VERSION",
+            message: "NewTabView requires iOS 18.0 or later",
+            details: nil
+          ))
+        }
+
       default:
         result(FlutterMethodNotImplemented)
       }
