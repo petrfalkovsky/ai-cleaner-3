@@ -66,11 +66,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return Scaffold(
           backgroundColor: context.iosBackground,
           appBar: AppBar(
-            leading: CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: () => context.router.push(SettingsRoute()),
-              child: Icon(CupertinoIcons.settings, color: context.iosLabel, size: 24),
+            leading: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: context.iosSecondaryBackground.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: context.iosLabel.withOpacity(0.1),
+                    width: 0.5,
+                  ),
+                ),
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => context.router.push(SettingsRoute()),
+                  child: Icon(CupertinoIcons.settings, color: context.iosLabel, size: 20),
+                ),
+              ),
             ),
+          ),
             title: Text(
               Locales.current.ai_cleaner,
               style: TextStyle(fontWeight: FontWeight.w600, color: context.iosLabel),

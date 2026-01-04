@@ -91,7 +91,7 @@ class IOSTabViewWrapper: NSObject, FlutterPlatformView {
             switch call.method {
             case "setSelectedTab":
                 if let index = call.arguments as? Int {
-                    self.tabViewController.selectedIndex = index
+                    self.tabViewController.selectTab(at: index)
                     result(nil)
                 } else {
                     result(FlutterError(code: "INVALID_ARGS", message: "Invalid tab index", details: nil))

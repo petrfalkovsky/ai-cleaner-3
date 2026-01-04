@@ -174,6 +174,17 @@ class IOSTabViewController: UIViewController {
         sharingVC?.updateCategories(categories)
     }
 
+    /// Программно выбрать таб
+    func selectTab(at index: Int) {
+        guard index >= 0 && index <= 1 else { return }
+
+        if selectedIndex != index {
+            selectedIndex = index
+            showViewController(at: index)
+            customTabBar.selectedIndex = index
+        }
+    }
+
     // MARK: - Scroll Handling
     // Реализация .tabBarMinimizeBehavior(.onScrollDown) из примера
 
