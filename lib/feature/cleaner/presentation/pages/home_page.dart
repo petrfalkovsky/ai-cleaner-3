@@ -142,8 +142,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 Column(
                   children: [
-                    // Баннер статуса сканирования
-                    const ScanStatusBanner(),
+                    // Анимированный переход между ScanStatusBanner и Storage Header
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      switchInCurve: Curves.easeInOut,
+                      switchOutCurve: Curves.easeInOut,
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0, -0.1),
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: (state is MediaCleanerScanning || state is MediaCleanerInitial)
+                          ? const ScanStatusBanner(key: ValueKey('scan_banner'))
+                          : state is MediaCleanerReady
+                              ? Padding(
+                                  key: const ValueKey('storage_header'),
+                                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                                  child: const IOSStorageHeader(),
+                                )
+                              : const SizedBox.shrink(key: ValueKey('empty')),
+                    ),
 
                     // Основной контент - нативный iOS 26 TabView
                     Expanded(
