@@ -1,102 +1,167 @@
 import UIKit
 import Flutter
 
-/// Главный контроллер для iOS 26 стиля TabView с Photos/Videos/Search табами
-/// Реализован по примеру iOS-26-by-Examples/NewTabView.swift
-class IOSTabViewController: UITabBarController {
+/// Главный контроллер для iOS 26 стиля с кастомным TabBar
+/// Реализован по примеру iOS-26-by-Examples/NewTabView.swift с glassmorphism эффектом
+class IOSTabViewController: UIViewController {
 
     // MARK: - Properties
 
+    private var customTabBar: IOSCustomTabBar!
     private var bottomAccessoryView: IOSBottomAccessoryView?
+    private var containerView: UIView!
+    private var currentViewController: UIViewController?
+
+    private var customTabBarBottomConstraint: NSLayoutConstraint!
+    private var bottomAccessoryBottomConstraint: NSLayoutConstraint!
 
     // Callback для Flutter
     var onRescanTapped: (() -> Void)?
     var onSearchTextChanged: ((String) -> Void)?
     var onTabChanged: ((Int) -> Void)?
-    var onCategoryTapped: ((String, String) -> Void)?  // (tabType, categoryName)
+    var onCategoryTapped: ((String, String) -> Void)?
 
     // View controllers
     private var summaryVC: SummaryListViewController?
     private var sharingVC: SharingViewController?
-    private var searchVC: SearchViewController?
+
+    private var selectedIndex: Int = 0
 
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupTabBar()
+        view.backgroundColor = .systemBackground
         setupViewControllers()
-        setupBottomAccessory()
-
-        delegate = self
+        setupUI()
+        showViewController(at: 0)
     }
 
     // MARK: - Setup
 
-    private func setupTabBar() {
-        // iOS 26 стиль таб-бара
-        let appearance = UITabBarAppearance()
-        appearance.configureWithDefaultBackground()
-
-        // Полупрозрачный фон для glassmorphism
-        appearance.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.8)
-
-        tabBar.standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            tabBar.scrollEdgeAppearance = appearance
-        }
-
-        // Закругленные углы как в iOS 26
-        tabBar.layer.cornerRadius = 16
-        tabBar.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        tabBar.layer.masksToBounds = true
-    }
-
     private func setupViewControllers() {
-        // Summary Tab (Photos) - аналог Summary из примера
+        // Summary (Photos) View Controller
         let summaryViewController = SummaryListViewController()
         summaryViewController.onCategoryTapped = { [weak self] categoryName in
             self?.onCategoryTapped?("photo", categoryName)
         }
         self.summaryVC = summaryViewController
 
-        let summaryNav = UINavigationController(rootViewController: summaryViewController)
-        summaryNav.tabBarItem = UITabBarItem(
-            title: "Photos",
-            image: UIImage(systemName: "photo.stack"),
-            selectedImage: UIImage(systemName: "photo.stack.fill")
-        )
-
-        // Sharing Tab (Videos) - аналог Sharing из примера
+        // Sharing (Videos) View Controller
         let sharingViewController = SharingViewController()
         sharingViewController.onCategoryTapped = { [weak self] categoryName in
             self?.onCategoryTapped?("video", categoryName)
         }
         self.sharingVC = sharingViewController
+    }
 
-        let sharingNav = UINavigationController(rootViewController: sharingViewController)
-        sharingNav.tabBarItem = UITabBarItem(
-            title: "Videos",
-            image: UIImage(systemName: "video.stack"),
-            selectedImage: UIImage(systemName: "video.stack.fill")
-        )
+    private func setupUI() {
+        // Container для view controllers
+        containerView = UIView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(containerView)
 
-        // Search Tab - аналог Search из примера с role: .search
-        let searchViewController = SearchViewController()
-        searchViewController.onSearchTextChanged = { [weak self] text in
-            self?.onSearchTextChanged?(text)
+        // Bottom Accessory (Rescan кнопка)
+        let accessory = IOSBottomAccessoryView()
+        accessory.translatesAutoresizingMaskIntoConstraints = false
+        accessory.onRescanTapped = { [weak self] in
+            self?.onRescanTapped?()
         }
-        self.searchVC = searchViewController
+        view.addSubview(accessory)
+        bottomAccessoryView = accessory
 
-        let searchNav = UINavigationController(rootViewController: searchViewController)
-        searchNav.tabBarItem = UITabBarItem(
-            title: "Search",
-            image: UIImage(systemName: "magnifyingglass"),
-            selectedImage: UIImage(systemName: "magnifyingglass")
+        // Custom Tab Bar (2 кнопки + поиск)
+        customTabBar = IOSCustomTabBar()
+        customTabBar.translatesAutoresizingMaskIntoConstraints = false
+        customTabBar.onTabChanged = { [weak self] index in
+            self?.selectTab(at: index)
+        }
+        customTabBar.onSearchTapped = { [weak self] in
+            self?.openSearch()
+        }
+        view.addSubview(customTabBar)
+
+        // Constraints
+        customTabBarBottomConstraint = customTabBar.bottomAnchor.constraint(
+            equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+            constant: -8
+        )
+        bottomAccessoryBottomConstraint = accessory.bottomAnchor.constraint(
+            equalTo: customTabBar.topAnchor,
+            constant: -8
         )
 
-        viewControllers = [summaryNav, sharingNav, searchNav]
+        NSLayoutConstraint.activate([
+            // Container
+            containerView.topAnchor.constraint(equalTo: view.topAnchor),
+            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            containerView.bottomAnchor.constraint(equalTo: accessory.topAnchor),
+
+            // Bottom Accessory
+            accessory.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            accessory.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bottomAccessoryBottomConstraint,
+            accessory.heightAnchor.constraint(equalToConstant: 60),
+
+            // Custom Tab Bar
+            customTabBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            customTabBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            customTabBarBottomConstraint,
+            customTabBar.heightAnchor.constraint(equalToConstant: 60)
+        ])
+    }
+
+    // MARK: - Tab Switching
+
+    private func selectTab(at index: Int) {
+        guard index != selectedIndex else { return }
+
+        selectedIndex = index
+        showViewController(at: index)
+        onTabChanged?(index)
+    }
+
+    private func showViewController(at index: Int) {
+        // Удаляем текущий VC
+        currentViewController?.willMove(toParent: nil)
+        currentViewController?.view.removeFromSuperview()
+        currentViewController?.removeFromParent()
+
+        // Определяем новый VC
+        let newVC: UIViewController
+        if index == 0 {
+            newVC = summaryVC ?? UIViewController()
+        } else {
+            newVC = sharingVC ?? UIViewController()
+        }
+
+        // Добавляем новый VC
+        addChild(newVC)
+        containerView.addSubview(newVC.view)
+        newVC.view.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            newVC.view.topAnchor.constraint(equalTo: containerView.topAnchor),
+            newVC.view.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            newVC.view.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            newVC.view.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+        ])
+
+        newVC.didMove(toParent: self)
+        currentViewController = newVC
+
+        // Обновляем выбранный таб в UI
+        customTabBar.selectedIndex = index
+    }
+
+    // MARK: - Search
+
+    private func openSearch() {
+        // TODO: Открыть поисковый экран
+        // Можно создать SearchViewController и показать как modal или push
+        onSearchTextChanged?("")
     }
 
     // MARK: - Public Methods
@@ -109,30 +174,6 @@ class IOSTabViewController: UITabBarController {
         sharingVC?.updateCategories(categories)
     }
 
-    func updateSearchResults(_ results: [[String: Any]]) {
-        searchVC?.updateSearchResults(results)
-    }
-
-    private func setupBottomAccessory() {
-        // Bottom Accessory - аналог .tabViewBottomAccessory из примера
-        let accessory = IOSBottomAccessoryView()
-        accessory.translatesAutoresizingMaskIntoConstraints = false
-        accessory.onRescanTapped = { [weak self] in
-            self?.onRescanTapped?()
-        }
-
-        view.addSubview(accessory)
-
-        NSLayoutConstraint.activate([
-            accessory.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            accessory.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            accessory.bottomAnchor.constraint(equalTo: tabBar.topAnchor),
-            accessory.heightAnchor.constraint(equalToConstant: 60)
-        ])
-
-        bottomAccessoryView = accessory
-    }
-
     // MARK: - Scroll Handling
     // Реализация .tabBarMinimizeBehavior(.onScrollDown) из примера
 
@@ -140,24 +181,30 @@ class IOSTabViewController: UITabBarController {
         let offsetY = scrollView.contentOffset.y
         let threshold: CGFloat = 50
 
-        UIView.animate(withDuration: 0.3) {
-            if offsetY > threshold {
-                // Скрываем таб-бар при скролле вниз (.onScrollDown)
-                self.tabBar.transform = CGAffineTransform(translationX: 0, y: self.tabBar.frame.height)
-                self.bottomAccessoryView?.transform = CGAffineTransform(translationX: 0, y: self.tabBar.frame.height + 60)
+        let shouldHide = offsetY > threshold
+
+        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0) {
+            if shouldHide {
+                // Скрываем табы и rescan при скролле вниз
+                // Только кнопка поиска остается видимой
+                self.customTabBar.setTabContainerHidden(true, animated: false)
+                self.bottomAccessoryView?.alpha = 0
+                self.bottomAccessoryView?.transform = CGAffineTransform(translationX: 0, y: 20)
+
+                // Двигаем кнопку поиска вниз (где были табы)
+                self.customTabBarBottomConstraint.constant = -8
+                self.bottomAccessoryBottomConstraint.constant = -8
             } else {
-                // Показываем обратно
-                self.tabBar.transform = .identity
+                // Показываем все обратно
+                self.customTabBar.setTabContainerHidden(false, animated: false)
+                self.bottomAccessoryView?.alpha = 1
                 self.bottomAccessoryView?.transform = .identity
+
+                self.customTabBarBottomConstraint.constant = -8
+                self.bottomAccessoryBottomConstraint.constant = -8
             }
+
+            self.view.layoutIfNeeded()
         }
-    }
-}
-
-// MARK: - UITabBarControllerDelegate
-
-extension IOSTabViewController: UITabBarControllerDelegate {
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        onTabChanged?(selectedIndex)
     }
 }
