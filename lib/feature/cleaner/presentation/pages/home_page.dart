@@ -34,17 +34,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  late TabController _tabController;
   late AnimationController _fabController;
+  int _currentTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTabIndex);
-    _tabController.addListener(() {
-      setState(() {}); // Обновляем UI при изменении таба
-    });
-
+    _currentTabIndex = widget.initialTabIndex;
     _fabController = AnimationController(duration: const Duration(milliseconds: 200), vsync: this);
 
     // При запуске проверяем наличие сохраненных данных или начинаем сканирование
@@ -56,7 +52,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _tabController.dispose();
     _fabController.dispose();
     super.dispose();
   }
@@ -147,41 +142,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 Column(
                   children: [
-                    // Нативный iOS 26 UISegmentedControl - показываем только после сканирования
-                    if (showTabs)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Center(
-                          child: SizedBox(
-                            height: 60,
-                            width: 200,
-                            child: NativeSegmentedControl(
-                              items: [
-                                Locales.current.photos,
-                                Locales.current.videos,
-                              ],
-                              selectedIndex: _tabController.index,
-                              onSegmentChanged: (index) {
-                                _tabController.animateTo(index);
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-
                     // Баннер статуса сканирования
                     const ScanStatusBanner(),
 
-                    // Основной контент
+                    // Основной контент - нативный iOS 26 TabView
                     Expanded(
                       child: showTabs
-                          ? TabBarView(
-                              controller: _tabController,
-                              children: [
-                                KeepAliveWrapper(child: _buildPhotoTab()),
-                                KeepAliveWrapper(child: _buildVideoTab()),
-                              ],
-                            )
+                          ? _buildNativeTabView(state as MediaCleanerReady)
                           : _buildPhotoTab(), // До завершения показываем только фото вкладку
                     ),
                   ],
@@ -299,6 +266,73 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
 
     return categories;
+  }
+
+  /// Построить нативный iOS 26 TabView
+  Widget _buildNativeTabView(MediaCleanerReady state) {
+    // Только для iOS
+    if (!Platform.isIOS) {
+      return _buildFallbackTabView(state);
+    }
+
+    final photoCategories = _preparePhotoCategories(state);
+    final videoCategories = _prepareVideoCategories(state);
+
+    return NativeTabView(
+      photoCategories: photoCategories,
+      videoCategories: videoCategories,
+      onRescanTapped: () {
+        // Запускаем повторное сканирование
+        context.read<MediaCleanerBloc>().add(ScanForProblematicFiles());
+      },
+      onSearchTextChanged: (searchText) {
+        // TODO: Реализовать поиск по категориям
+        print('Search text: $searchText');
+      },
+      onTabChanged: (tabIndex) {
+        setState(() {
+          _currentTabIndex = tabIndex;
+        });
+      },
+      onCategoryTapped: (tabType, categoryName) {
+        // Открываем страницу категории
+        context.router.push(
+          CategoryRoute(
+            categoryType: tabType,
+            categoryName: categoryName,
+          ),
+        );
+      },
+    );
+  }
+
+  /// Fallback для не-iOS платформ (используем обычный Flutter TabView)
+  Widget _buildFallbackTabView(MediaCleanerReady state) {
+    return Column(
+      children: [
+        // Простой переключатель табов для Android/других платформ
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () => setState(() => _currentTabIndex = 0),
+                child: Text(Locales.current.photos),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () => setState(() => _currentTabIndex = 1),
+                child: Text(Locales.current.videos),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _currentTabIndex == 0 ? _buildPhotoTab() : _buildVideoTab(),
+        ),
+      ],
+    );
   }
 
   Widget _buildPhotoTab() {
