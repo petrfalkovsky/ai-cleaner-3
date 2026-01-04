@@ -254,6 +254,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               const SizedBox(height: 30),
 
+              // 🧪 DEV (только в DEBUG режиме)
+              if (kDebugMode) ...[
+                _buildSectionHeader('🧪 DEV'),
+                _buildSettingsTile(
+                  icon: CupertinoIcons.device_phone_portrait,
+                  title: 'iOS 26 Reference Screen',
+                  onTap: () => context.router.push(const iOS26ReferenceRoute()),
+                  showChevron: true,
+                ),
+                const SizedBox(height: 30),
+              ],
+
               // Версия приложения
               if (_appVersion.isNotEmpty)
                 Center(

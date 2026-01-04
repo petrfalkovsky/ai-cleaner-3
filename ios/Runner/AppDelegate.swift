@@ -191,6 +191,13 @@ class NativeSegmentedControlView: NSObject, FlutterPlatformView {
       withId: "ios_tab_view"
     )
 
+    // Регистрируем iOS 26 Reference Screen (точная копия NewTabView из примера)
+    let ios26ReferenceFactory = iOS26ReferenceViewFactory(messenger: controller.binaryMessenger)
+    registrar(forPlugin: "iOS26Reference")?.register(
+      ios26ReferenceFactory,
+      withId: "ios26_reference_view"
+    )
+
     // Настраиваем Method Channel для передачи метаданных медиафайлов
     let metadataChannel = FlutterMethodChannel(
       name: CHANNEL_NAME,

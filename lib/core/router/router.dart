@@ -39,6 +39,7 @@ class AppRouter extends RootStackRouter {
         ),
         CustomRoute(page: SwipeRoute.page, transitionsBuilder: fadeTransition),
         CustomRoute(page: SettingsRoute.page, transitionsBuilder: fadeTransition),
+        CustomRoute(page: iOS26ReferenceRoute.page, transitionsBuilder: fadeTransition),
         CustomRoute(page: FeedbackRoute.page, transitionsBuilder: fadeTransition),
         CustomRoute(page: FeedbackSuccessRoute.page, transitionsBuilder: fadeTransition),
         CustomRoute(
