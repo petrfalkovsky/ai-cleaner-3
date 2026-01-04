@@ -125,6 +125,14 @@ class IOSTabViewWrapper: NSObject, FlutterPlatformView {
                     result(FlutterError(code: "INVALID_ARGS", message: "Invalid categories", details: nil))
                 }
 
+            case "updateSearchResults":
+                if let results = call.arguments as? [[String: Any]] {
+                    self.tabViewController.updateSearchResults(results)
+                    result(nil)
+                } else {
+                    result(FlutterError(code: "INVALID_ARGS", message: "Invalid search results", details: nil))
+                }
+
             default:
                 result(FlutterMethodNotImplemented)
             }

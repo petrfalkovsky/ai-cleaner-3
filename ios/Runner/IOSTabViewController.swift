@@ -1,15 +1,13 @@
 import UIKit
 import Flutter
 
-/// Главный контроллер для iOS 26 стиля TabView с Summary/Sharing табами
+/// Главный контроллер для iOS 26 стиля TabView с Photos/Videos/Search табами
+/// Реализован по примеру iOS-26-by-Examples/NewTabView.swift
 class IOSTabViewController: UITabBarController {
 
     // MARK: - Properties
 
     private var bottomAccessoryView: IOSBottomAccessoryView?
-    private var searchButton: UIButton?
-    private var isSearchExpanded = false
-    private var searchBarController: UISearchController?
 
     // Callback для Flutter
     var onRescanTapped: (() -> Void)?
@@ -20,6 +18,7 @@ class IOSTabViewController: UITabBarController {
     // View controllers
     private var summaryVC: SummaryListViewController?
     private var sharingVC: SharingViewController?
+    private var searchVC: SearchViewController?
 
     // MARK: - Lifecycle
 
@@ -29,7 +28,6 @@ class IOSTabViewController: UITabBarController {
         setupTabBar()
         setupViewControllers()
         setupBottomAccessory()
-        setupSearchButton()
 
         delegate = self
     }
@@ -56,7 +54,7 @@ class IOSTabViewController: UITabBarController {
     }
 
     private func setupViewControllers() {
-        // Summary Tab (Photos)
+        // Summary Tab (Photos) - аналог Summary из примера
         let summaryViewController = SummaryListViewController()
         summaryViewController.onCategoryTapped = { [weak self] categoryName in
             self?.onCategoryTapped?("photo", categoryName)
@@ -70,7 +68,7 @@ class IOSTabViewController: UITabBarController {
             selectedImage: UIImage(systemName: "photo.stack.fill")
         )
 
-        // Sharing Tab (Videos)
+        // Sharing Tab (Videos) - аналог Sharing из примера
         let sharingViewController = SharingViewController()
         sharingViewController.onCategoryTapped = { [weak self] categoryName in
             self?.onCategoryTapped?("video", categoryName)
@@ -84,7 +82,21 @@ class IOSTabViewController: UITabBarController {
             selectedImage: UIImage(systemName: "video.stack.fill")
         )
 
-        viewControllers = [summaryNav, sharingNav]
+        // Search Tab - аналог Search из примера с role: .search
+        let searchViewController = SearchViewController()
+        searchViewController.onSearchTextChanged = { [weak self] text in
+            self?.onSearchTextChanged?(text)
+        }
+        self.searchVC = searchViewController
+
+        let searchNav = UINavigationController(rootViewController: searchViewController)
+        searchNav.tabBarItem = UITabBarItem(
+            title: "Search",
+            image: UIImage(systemName: "magnifyingglass"),
+            selectedImage: UIImage(systemName: "magnifyingglass")
+        )
+
+        viewControllers = [summaryNav, sharingNav, searchNav]
     }
 
     // MARK: - Public Methods
@@ -97,9 +109,12 @@ class IOSTabViewController: UITabBarController {
         sharingVC?.updateCategories(categories)
     }
 
-    private func setupBottomAccessory() {
-        guard let tabBar = tabBar as? UITabBar else { return }
+    func updateSearchResults(_ results: [[String: Any]]) {
+        searchVC?.updateSearchResults(results)
+    }
 
+    private func setupBottomAccessory() {
+        // Bottom Accessory - аналог .tabViewBottomAccessory из примера
         let accessory = IOSBottomAccessoryView()
         accessory.translatesAutoresizingMaskIntoConstraints = false
         accessory.onRescanTapped = { [weak self] in
@@ -118,70 +133,8 @@ class IOSTabViewController: UITabBarController {
         bottomAccessoryView = accessory
     }
 
-    private func setupSearchButton() {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
-        button.tintColor = .label
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
-
-        tabBar.addSubview(button)
-
-        NSLayoutConstraint.activate([
-            button.trailingAnchor.constraint(equalTo: tabBar.trailingAnchor, constant: -16),
-            button.centerYAnchor.constraint(equalTo: tabBar.centerYAnchor),
-            button.widthAnchor.constraint(equalToConstant: 44),
-            button.heightAnchor.constraint(equalToConstant: 44)
-        ])
-
-        searchButton = button
-    }
-
-    // MARK: - Actions
-
-    @objc private func searchButtonTapped() {
-        toggleSearch()
-    }
-
-    private func toggleSearch() {
-        isSearchExpanded.toggle()
-
-        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0) {
-            if self.isSearchExpanded {
-                self.expandSearch()
-            } else {
-                self.collapseSearch()
-            }
-        }
-    }
-
-    private func expandSearch() {
-        // Показываем поисковую строку
-        guard let navVC = selectedViewController as? UINavigationController,
-              let topVC = navVC.topViewController else { return }
-
-        let searchController = UISearchController(searchResultsController: nil)
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search"
-
-        topVC.navigationItem.searchController = searchController
-        topVC.navigationItem.hidesSearchBarWhenScrolling = false
-
-        searchBarController = searchController
-        searchController.searchBar.becomeFirstResponder()
-    }
-
-    private func collapseSearch() {
-        // Скрываем поисковую строку
-        guard let navVC = selectedViewController as? UINavigationController,
-              let topVC = navVC.topViewController else { return }
-
-        topVC.navigationItem.searchController = nil
-        searchBarController = nil
-    }
-
     // MARK: - Scroll Handling
+    // Реализация .tabBarMinimizeBehavior(.onScrollDown) из примера
 
     func handleScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
@@ -189,7 +142,7 @@ class IOSTabViewController: UITabBarController {
 
         UIView.animate(withDuration: 0.3) {
             if offsetY > threshold {
-                // Скрываем таб-бар при скролле вниз
+                // Скрываем таб-бар при скролле вниз (.onScrollDown)
                 self.tabBar.transform = CGAffineTransform(translationX: 0, y: self.tabBar.frame.height)
                 self.bottomAccessoryView?.transform = CGAffineTransform(translationX: 0, y: self.tabBar.frame.height + 60)
             } else {
@@ -206,14 +159,5 @@ class IOSTabViewController: UITabBarController {
 extension IOSTabViewController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         onTabChanged?(selectedIndex)
-    }
-}
-
-// MARK: - UISearchResultsUpdating
-
-extension IOSTabViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        guard let text = searchController.searchBar.text else { return }
-        onSearchTextChanged?(text)
     }
 }
