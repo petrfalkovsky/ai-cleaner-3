@@ -1,9 +1,9 @@
-import 'dart:ui';
 import 'package:ai_cleaner_2/core/config/vision_config.dart';
 import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/core/router/router.gr.dart';
 import 'package:ai_cleaner_2/core/theme/app_colors.dart';
 import 'package:ai_cleaner_2/core/widgets/ios_notification.dart';
+import 'package:ai_cleaner_2/core/widgets/native_segmented_control.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_button.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_status_banner.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selected_files_counter.dart';
@@ -18,8 +18,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
-import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
 import '../widgets/video_category_card.dart';
 
@@ -147,137 +145,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 Column(
                   children: [
-                    // Custom Tab Bar в iOS стиле с liquid glass - показываем только после сканирования
+                    // Нативный iOS 26 UISegmentedControl - показываем только после сканирования
                     if (showTabs)
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        child: LiquidGlassLayer(
-                          settings: LiquidGlassSettings(
-                            blur: 3,
-                            ambientStrength: 0.5,
-                            lightAngle: 0.2 * math.pi,
-                            glassColor: Colors.white12,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Expanded(
-                                child: LiquidGlass.inLayer(
-                                  shape: LiquidRoundedSuperellipse(
-                                    borderRadius: const Radius.circular(12),
-                                  ),
-                                  glassContainsChild: false,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: GestureDetector(
-                                            behavior: HitTestBehavior.opaque,
-                                            onTap: () {
-                                              _tabController.animateTo(0);
-                                            },
-                                            child: _tabController.index == 0
-                                                ? ClipRRect(
-                                                    borderRadius: BorderRadius.circular(10),
-                                                    child: BackdropFilter(
-                                                      filter: ImageFilter.blur(
-                                                        sigmaX: 10,
-                                                        sigmaY: 10,
-                                                      ),
-                                                      child: Container(
-                                                        padding: const EdgeInsets.symmetric(
-                                                          vertical: 8,
-                                                        ),
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.black.withOpacity(0.35),
-                                                          borderRadius: BorderRadius.circular(10),
-                                                        ),
-                                                        child: Center(
-                                                          child: Text(
-                                                            Locales.current.photos,
-                                                            style: const TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: 16,
-                                                              fontWeight: FontWeight.w600,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Padding(
-                                                    padding: EdgeInsets.symmetric(vertical: 8),
-                                                    child: Center(
-                                                      child: Text(
-                                                        Locales.current.photos,
-                                                        style: TextStyle(
-                                                          color: Colors.white70,
-                                                          fontSize: 16,
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: GestureDetector(
-                                            behavior: HitTestBehavior.opaque,
-                                            onTap: () {
-                                              _tabController.animateTo(1);
-                                            },
-                                            child: _tabController.index == 1
-                                                ? ClipRRect(
-                                                    borderRadius: BorderRadius.circular(10),
-                                                    child: BackdropFilter(
-                                                      filter: ImageFilter.blur(
-                                                        sigmaX: 10,
-                                                        sigmaY: 10,
-                                                      ),
-                                                      child: Container(
-                                                        padding: const EdgeInsets.symmetric(
-                                                          vertical: 8,
-                                                        ),
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.black.withOpacity(0.35),
-                                                          borderRadius: BorderRadius.circular(10),
-                                                        ),
-                                                        child: Center(
-                                                          child: Text(
-                                                            Locales.current.videos,
-                                                            style: const TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: 16,
-                                                              fontWeight: FontWeight.w600,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Padding(
-                                                    padding: EdgeInsets.symmetric(vertical: 8),
-                                                    child: Center(
-                                                      child: Text(
-                                                        Locales.current.videos,
-                                                        style: TextStyle(
-                                                          color: Colors.white70,
-                                                          fontSize: 16,
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Center(
+                          child: SizedBox(
+                            height: 60,
+                            // width: 100,
+                            child: NativeSegmentedControl(
+                              items: [
+                                Locales.current.photos,
+                                Locales.current.videos,
+                              ],
+                              selectedIndex: _tabController.index,
+                              onSegmentChanged: (index) {
+                                _tabController.animateTo(index);
+                              },
+                            ),
                           ),
                         ),
                       ),

@@ -4,6 +4,165 @@ import FBSDKCoreKit
 import Photos
 import Vision
 
+/// Factory для создания нативного UISegmentedControl
+class NativeSegmentedControlFactory: NSObject, FlutterPlatformViewFactory {
+    private var messenger: FlutterBinaryMessenger
+
+    init(messenger: FlutterBinaryMessenger) {
+        self.messenger = messenger
+        super.init()
+    }
+
+    func create(
+        withFrame frame: CGRect,
+        viewIdentifier viewId: Int64,
+        arguments args: Any?
+    ) -> FlutterPlatformView {
+        return NativeSegmentedControlView(
+            frame: frame,
+            viewIdentifier: viewId,
+            arguments: args,
+            binaryMessenger: messenger
+        )
+    }
+
+    func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+        return FlutterStandardMessageCodec.sharedInstance()
+    }
+}
+
+/// Нативный UISegmentedControl для Flutter
+class NativeSegmentedControlView: NSObject, FlutterPlatformView {
+    private var _view: UIView
+    private var segmentedControl: UISegmentedControl
+    private var channel: FlutterMethodChannel
+
+    init(
+        frame: CGRect,
+        viewIdentifier viewId: Int64,
+        arguments args: Any?,
+        binaryMessenger messenger: FlutterBinaryMessenger
+    ) {
+        _view = UIView(frame: frame)
+        _view.backgroundColor = .clear
+
+        // Создаем UISegmentedControl с iOS 26 стилем
+        segmentedControl = UISegmentedControl()
+
+        // Парсим аргументы
+        var items: [String] = ["Photos", "Videos"]
+        var selectedIndex: Int = 0
+
+        if let arguments = args as? [String: Any] {
+            if let itemsArray = arguments["items"] as? [String] {
+                items = itemsArray
+            }
+            if let index = arguments["selectedIndex"] as? Int {
+                selectedIndex = index
+            }
+        }
+
+        // Настраиваем сегменты
+        for (index, item) in items.enumerated() {
+            segmentedControl.insertSegment(withTitle: item, at: index, animated: false)
+        }
+
+        segmentedControl.selectedSegmentIndex = selectedIndex
+
+        // Настраиваем внешний вид для iOS стиля (соответствует HIG)
+        if #available(iOS 13.0, *) {
+            // Используем стиль с glassmorphism эффектом как в iOS Settings
+            segmentedControl.selectedSegmentTintColor = UIColor.white.withAlphaComponent(0.25)
+
+            // Настраиваем фон - полупрозрачный для эффекта стекла
+            segmentedControl.backgroundColor = UIColor.white.withAlphaComponent(0.15)
+            segmentedControl.layer.cornerRadius = 9 // Стандартный radius для UISegmentedControl
+            segmentedControl.layer.masksToBounds = true
+
+            // Добавляем тонкую border для стеклянного эффекта
+            segmentedControl.layer.borderWidth = 1
+            segmentedControl.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
+
+            // Добавляем легкую тень для объема
+            _view.layer.shadowColor = UIColor.black.cgColor
+            _view.layer.shadowOffset = CGSize(width: 0, height: 4)
+            _view.layer.shadowRadius = 12
+            _view.layer.shadowOpacity = 0.15
+            _view.layer.masksToBounds = false
+
+            // Настраиваем текстовые атрибуты по Apple HIG
+            let normalAttributes: [NSAttributedString.Key: Any] = [
+                .foregroundColor: UIColor.white.withAlphaComponent(0.6),
+                .font: UIFont.systemFont(ofSize: 13, weight: .medium) // iOS стандартный размер
+            ]
+
+            let selectedAttributes: [NSAttributedString.Key: Any] = [
+                .foregroundColor: UIColor.white,
+                .font: UIFont.systemFont(ofSize: 13, weight: .semibold)
+            ]
+
+            segmentedControl.setTitleTextAttributes(normalAttributes, for: .normal)
+            segmentedControl.setTitleTextAttributes(selectedAttributes, for: .selected)
+        }
+
+        // Настраиваем layout
+        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
+        _view.addSubview(segmentedControl)
+
+        NSLayoutConstraint.activate([
+            segmentedControl.leadingAnchor.constraint(equalTo: _view.leadingAnchor),
+            segmentedControl.trailingAnchor.constraint(equalTo: _view.trailingAnchor),
+            segmentedControl.topAnchor.constraint(equalTo: _view.topAnchor),
+            segmentedControl.bottomAnchor.constraint(equalTo: _view.bottomAnchor)
+        ])
+
+        // Создаем канал для коммуникации с Flutter
+        channel = FlutterMethodChannel(
+            name: "native_segmented_control_\(viewId)",
+            binaryMessenger: messenger
+        )
+
+        super.init()
+
+        // Добавляем обработчик изменения сегмента
+        segmentedControl.addTarget(
+            self,
+            action: #selector(segmentChanged),
+            for: .valueChanged
+        )
+
+        // Настраиваем обработчик методов из Flutter
+        channel.setMethodCallHandler { [weak self] (call, result) in
+            guard let self = self else { return }
+
+            switch call.method {
+            case "setSelectedIndex":
+                if let index = call.arguments as? Int {
+                    self.segmentedControl.selectedSegmentIndex = index
+                    result(nil)
+                } else {
+                    result(FlutterError(code: "INVALID_ARGS", message: "Invalid index", details: nil))
+                }
+
+            case "getSelectedIndex":
+                result(self.segmentedControl.selectedSegmentIndex)
+
+            default:
+                result(FlutterMethodNotImplemented)
+            }
+        }
+    }
+
+    @objc private func segmentChanged() {
+        // Отправляем изменение во Flutter
+        channel.invokeMethod("onSegmentChanged", arguments: segmentedControl.selectedSegmentIndex)
+    }
+
+    func view() -> UIView {
+        return _view
+    }
+}
+
 @main
 @objc class AppDelegate: FlutterAppDelegate {
   private let CHANNEL_NAME = "ai_cleaner/media_metadata"
@@ -17,6 +176,20 @@ import Vision
     GeneratedPluginRegistrant.register(with: self)
 
     let controller = window?.rootViewController as! FlutterViewController
+
+    // Регистрируем нативный UISegmentedControl
+    let segmentedControlFactory = NativeSegmentedControlFactory(messenger: controller.binaryMessenger)
+    registrar(forPlugin: "NativeSegmentedControl")?.register(
+      segmentedControlFactory,
+      withId: "native_segmented_control"
+    )
+
+    // Регистрируем нативный iOS 26 TabView
+    let tabViewFactory = IOSTabViewFactory(messenger: controller.binaryMessenger)
+    registrar(forPlugin: "IOSTabView")?.register(
+      tabViewFactory,
+      withId: "ios_tab_view"
+    )
 
     // Настраиваем Method Channel для передачи метаданных медиафайлов
     let metadataChannel = FlutterMethodChannel(
@@ -499,3 +672,4 @@ enum VisionError: LocalizedError {
         }
     }
 }
+
