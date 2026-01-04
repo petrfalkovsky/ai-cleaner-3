@@ -115,14 +115,6 @@ class IOSTabViewController: UIViewController {
 
     // MARK: - Tab Switching
 
-    private func selectTab(at index: Int) {
-        guard index != selectedIndex else { return }
-
-        selectedIndex = index
-        showViewController(at: index)
-        onTabChanged?(index)
-    }
-
     private func showViewController(at index: Int) {
         // Удаляем текущий VC
         currentViewController?.willMove(toParent: nil)
@@ -177,12 +169,12 @@ class IOSTabViewController: UIViewController {
     /// Программно выбрать таб
     func selectTab(at index: Int) {
         guard index >= 0 && index <= 1 else { return }
+        guard index != selectedIndex else { return }
 
-        if selectedIndex != index {
-            selectedIndex = index
-            showViewController(at: index)
-            customTabBar.selectedIndex = index
-        }
+        selectedIndex = index
+        showViewController(at: index)
+        customTabBar.selectedIndex = index
+        onTabChanged?(index)
     }
 
     // MARK: - Scroll Handling
