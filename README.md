@@ -47,11 +47,3 @@ dart run pigeon --input lib/core/pigeon/media_api.dart --dart_out lib/generated/
 ```shell 
 dart run flutter_launcher_icons
 ```
-
-#### Запустить код можно на iOS-симуляторе для этого нужно установить Xcode 16.2 (на других версиях Xcode запуск не тестировался)
-```shell 
-flutter run
-```
-
-#### Короткое видео с основными функциями:
-<!-- [Demo](https://github.com/) -->

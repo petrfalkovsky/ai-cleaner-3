@@ -5,8 +5,7 @@ class ScanProgressIndicator extends StatelessWidget {
   final double progress;
   final String message;
 
-  const ScanProgressIndicator({Key? key, required this.progress, required this.message})
-    : super(key: key);
+  const ScanProgressIndicator({super.key, required this.progress, required this.message});
 
   @override
   Widget build(BuildContext context) {

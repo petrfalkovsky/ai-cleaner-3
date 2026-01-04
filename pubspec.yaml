@@ -1,7 +1,7 @@
 name: "ai_cleaner_2"
 description: "AI Cleaner 2 - Clean Up Your Storage"
 publish_to: "none"
-version: "1.0.0+1"
+version: "1.0.3+12"
 scripts:
   gen: "dart run build_runner watch"
   build: "flutter build ipa --obfuscate --split-debug-info=debug-info --target=lib/main_production.dart"
@@ -54,15 +54,17 @@ dependencies:
   widget_zoom: ^0.0.4
   toastification: ^2.3.0
   liquid_glass_renderer: ^0.1.1-dev.25
+  figma_squircle: ^0.6.3
 
   # Иконки и шрифты
   google_fonts: ^6.2.1
   flutter_feather_icons: ^2.0.0+1
   pixelarticons: ^0.4.0
   flutter_launcher_icons: ^0.14.4
+  flutter_svg: ^2.2.1
 
   # Мультимедиа и работа с файлами
-  photo_manager: ^3.6.4
+  photo_manager: ^3.7.1
   photo_manager_image_provider: ^2.2.0
   photo_view: ^0.15.0
   video_player: ^2.9.5
@@ -89,6 +91,11 @@ dependencies:
   flutter_markdown: ^0.7.7+1
   flutter_dotenv: ^5.2.1
   in_app_purchase: ^3.2.2
+  apphud: ^2.7.4
+  appsflyer_sdk: ^6.16.1
+  app_tracking_transparency: ^2.0.4
+  flutter_secure_storage: ^9.2.2
+  uuid: ^4.5.1
   share_plus: ^10.1.4
   in_app_review: ^2.0.10
   shared_preferences: ^2.3.4
@@ -116,7 +123,7 @@ flutter:
     - assets/
     # - assets/fonts/
     - assets/images/
-    # - assets/vectors/
+    - assets/vectors/
     # - assets/lottie/
     - assets/models/
 
@@ -126,6 +133,7 @@ flutter_intl:
   main_locale: en
 
 flutter_launcher_icons:
-  android: true
+  android: false
   ios: true
   image_path: "assets/app_icon.png"
+  remove_alpha_ios: true

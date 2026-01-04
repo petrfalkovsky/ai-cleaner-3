@@ -73,9 +73,15 @@ class SimilarMediaGroup extends StatelessWidget {
                     height: 120,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
+                      // Оптимизация производительности
+                      cacheExtent: 500.0, // Предзагрузка элементов за пределами видимой области
+                      addAutomaticKeepAlives: true,
+                      addRepaintBoundaries: true,
                       itemCount: group.files.length,
                       itemBuilder: (context, index) {
-                        return _buildMediaItem(context, group.files[index]);
+                        return RepaintBoundary(
+                          child: _buildMediaItem(context, group.files[index]),
+                        );
                       },
                     ),
                   ),

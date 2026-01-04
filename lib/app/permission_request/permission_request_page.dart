@@ -8,15 +8,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../../feature/gallery/presentation/cubit/gallery_assets/gallery_assets_cubit.dart';
-import '../../core/extensions/core_extensions.dart';
 import '../../core/router/router.gr.dart';
-import '../../core/theme/button.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:pixelarticons/pixel.dart';
 
 @RoutePage()
-class PermissionRequestPage extends StatelessWidget {
+class PermissionRequestPage extends StatefulWidget {
   const PermissionRequestPage({super.key});
+
+  @override
+  State<PermissionRequestPage> createState() => _PermissionRequestPageState();
+}
+
+class _PermissionRequestPageState extends State<PermissionRequestPage> {
+  bool _isLoading = false;
+
+  Future<void> _requestPermission() async {
+    if (_isLoading) return;
+
+    setState(() => _isLoading = true);
+
+    final startTime = DateTime.now();
+
+    try {
+      final state = await PhotoManager.requestPermissionExtend();
+
+      // Гарантируем минимум 3 секунды loading
+      final elapsed = DateTime.now().difference(startTime);
+      final remaining = const Duration(seconds: 3) - elapsed;
+      if (remaining.isNegative == false) {
+        await Future.delayed(remaining);
+      }
+
+      if (!mounted) return;
+
+      if (state.hasAccess) {
+        await context.read<GalleryAssetsCubit>().loadAssets();
+        if (!mounted) return;
+        context.router.replaceAll([HomeRoute()]);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +69,7 @@ class PermissionRequestPage extends StatelessWidget {
               children: [
                 SizedBox(height: 300),
                 GestureDetector(
-                  onTap: () async {
-                    final state = await PhotoManager.requestPermissionExtend();
-                    if (state.hasAccess) {
-                      if (!context.mounted) return;
-                      await context.read<GalleryAssetsCubit>().loadAssets();
-                      if (!context.mounted) return;
-                      context.router.replaceAll([HomeRoute()]);
-                    }
-                  },
+                  onTap: _isLoading ? null : _requestPermission,
                   child: LiquidGlass(
                     settings: LiquidGlassSettings(
                       blur: 5,
@@ -56,14 +83,19 @@ class PermissionRequestPage extends StatelessWidget {
                     child: Container(
                       height: 52,
                       alignment: Alignment.center,
-                      child:  Text(
-                        Locales.current.give_gallery_access,
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const CupertinoActivityIndicator(
+                              color: Colors.white,
+                              radius: 12,
+                            )
+                          : Text(
+                              Locales.current.continue_action,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
                 ),

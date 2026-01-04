@@ -128,7 +128,7 @@ class _ScanStatusBannerState extends State<ScanStatusBanner> with TickerProvider
         if (_showCompletionMessage) {
           // Показываем сообщение о завершении
           showBanner = true;
-          message = "Сканирование завершено!";
+          message = Locales.current.scan_completed_exclamation;
           isCompleted = true;
         } else if (state is MediaCleanerScanning) {
           showBanner = true;

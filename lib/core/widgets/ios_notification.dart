@@ -62,11 +62,7 @@ class IOSNotification {
   }
 
   /// Показать уведомление об успехе
-  static void showSuccess(
-    BuildContext context, {
-    required String title,
-    String? message,
-  }) {
+  static void showSuccess(BuildContext context, {required String title, String? message}) {
     show(
       context,
       title: title,
@@ -77,11 +73,7 @@ class IOSNotification {
   }
 
   /// Показать уведомление об ошибке
-  static void showError(
-    BuildContext context, {
-    required String title,
-    String? message,
-  }) {
+  static void showError(BuildContext context, {required String title, String? message}) {
     show(
       context,
       title: title,
@@ -92,11 +84,7 @@ class IOSNotification {
   }
 
   /// Показать информационное уведомление
-  static void showInfo(
-    BuildContext context, {
-    required String title,
-    String? message,
-  }) {
+  static void showInfo(BuildContext context, {required String title, String? message}) {
     show(
       context,
       title: title,
@@ -107,11 +95,7 @@ class IOSNotification {
   }
 }
 
-enum IOSNotificationType {
-  success,
-  error,
-  info,
-}
+enum IOSNotificationType { success, error, info }
 
 class _IOSNotificationWidget extends StatefulWidget {
   final String title;
@@ -143,10 +127,7 @@ class _IOSNotificationWidgetState extends State<_IOSNotificationWidget>
     super.initState();
 
     // Контроллер анимации с spring эффектом
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
 
     // Анимация сдвига с iOS spring эффектом
     _slideAnimation = CurvedAnimation(
@@ -178,11 +159,11 @@ class _IOSNotificationWidgetState extends State<_IOSNotificationWidget>
   Color _getBackgroundColor() {
     switch (widget.type) {
       case IOSNotificationType.success:
-        return const Color(0xFF34C759); // iOS green
+        return const Color(0xFF34C759).withOpacity(.5);
       case IOSNotificationType.error:
-        return const Color(0xFFFF3B30); // iOS red
+        return const Color(0xFFFF3B30).withOpacity(.5);
       case IOSNotificationType.info:
-        return const Color(0xFF007AFF); // iOS blue
+        return Colors.grey.withOpacity(.2);
     }
   }
 
@@ -211,10 +192,7 @@ class _IOSNotificationWidgetState extends State<_IOSNotificationWidget>
           builder: (context, child) {
             return Transform.translate(
               offset: Offset(0, -100 * (1 - _slideAnimation.value)),
-              child: Opacity(
-                opacity: _opacityAnimation.value,
-                child: child,
-              ),
+              child: Opacity(opacity: _opacityAnimation.value, child: child),
             );
           },
           child: Padding(
@@ -246,10 +224,7 @@ class _IOSNotificationWidgetState extends State<_IOSNotificationWidget>
                     child: Material(
                       color: Colors.transparent,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         child: Row(
                           children: [
                             // Иконка
@@ -260,11 +235,7 @@ class _IOSNotificationWidgetState extends State<_IOSNotificationWidget>
                                 color: Colors.white.withOpacity(0.3),
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(
-                                _getIcon(),
-                                color: Colors.white,
-                                size: 18,
-                              ),
+                              child: Icon(_getIcon(), color: Colors.white, size: 18),
                             ),
                             const SizedBox(width: 12),
 

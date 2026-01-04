@@ -4,6 +4,7 @@ import '../../../core/widgets/common/context_menu/context_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
+// Deprecated
 @RoutePage()
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key, this.onLogoutCallback});

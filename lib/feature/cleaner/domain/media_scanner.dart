@@ -522,4 +522,124 @@ class MediaScanner {
     debugPrint('ОПТИМИЗАЦИЯ: Найдено ${result.length} групп дубликатов видео (всего ${duplicateGroups.values.fold(0, (sum, group) => sum + group.length)} файлов)');
     return result;
   }
+
+  // Поиск Live Photos - используя iOS метаданные
+  static List<MediaFile> findLivePhotos(List<MediaFile> files) {
+    final livePhotos = <MediaFile>[];
+
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск Live Photos среди ${files.length} файлов');
+
+    for (final file in files) {
+      if (!file.isImage) continue;
+
+      // iOS помечает Live Photos через PHAssetMediaSubtype.photoLive (бит 3 = 1 << 3 = 8)
+      // В photo_manager это доступно через entity.subtype
+      final isLivePhoto = (file.entity.subtype & 8) != 0;
+
+      if (isLivePhoto) {
+        livePhotos.add(file.copyWith(category: 'livePhotos'));
+        debugPrint('Найдено Live Photo: ${file.entity.title}');
+      }
+    }
+
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${livePhotos.length} Live Photos');
+    return livePhotos;
+  }
+
+  // Поиск больших видео (>180MB)
+  static Future<List<MediaFile>> findLargeVideos(List<MediaFile> files) async {
+    final largeVideos = <MediaFile>[];
+    const int largeSizeThreshold = 180 * 1024 * 1024; // 180 MB в байтах
+
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск больших видео (>180MB) среди ${files.where((f) => f.isVideo).length} видео');
+
+    for (final file in files) {
+      if (!file.isVideo) continue;
+
+      try {
+        // Получаем файл для определения размера
+        final assetFile = await file.entity.file;
+        if (assetFile == null) continue;
+
+        final fileSize = await assetFile.length();
+
+        // Проверяем размер файла
+        if (fileSize >= largeSizeThreshold) {
+          largeVideos.add(file.copyWith(category: 'largeVideos'));
+          final sizeMB = (fileSize / (1024 * 1024)).toStringAsFixed(1);
+          debugPrint('Найдено большое видео: ${file.entity.title} (${sizeMB}MB)');
+        }
+      } catch (e) {
+        debugPrint('Ошибка при проверке размера видео ${file.entity.id}: $e');
+      }
+    }
+
+    debugPrint('ОПТИМИЗАЦИЯ: Найдено ${largeVideos.length} больших видео');
+    return largeVideos;
+  }
+
+  // Поиск медиа из приложений (WhatsApp, Instagram, Telegram и т.д.)
+  static Map<String, List<MediaFile>> findAppSpecificMedia(List<MediaFile> files) {
+    final Map<String, List<MediaFile>> appGroups = {};
+
+    debugPrint('ОПТИМИЗАЦИЯ: Поиск медиа из приложений среди ${files.length} файлов');
+
+    // Определяем паттерны для каждого приложения
+    final appPatterns = {
+      'WhatsApp': [
+        'whatsapp',
+        'wa_',
+        '.wa.',
+      ],
+      'Instagram': [
+        'instagram',
+        'insta_',
+        '.insta.',
+      ],
+      'Telegram': [
+        'telegram',
+        'tg_',
+        '.tg.',
+      ],
+      'Messenger': [
+        'messenger',
+        'fb_messenger',
+        'fbm_',
+      ],
+      'Snapchat': [
+        'snapchat',
+        'snap_',
+        '.snap.',
+      ],
+    };
+
+    for (final file in files) {
+      final title = file.entity.title?.toLowerCase() ?? '';
+
+      // Проверяем каждое приложение
+      for (final entry in appPatterns.entries) {
+        final appName = entry.key;
+        final patterns = entry.value;
+
+        // Проверяем, соответствует ли имя файла одному из паттернов
+        final matches = patterns.any((pattern) => title.contains(pattern));
+
+        if (matches) {
+          if (!appGroups.containsKey(appName)) {
+            appGroups[appName] = [];
+          }
+          appGroups[appName]!.add(file.copyWith(category: 'app_$appName'));
+          debugPrint('Найден файл из $appName: ${file.entity.title}');
+          break; // Выходим из цикла, чтобы не добавлять файл в несколько групп
+        }
+      }
+    }
+
+    // Выводим статистику по каждому приложению
+    appGroups.forEach((appName, files) {
+      debugPrint('ОПТИМИЗАЦИЯ: Найдено ${files.length} файлов из $appName');
+    });
+
+    return appGroups;
+  }
 }

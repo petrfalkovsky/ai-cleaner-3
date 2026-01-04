@@ -8,7 +8,7 @@ import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
 
 class SelectedFilesCounter extends StatefulWidget {
-  const SelectedFilesCounter({Key? key}) : super(key: key);
+  const SelectedFilesCounter({super.key});
 
   @override
   State<SelectedFilesCounter> createState() => _SelectedFilesCounterState();

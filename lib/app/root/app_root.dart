@@ -9,7 +9,7 @@ import '../../core/limiters/throttler.dart';
 
 @RoutePage()
 class AppRootPage extends StatefulWidget {
-  AppRootPage({super.key});
+  const AppRootPage({super.key});
   
   @override
   State<AppRootPage> createState() => _AppRootPageState();

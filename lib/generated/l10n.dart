@@ -990,6 +990,16 @@ class Locales {
     );
   }
 
+  /// `Products are not loaded yet. Please try again in a moment.`
+  String get products_not_loaded {
+    return Intl.message(
+      'Products are not loaded yet. Please try again in a moment.',
+      name: 'products_not_loaded',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `We'd love to hear from you!`
   String get we_love_to_hear_from_you {
     return Intl.message(
@@ -1130,11 +1140,11 @@ class Locales {
     );
   }
 
-  /// `Unlock Premium`
-  String get unlock_premium {
+  /// `iPhone Storage Full`
+  String get iphone_storage_full {
     return Intl.message(
-      'Unlock Premium',
-      name: 'unlock_premium',
+      'iPhone Storage Full',
+      name: 'iphone_storage_full',
       desc: '',
       args: [],
     );
@@ -1225,6 +1235,366 @@ class Locales {
     return Intl.message(
       'freed',
       name: 'freed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `of`
+  String get of_1 {
+    return Intl.message(
+      'of',
+      name: 'of_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `free`
+  String get free {
+    return Intl.message(
+      'free',
+      name: 'free',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `used`
+  String get used {
+    return Intl.message(
+      'used',
+      name: 'used',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Live Photos`
+  String get live_photos {
+    return Intl.message(
+      'Live Photos',
+      name: 'live_photos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Photos with Live Photo video effect`
+  String get live_photos_description {
+    return Intl.message(
+      'Photos with Live Photo video effect',
+      name: 'live_photos_description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Large Videos`
+  String get large_videos {
+    return Intl.message(
+      'Large Videos',
+      name: 'large_videos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Videos larger than 180 MB`
+  String get large_videos_description {
+    return Intl.message(
+      'Videos larger than 180 MB',
+      name: 'large_videos_description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `WhatsApp Media`
+  String get whatsapp_media {
+    return Intl.message(
+      'WhatsApp Media',
+      name: 'whatsapp_media',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Instagram Media`
+  String get instagram_media {
+    return Intl.message(
+      'Instagram Media',
+      name: 'instagram_media',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Telegram Media`
+  String get telegram_media {
+    return Intl.message(
+      'Telegram Media',
+      name: 'telegram_media',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Messenger Media`
+  String get messenger_media {
+    return Intl.message(
+      'Messenger Media',
+      name: 'messenger_media',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Snapchat Media`
+  String get snapchat_media {
+    return Intl.message(
+      'Snapchat Media',
+      name: 'snapchat_media',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `From Apps`
+  String get app_media {
+    return Intl.message(
+      'From Apps',
+      name: 'app_media',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Purchased`
+  String get purchased {
+    return Intl.message(
+      'Purchased',
+      name: 'purchased',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scanning media files...`
+  String get scanning_media_files {
+    return Intl.message(
+      'Scanning media files...',
+      name: 'scanning_media_files',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scanning already in progress...`
+  String get scanning_already_in_progress {
+    return Intl.message(
+      'Scanning already in progress...',
+      name: 'scanning_already_in_progress',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan completed`
+  String get scan_completed {
+    return Intl.message(
+      'Scan completed',
+      name: 'scan_completed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pro`
+  String get pro {
+    return Intl.message(
+      'Pro',
+      name: 'pro',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan completed!`
+  String get scan_completed_exclamation {
+    return Intl.message(
+      'Scan completed!',
+      name: 'scan_completed_exclamation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Searching for Live Photos...`
+  String get searching_live_photos {
+    return Intl.message(
+      'Searching for Live Photos...',
+      name: 'searching_live_photos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Searching for large videos (>180MB)...`
+  String get searching_large_videos {
+    return Intl.message(
+      'Searching for large videos (>180MB)...',
+      name: 'searching_large_videos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Searching for app media...`
+  String get searching_app_media {
+    return Intl.message(
+      'Searching for app media...',
+      name: 'searching_app_media',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Files from apps`
+  String get files_from_apps {
+    return Intl.message(
+      'Files from apps',
+      name: 'files_from_apps',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Weekly`
+  String get weekly {
+    return Intl.message(
+      'Weekly',
+      name: 'weekly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Yearly`
+  String get yearly {
+    return Intl.message(
+      'Yearly',
+      name: 'yearly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Lifetime`
+  String get lifetime {
+    return Intl.message(
+      'Lifetime',
+      name: 'lifetime',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `MOST POPULAR`
+  String get most_popular {
+    return Intl.message(
+      'MOST POPULAR',
+      name: 'most_popular',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `BEST VALUE`
+  String get best_value {
+    return Intl.message(
+      'BEST VALUE',
+      name: 'best_value',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Continue`
+  String get continue_action {
+    return Intl.message(
+      'Continue',
+      name: 'continue_action',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `/week`
+  String get per_week {
+    return Intl.message(
+      '/week',
+      name: 'per_week',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `/year`
+  String get per_year {
+    return Intl.message(
+      '/year',
+      name: 'per_year',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `one-time`
+  String get one_time_purchase {
+    return Intl.message(
+      'one-time',
+      name: 'one_time_purchase',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Billed weekly`
+  String get billed_weekly {
+    return Intl.message(
+      'Billed weekly',
+      name: 'billed_weekly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save 35% vs weekly`
+  String get save_vs_weekly {
+    return Intl.message(
+      'Save 35% vs weekly',
+      name: 'save_vs_weekly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlock forever`
+  String get unlock_forever {
+    return Intl.message(
+      'Unlock forever',
+      name: 'unlock_forever',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Selected`
+  String get selected {
+    return Intl.message(
+      'Selected',
+      name: 'selected',
       desc: '',
       args: [],
     );

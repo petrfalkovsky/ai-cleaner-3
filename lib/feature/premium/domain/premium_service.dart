@@ -1,26 +1,31 @@
 import 'dart:async';
+import 'package:apphud/models/apphud_models/apphud_product.dart';
 import 'package:flutter/foundation.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'apphud_service.dart';
 
 /// Сервис для управления премиум-подписками
+///
+/// Это тонкая обертка над ApphudService для обратной совместимости
+/// Использует Apphud SDK для управления подписками и аналитики
 class PremiumService {
   static final PremiumService _instance = PremiumService._internal();
   factory PremiumService() => _instance;
   PremiumService._internal();
 
-  final InAppPurchase _inAppPurchase = InAppPurchase.instance;
-  StreamSubscription<List<PurchaseDetails>>? _subscription;
+  final ApphudService _apphudService = ApphudService();
+  StreamSubscription<bool>? _apphudSubscription;
 
   // Состояние премиум-подписки
-  bool _isPremium = false;
-  bool get isPremium => _isPremium;
+  bool get isPremium => _apphudService.isPremium;
 
-  // Product IDs
-  static const String trialProductId = 'ai_cleaner_premium_trial';
+  // Product IDs - используем Apphud IDs
+  static const String weekProductId = ApphudService.weekProductId;
+  static const String yearProductId = ApphudService.yearProductId;
+  static const String lifetimeProductId = ApphudService.lifetimeProductId;
 
   // Список доступных продуктов
-  List<ProductDetails> _products = [];
-  List<ProductDetails> get products => _products;
+  List<ApphudProduct> get products => _apphudService.products;
 
   // Stream для уведомлений об изменении статуса
   final _premiumStatusController = StreamController<bool>.broadcast();
@@ -30,107 +35,45 @@ class PremiumService {
   Future<void> initialize() async {
     debugPrint('🔐 PremiumService: Инициализация...');
 
-    // Проверяем доступность IAP
-    final bool available = await _inAppPurchase.isAvailable();
-    if (!available) {
-      debugPrint('🔐 PremiumService: In-App Purchase недоступен');
-      return;
-    }
+    try {
+      // Получаем API ключ из .env файла
+      final apphudApiKey = dotenv.env['APPHUD_API_KEY'];
 
-    // Подписываемся на обновления покупок
-    _subscription = _inAppPurchase.purchaseStream.listen(
-      _onPurchaseUpdate,
-      onDone: _updateStreamOnDone,
-      onError: _updateStreamOnError,
-    );
-
-    // Загружаем список продуктов
-    await _loadProducts();
-
-    // Восстанавливаем покупки при старте
-    await restorePurchases();
-
-    debugPrint('🔐 PremiumService: Инициализация завершена');
-  }
-
-  /// Загрузка списка продуктов
-  Future<void> _loadProducts() async {
-    const Set<String> productIds = {trialProductId};
-
-    final ProductDetailsResponse response =
-        await _inAppPurchase.queryProductDetails(productIds);
-
-    if (response.error != null) {
-      debugPrint('🔐 PremiumService: Ошибка загрузки продуктов: ${response.error}');
-      return;
-    }
-
-    if (response.productDetails.isEmpty) {
-      debugPrint('🔐 PremiumService: Продукты не найдены');
-      debugPrint('🔐 PremiumService: Для тестирования используйте StoreKit Configuration');
-      return;
-    }
-
-    _products = response.productDetails;
-    debugPrint('🔐 PremiumService: Загружено ${_products.length} продуктов');
-    for (var product in _products) {
-      debugPrint('   - ${product.id}: ${product.title} (${product.price})');
-    }
-  }
-
-  /// Обработка обновлений покупок
-  void _onPurchaseUpdate(List<PurchaseDetails> purchases) async {
-    for (final purchase in purchases) {
-      debugPrint('🔐 PremiumService: Обновление покупки: ${purchase.productID} - ${purchase.status}');
-
-      if (purchase.status == PurchaseStatus.pending) {
-        // Покупка в процессе
-        debugPrint('🔐 PremiumService: Покупка в процессе...');
-      } else if (purchase.status == PurchaseStatus.error) {
-        // Ошибка покупки
-        debugPrint('🔐 PremiumService: Ошибка покупки: ${purchase.error}');
-      } else if (purchase.status == PurchaseStatus.purchased ||
-          purchase.status == PurchaseStatus.restored) {
-        // Покупка успешна
-        debugPrint('🔐 PremiumService: Покупка успешна! Активируем Premium');
-        await _activatePremium(purchase);
+      if (apphudApiKey == null || apphudApiKey.isEmpty) {
+        debugPrint('🔐 PremiumService: ⚠️ APPHUD_API_KEY не найден в .env');
+        debugPrint('🔐 PremiumService: ⚠️ Добавьте APPHUD_API_KEY=ваш_ключ в файл .env');
+        throw Exception('APPHUD_API_KEY не найден в .env');
       }
 
-      // Завершаем покупку
-      if (purchase.pendingCompletePurchase) {
-        await _inAppPurchase.completePurchase(purchase);
-      }
-    }
-  }
+      // Инициализируем Apphud
+      debugPrint('🔐 PremiumService: Инициализация Apphud SDK...');
+      await _apphudService.initialize(apphudApiKey);
 
-  /// Активация премиум-статуса
-  Future<void> _activatePremium(PurchaseDetails purchase) async {
-    // TODO: Здесь должна быть верификация покупки на вашем сервере
-    // Для тестирования просто активируем премиум
-    _isPremium = true;
-    _premiumStatusController.add(true);
-    debugPrint('🔐 PremiumService: ✅ Premium активирован!');
+      // Подписываемся на изменения статуса от Apphud
+      _apphudSubscription = _apphudService.premiumStatusStream.listen((isPremium) {
+        _premiumStatusController.add(isPremium);
+      });
+
+      // Пробрасываем начальное состояние
+      if (_apphudService.isPremium) {
+        _premiumStatusController.add(true);
+      }
+
+      debugPrint('🔐 PremiumService: ✅ Инициализация завершена');
+    } catch (e) {
+      debugPrint('🔐 PremiumService: ❌ Ошибка инициализации: $e');
+      rethrow;
+    }
   }
 
   /// Покупка подписки
-  Future<bool> purchaseSubscription() async {
-    if (_products.isEmpty) {
-      debugPrint('🔐 PremiumService: Нет доступных продуктов');
-      return false;
-    }
-
-    final ProductDetails product = _products.first;
-    final PurchaseParam purchaseParam = PurchaseParam(
-      productDetails: product,
-    );
-
+  ///
+  /// [productId] - ID продукта (weekProductId, yearProductId, lifetimeProductId)
+  Future<bool> purchaseSubscription([String? productId]) async {
     try {
-      debugPrint('🔐 PremiumService: Начинаем покупку: ${product.id}');
-      final bool success = await _inAppPurchase.buyNonConsumable(
-        purchaseParam: purchaseParam,
-      );
-      debugPrint('🔐 PremiumService: buyNonConsumable вернул: $success');
-      return success;
+      final targetProductId = productId ?? weekProductId;
+      debugPrint('🔐 PremiumService: Покупка через Apphud: $targetProductId');
+      return await _apphudService.purchase(targetProductId);
     } catch (e) {
       debugPrint('🔐 PremiumService: Ошибка при покупке: $e');
       return false;
@@ -138,29 +81,27 @@ class PremiumService {
   }
 
   /// Восстановление покупок
-  Future<void> restorePurchases() async {
+  Future<bool> restorePurchases() async {
     debugPrint('🔐 PremiumService: Восстановление покупок...');
+
     try {
-      await _inAppPurchase.restorePurchases();
-      debugPrint('🔐 PremiumService: Запрос на восстановление отправлен');
+      return await _apphudService.restorePurchases();
     } catch (e) {
       debugPrint('🔐 PremiumService: Ошибка восстановления: $e');
+      return false;
     }
   }
 
-  void _updateStreamOnDone() {
-    debugPrint('🔐 PremiumService: Purchase stream завершен');
-    _subscription?.cancel();
-  }
-
-  void _updateStreamOnError(dynamic error) {
-    debugPrint('🔐 PremiumService: Ошибка в purchase stream: $error');
+  /// Получить список доступных продуктов Apphud
+  List<String> get availableProductIds {
+    return products.map((p) => p.productId).toList();
   }
 
   /// Освобождение ресурсов
   void dispose() {
-    _subscription?.cancel();
+    _apphudSubscription?.cancel();
     _premiumStatusController.close();
+    _apphudService.dispose();
   }
 
   // ===== ДЛЯ ТЕСТИРОВАНИЯ =====
@@ -168,14 +109,12 @@ class PremiumService {
   /// Активировать премиум вручную (только для тестирования!)
   void enablePremiumForTesting() {
     debugPrint('🔐 PremiumService: ⚠️ ТЕСТОВЫЙ РЕЖИМ - Premium активирован вручную');
-    _isPremium = true;
-    _premiumStatusController.add(true);
+    _apphudService.setTestPremiumStatus(true);
   }
 
   /// Деактивировать премиум вручную (только для тестирования!)
   void disablePremiumForTesting() {
     debugPrint('🔐 PremiumService: ⚠️ ТЕСТОВЫЙ РЕЖИМ - Premium деактивирован вручную');
-    _isPremium = false;
-    _premiumStatusController.add(false);
+    _apphudService.setTestPremiumStatus(false);
   }
 }

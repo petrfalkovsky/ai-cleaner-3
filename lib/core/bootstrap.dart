@@ -13,6 +13,7 @@ import 'dotenv/dotenv.dart';
 import 'flavors.dart';
 import 'share/installed_apps_repository.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'services/rating_service.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -54,6 +55,13 @@ class Bootstrap {
       debugPrint('Error initializing MediaScanner: $e');
     }
 
+    // Увеличиваем счетчик запусков для умного показа рейтинга
+    try {
+      await RatingService().incrementAppLaunch();
+    } catch (e) {
+      debugPrint('Error incrementing app launch: $e');
+    }
+
     _initialized = true;
     _completer.complete();
   }
@@ -77,7 +85,7 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder, {required Flavor fla
     WidgetsFlutterBinding.ensureInitialized();
     await setupServiceLocator();
     sl<InstalledAppsRepository>().loadInstalledApps();
-    DotEnv.instance.load();
+    await DotEnv.instance.load(); // ✅ Добавлен await для загрузки .env
     if (kDebugMode) {
       SystemChannels.textInput.invokeMethod('TextInput.hide');
     }

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
+import 'package:ai_cleaner_2/core/services/rating_service.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/domain/media_scanner.dart';
 import 'package:ai_cleaner_2/generated/l10n.dart';
@@ -51,23 +53,53 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
       final List<AssetEntity> assets = await paths.first.getAssetListPaged(page: 0, size: 10000);
       final List<MediaFile> mediaFiles = assets.map((asset) => MediaFile(entity: asset)).toList();
 
-      emit(
-        MediaCleanerLoaded(
-          allFiles: mediaFiles,
-          photoFiles: mediaFiles.where((f) => f.isImage).toList(),
-          videoFiles: mediaFiles.where((f) => f.isVideo).toList(),
-        ),
-      );
-
       // Проверяем, было ли завершено первое сканирование
       final hasCompletedScan = await _hasCompletedFirstScan();
 
-      // Если сканирование уже было выполнено ранее, автоматически запускаем его снова
-      // чтобы пользователь сразу увидел категории вместо приветственного экрана
       if (hasCompletedScan) {
         debugPrint('PERSISTENCE: Отображаем экран с ранее найденными группами');
-        // debugPrint('PERSISTENCE: Автоматически запускаем сканирование, так как оно уже выполнялось ранее');
-        // add(ScanForProblematicFiles());
+
+        // Загружаем сохраненные результаты сканирования
+        final savedResults = await _loadScanResults(mediaFiles);
+
+        if (savedResults != null) {
+          debugPrint('PERSISTENCE: Восстановлено ${savedResults.similarGroups.length} групп похожих, '
+              '${savedResults.screenshots.length} скриншотов, '
+              '${savedResults.blurry.length} размытых, '
+              '${savedResults.livePhotos.length} Live Photos');
+          emit(savedResults);
+        } else {
+          // Если не удалось загрузить, показываем пустое состояние
+          final lastScanTime = await _getLastScanTime();
+          emit(
+            MediaCleanerReady(
+              allFiles: mediaFiles,
+              photoFiles: mediaFiles.where((f) => f.isImage).toList(),
+              videoFiles: mediaFiles.where((f) => f.isVideo).toList(),
+              similarGroups: const [],
+              screenshots: const [],
+              blurry: const [],
+              photoDuplicateGroups: const [],
+              videoDuplicateGroups: const [],
+              screenRecordings: const [],
+              shortVideos: const [],
+              livePhotos: const [],
+              largeVideos: const [],
+              appMediaGroups: const {},
+              lastScanTime: lastScanTime,
+              isScanningInBackground: false,
+            ),
+          );
+        }
+      } else {
+        // Если это первое сканирование, показываем обычное состояние Loaded
+        emit(
+          MediaCleanerLoaded(
+            allFiles: mediaFiles,
+            photoFiles: mediaFiles.where((f) => f.isImage).toList(),
+            videoFiles: mediaFiles.where((f) => f.isVideo).toList(),
+          ),
+        );
       }
     } catch (e) {
       emit(MediaCleanerError('${Locales.current.files_load_error} $e'));
@@ -535,16 +567,87 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
         return;
       }
 
+      // 6. Находим Live Photos
+      await updateStatus(
+        Locales.current.searching_live_photos,
+        0.85,
+        currentBatch: processedFiles,
+      );
+
+      final livePhotos = MediaScanner.findLivePhotos(currentState.photoFiles);
+      if (livePhotos.isNotEmpty) {
+        currentState = currentState.copyWith(livePhotos: livePhotos);
+        processedFiles += livePhotos.length;
+        await updateStatus(
+          '${Locales.current.found} ${livePhotos.length} Live Photos',
+          0.88,
+          currentBatch: processedFiles,
+        );
+      }
+
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return;
+      }
+
+      // 7. Находим большие видео
+      await updateStatus(
+        Locales.current.searching_large_videos,
+        0.90,
+        currentBatch: processedFiles,
+      );
+
+      final largeVideos = await MediaScanner.findLargeVideos(currentState.videoFiles);
+      if (largeVideos.isNotEmpty) {
+        currentState = currentState.copyWith(largeVideos: largeVideos);
+        processedFiles += largeVideos.length;
+        await updateStatus(
+          '${Locales.current.found} ${largeVideos.length} ${Locales.current.large_videos.toLowerCase()}',
+          0.93,
+          currentBatch: processedFiles,
+        );
+      }
+
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return;
+      }
+
+      // 8. Находим медиа из приложений
+      await updateStatus(
+        Locales.current.searching_app_media,
+        0.95,
+        currentBatch: processedFiles,
+      );
+
+      final appMediaGroups = MediaScanner.findAppSpecificMedia(currentState.allFiles);
+      if (appMediaGroups.isNotEmpty) {
+        currentState = currentState.copyWith(appMediaGroups: appMediaGroups);
+        final totalAppMedia = appMediaGroups.values.fold<int>(0, (sum, files) => sum + files.length);
+        processedFiles += totalAppMedia;
+        await updateStatus(
+          '${Locales.current.found} $totalAppMedia ${Locales.current.files_from_apps.toLowerCase()}',
+          0.98,
+          currentBatch: processedFiles,
+        );
+      }
+
+      if (isPaused) {
+        debugPrint('СКАНИРОВАНИЕ: Приостановлено пользователем');
+        return;
+      }
+
       // Завершающая стадия - финальное обновление
-      await updateStatus('Сканирование завершено', 1.0, currentBatch: processedFiles);
+      await updateStatus(Locales.current.scan_completed, 1.0, currentBatch: processedFiles);
 
       // Завершаем сканирование
       if (!emit.isDone) {
         emit(currentState.copyWith(isScanningInBackground: false, lastScanTime: DateTime.now()));
         debugPrint('СКАНИРОВАНИЕ: Завершено успешно! Обработано $processedFiles файлов');
 
-        // Сохраняем флаг о завершении первого сканирования
+        // Сохраняем флаг о завершении первого сканирования и результаты
         await _saveFirstScanCompleted();
+        await _saveScanResults(currentState);
       } else {
         debugPrint(
           'СКАНИРОВАНИЕ: Обработчик событий завершен при попытке отправить финальный статус',
@@ -662,6 +765,9 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
           case PhotoCategory.blurry:
             categoryFiles = currentState.blurry;
             break;
+          case PhotoCategory.livePhotos:
+            categoryFiles = currentState.livePhotos;
+            break;
         }
       } catch (e) {
         // Неизвестная категория
@@ -680,6 +786,9 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
             break;
           case VideoCategory.shortVideos:
             categoryFiles = currentState.shortVideos;
+            break;
+          case VideoCategory.largeVideos:
+            categoryFiles = currentState.largeVideos;
             break;
         }
       } catch (e) {
@@ -775,8 +884,32 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
     final selectedFileIds = currentState.selectedFiles.map((f) => f.entity.id).toList();
 
     try {
+      // Подсчитываем примерный размер файлов перед удалением для RatingService
+      // Используем приблизительный расчет: ширина * высота * 3 (RGB) для фото
+      int totalSizeBytes = 0;
+      for (final file in currentState.selectedFiles) {
+        // Приблизительный размер: для фото ~ width * height * 3, для видео ~ 10MB
+        if (file.isImage) {
+          totalSizeBytes += file.entity.width * file.entity.height * 3;
+        } else if (file.isVideo) {
+          // Примерный размер видео: duration (сек) * 1.5MB
+          final duration = file.entity.duration;
+          totalSizeBytes += ((duration * 1.5 * 1024 * 1024).toInt());
+        }
+      }
+
       // Удаляем выбранные файлы
       await PhotoManager.editor.deleteWithIds(selectedFileIds);
+
+      // Записываем статистику удаления для умного показа рейтинга
+      try {
+        await RatingService().recordDeletedFiles(
+          count: selectedFileIds.length,
+          freedSpaceBytes: totalSizeBytes,
+        );
+      } catch (e) {
+        debugPrint('[MediaCleanerBloc] Error recording deletion stats: $e');
+      }
 
       // Удаляем файлы из всех списков
       final updatedFiles = currentState.allFiles
@@ -1048,6 +1181,171 @@ class MediaCleanerBloc extends Bloc<MediaCleanerEvent, MediaCleanerState> {
     } catch (e) {
       debugPrint('PERSISTENCE: Ошибка при проверке флага сканирования: $e');
       return false;
+    }
+  }
+
+  Future<DateTime?> _getLastScanTime() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final timeString = prefs.getString('last_scan_time');
+      if (timeString != null) {
+        return DateTime.parse(timeString);
+      }
+      return null;
+    } catch (e) {
+      debugPrint('PERSISTENCE: Ошибка при получении времени последнего сканирования: $e');
+      return null;
+    }
+  }
+
+  // Сохранение результатов сканирования
+  Future<void> _saveScanResults(MediaCleanerReady state) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // Создаем JSON структуру с ID файлов
+      final scanResults = {
+        'lastScanTime': state.lastScanTime?.toIso8601String(),
+        'screenshots': state.screenshots.map((f) => f.entity.id).toList(),
+        'blurry': state.blurry.map((f) => f.entity.id).toList(),
+        'livePhotos': state.livePhotos.map((f) => f.entity.id).toList(),
+        'shortVideos': state.shortVideos.map((f) => f.entity.id).toList(),
+        'screenRecordings': state.screenRecordings.map((f) => f.entity.id).toList(),
+        'largeVideos': state.largeVideos.map((f) => f.entity.id).toList(),
+        'similarGroups': state.similarGroups
+            .map((group) => {
+                  'id': group.id,
+                  'name': group.name,
+                  'fileIds': group.files.map((f) => f.entity.id).toList(),
+                })
+            .toList(),
+        'photoDuplicateGroups': state.photoDuplicateGroups
+            .map((group) => {
+                  'id': group.id,
+                  'name': group.name,
+                  'fileIds': group.files.map((f) => f.entity.id).toList(),
+                })
+            .toList(),
+        'videoDuplicateGroups': state.videoDuplicateGroups
+            .map((group) => {
+                  'id': group.id,
+                  'name': group.name,
+                  'fileIds': group.files.map((f) => f.entity.id).toList(),
+                })
+            .toList(),
+        'appMediaGroups': state.appMediaGroups.map(
+          (key, value) => MapEntry(key, value.map((f) => f.entity.id).toList()),
+        ),
+      };
+
+      final jsonString = jsonEncode(scanResults);
+      await prefs.setString('scan_results', jsonString);
+
+      debugPrint('PERSISTENCE: Результаты сканирования сохранены (${jsonString.length} байт)');
+    } catch (e) {
+      debugPrint('PERSISTENCE: Ошибка при сохранении результатов сканирования: $e');
+    }
+  }
+
+  // Загрузка результатов сканирования
+  Future<MediaCleanerReady?> _loadScanResults(List<MediaFile> allMediaFiles) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonString = prefs.getString('scan_results');
+
+      if (jsonString == null) {
+        debugPrint('PERSISTENCE: Нет сохраненных результатов');
+        return null;
+      }
+
+      final scanResults = jsonDecode(jsonString) as Map<String, dynamic>;
+
+      // Создаем Map для быстрого поиска MediaFile по ID
+      final mediaFilesMap = <String, MediaFile>{};
+      for (final file in allMediaFiles) {
+        mediaFilesMap[file.entity.id] = file;
+      }
+
+      // Вспомогательная функция для восстановления файлов по ID
+      List<MediaFile> restoreFiles(List<dynamic> ids) {
+        return ids
+            .map((id) => mediaFilesMap[id as String])
+            .where((file) => file != null)
+            .cast<MediaFile>()
+            .toList();
+      }
+
+      // Вспомогательная функция для восстановления групп
+      List<MediaGroup> restoreGroups(List<dynamic> groups) {
+        return groups.map((group) {
+          final groupData = group as Map<String, dynamic>;
+          final fileIds = groupData['fileIds'] as List<dynamic>;
+          final files = restoreFiles(fileIds);
+
+          return MediaGroup(
+            id: groupData['id'] as String,
+            name: groupData['name'] as String,
+            files: files,
+          );
+        }).where((group) => group.files.isNotEmpty).toList();
+      }
+
+      // Восстанавливаем категории
+      final screenshots = restoreFiles(scanResults['screenshots'] as List<dynamic>? ?? []);
+      final blurry = restoreFiles(scanResults['blurry'] as List<dynamic>? ?? []);
+      final livePhotos = restoreFiles(scanResults['livePhotos'] as List<dynamic>? ?? []);
+      final shortVideos = restoreFiles(scanResults['shortVideos'] as List<dynamic>? ?? []);
+      final screenRecordings = restoreFiles(scanResults['screenRecordings'] as List<dynamic>? ?? []);
+      final largeVideos = restoreFiles(scanResults['largeVideos'] as List<dynamic>? ?? []);
+
+      // Восстанавливаем группы
+      final similarGroups = restoreGroups(scanResults['similarGroups'] as List<dynamic>? ?? []);
+      final photoDuplicateGroups = restoreGroups(scanResults['photoDuplicateGroups'] as List<dynamic>? ?? []);
+      final videoDuplicateGroups = restoreGroups(scanResults['videoDuplicateGroups'] as List<dynamic>? ?? []);
+
+      // Восстанавливаем группы приложений
+      final appMediaGroups = <String, List<MediaFile>>{};
+      final appGroupsData = scanResults['appMediaGroups'] as Map<String, dynamic>? ?? {};
+      for (final entry in appGroupsData.entries) {
+        final files = restoreFiles(entry.value as List<dynamic>);
+        if (files.isNotEmpty) {
+          appMediaGroups[entry.key] = files;
+        }
+      }
+
+      // Восстанавливаем время последнего сканирования
+      DateTime? lastScanTime;
+      final lastScanTimeStr = scanResults['lastScanTime'] as String?;
+      if (lastScanTimeStr != null) {
+        lastScanTime = DateTime.parse(lastScanTimeStr);
+      }
+
+      debugPrint('PERSISTENCE: Загружено результатов - '
+          'скриншотов: ${screenshots.length}, '
+          'размытых: ${blurry.length}, '
+          'Live Photos: ${livePhotos.length}, '
+          'групп похожих: ${similarGroups.length}');
+
+      return MediaCleanerReady(
+        allFiles: allMediaFiles,
+        photoFiles: allMediaFiles.where((f) => f.isImage).toList(),
+        videoFiles: allMediaFiles.where((f) => f.isVideo).toList(),
+        similarGroups: similarGroups,
+        screenshots: screenshots,
+        blurry: blurry,
+        photoDuplicateGroups: photoDuplicateGroups,
+        videoDuplicateGroups: videoDuplicateGroups,
+        shortVideos: shortVideos,
+        screenRecordings: screenRecordings,
+        livePhotos: livePhotos,
+        largeVideos: largeVideos,
+        appMediaGroups: appMediaGroups,
+        lastScanTime: lastScanTime,
+        isScanningInBackground: false,
+      );
+    } catch (e) {
+      debugPrint('PERSISTENCE: Ошибка при загрузке результатов сканирования: $e');
+      return null;
     }
   }
 }

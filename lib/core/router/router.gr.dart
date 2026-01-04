@@ -42,7 +42,7 @@ import 'package:ai_cleaner_2/feature/gallery/presentation/pages/image_full_scree
     as _i13;
 import 'package:ai_cleaner_2/feature/gallery/presentation/pages/video_full_screen.dart'
     as _i23;
-import 'package:ai_cleaner_2/feature/premium/presentation/pages/paywall_screen.dart'
+import 'package:ai_cleaner_2/feature/premium/presentation/pages/paywall_three_plans_screen.dart'
     as _i16;
 import 'package:ai_cleaner_2/feature/settings/presentation/pages/feedback_screen.dart'
     as _i10;
@@ -169,36 +169,18 @@ class AlertDialogRouteArgs {
 
 /// generated route for
 /// [_i3.AppRootPage]
-class AppRootRoute extends _i24.PageRouteInfo<AppRootRouteArgs> {
-  AppRootRoute({_i25.Key? key, List<_i24.PageRouteInfo>? children})
-    : super(
-        AppRootRoute.name,
-        args: AppRootRouteArgs(key: key),
-        initialChildren: children,
-      );
+class AppRootRoute extends _i24.PageRouteInfo<void> {
+  const AppRootRoute({List<_i24.PageRouteInfo>? children})
+    : super(AppRootRoute.name, initialChildren: children);
 
   static const String name = 'AppRootRoute';
 
   static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<AppRootRouteArgs>(
-        orElse: () => const AppRootRouteArgs(),
-      );
-      return _i3.AppRootPage(key: args.key);
+      return const _i3.AppRootPage();
     },
   );
-}
-
-class AppRootRouteArgs {
-  const AppRootRouteArgs({this.key});
-
-  final _i25.Key? key;
-
-  @override
-  String toString() {
-    return 'AppRootRouteArgs{key: $key}';
-  }
 }
 
 /// generated route for
@@ -635,17 +617,17 @@ class MediaPreviewRouteArgs {
 }
 
 /// generated route for
-/// [_i16.PaywallScreen]
-class PaywallRoute extends _i24.PageRouteInfo<void> {
-  const PaywallRoute({List<_i24.PageRouteInfo>? children})
-    : super(PaywallRoute.name, initialChildren: children);
+/// [_i16.PaywallThreePlansScreen]
+class PaywallThreePlansRoute extends _i24.PageRouteInfo<void> {
+  const PaywallThreePlansRoute({List<_i24.PageRouteInfo>? children})
+    : super(PaywallThreePlansRoute.name, initialChildren: children);
 
-  static const String name = 'PaywallRoute';
+  static const String name = 'PaywallThreePlansRoute';
 
   static _i24.PageInfo page = _i24.PageInfo(
     name,
     builder: (data) {
-      return const _i16.PaywallScreen();
+      return const _i16.PaywallThreePlansScreen();
     },
   );
 }

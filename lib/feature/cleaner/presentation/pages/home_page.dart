@@ -1,12 +1,14 @@
 import 'dart:ui';
+import 'package:ai_cleaner_2/core/config/vision_config.dart';
 import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/core/router/router.gr.dart';
+import 'package:ai_cleaner_2/core/theme/app_colors.dart';
 import 'package:ai_cleaner_2/core/widgets/ios_notification.dart';
-import 'package:ai_cleaner_2/feature/cleaner/domain/media_file_entity.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_button.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_status_banner.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selected_files_counter.dart';
-import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/animated_background.dart';
+import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/ios_category_card.dart';
+import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/ios_storage_header.dart';
 import 'package:ai_cleaner_2/feature/premium/domain/premium_service.dart';
 import 'package:ai_cleaner_2/generated/l10n.dart';
 import 'package:auto_route/auto_route.dart';
@@ -14,11 +16,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
-import '../widgets/photo_category_card.dart';
 import '../widgets/video_category_card.dart';
 
 @RoutePage()
@@ -34,10 +36,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late TabController _tabController;
   late AnimationController _fabController;
-
-  // Для отслеживания категорий, которые уже отображались
-  Set<PhotoCategory> _previousPhotoCategories = {};
-  Set<VideoCategory> _previousVideoCategories = {};
 
   @override
   void initState() {
@@ -71,62 +69,73 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         final showTabs = state is MediaCleanerReady;
 
         return Scaffold(
-          backgroundColor: const Color(0xFF0A0E27), // Темный фон для контраста
+          backgroundColor: context.iosBackground,
           appBar: AppBar(
             leading: CupertinoButton(
               padding: EdgeInsets.zero,
-              onPressed: () => context.router.push( SettingsRoute()),
-              child: const Icon(
-                CupertinoIcons.settings,
-                color: Colors.white,
-                size: 24,
-              ),
+              onPressed: () => context.router.push(SettingsRoute()),
+              child: Icon(CupertinoIcons.settings, color: context.iosLabel, size: 24),
             ),
             title: Text(
               Locales.current.ai_cleaner,
-              style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+              style: TextStyle(fontWeight: FontWeight.w600, color: context.iosLabel),
             ),
             actions: [
               Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFFD700).withOpacity(0.3),
-                        blurRadius: 10,
-                        spreadRadius: 1,
+                padding: const EdgeInsets.only(right: 16),
+                child: StreamBuilder<bool>(
+                  stream: PremiumService().premiumStatusStream,
+                  initialData: PremiumService().isPremium,
+                  builder: (context, snapshot) {
+                    final isPremium = snapshot.data ?? false;
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isPremium
+                              ? [Colors.white.withOpacity(0.3), Colors.white.withOpacity(0.2)]
+                              : [const Color(0xFFFFD700), const Color(0xFFFFA500)],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: isPremium
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFFFFD700).withOpacity(0.3),
+                                  blurRadius: 10,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : [],
                       ),
-                    ],
-                  ),
-                  child: CupertinoButton(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    minSize: 0,
-                    onPressed: () => context.router.push( PaywallRoute()),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                     Icons.compare_arrows_rounded,
-                          color: Colors.white,
-                          size: 18,
+                      child: CupertinoButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        minSize: 0,
+                        // onPressed: () => context.router.push(PaywallRoute()),
+                        onPressed: () => context.router.push(const PaywallThreePlansRoute()),
+
+                        // onPressed: () => context.router.push(const PaywallWhiteThemeRoute()),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/vectors/crown.svg',
+                              color: isPremium ? const Color(0xFFFFD700) : Colors.white,
+                              width: 24,
+                            ),
+                            const SizedBox(width: 7),
+                            Text(
+                              Locales.current.pro.toUpperCase(),
+                              style: TextStyle(
+                                color: isPremium ? const Color(0xFFFFD700) : Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          'PRO',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -136,8 +145,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           body: SafeArea(
             child: Stack(
               children: [
-                // Анимированный фон с паттернами
-                const Positioned.fill(child: AnimatedBackground()),
                 Column(
                   children: [
                     // Custom Tab Bar в iOS стиле с liquid glass - показываем только после сканирования
@@ -174,16 +181,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 ? ClipRRect(
                                                     borderRadius: BorderRadius.circular(10),
                                                     child: BackdropFilter(
-                                                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                      filter: ImageFilter.blur(
+                                                        sigmaX: 10,
+                                                        sigmaY: 10,
+                                                      ),
                                                       child: Container(
-                                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                                        padding: const EdgeInsets.symmetric(
+                                                          vertical: 8,
+                                                        ),
                                                         decoration: BoxDecoration(
                                                           color: Colors.black.withOpacity(0.35),
                                                           borderRadius: BorderRadius.circular(10),
-                                                          border: Border.all(
-                                                            color: Colors.white.withOpacity(0.15),
-                                                            width: 1,
-                                                          ),
                                                         ),
                                                         child: Center(
                                                           child: Text(
@@ -224,16 +232,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 ? ClipRRect(
                                                     borderRadius: BorderRadius.circular(10),
                                                     child: BackdropFilter(
-                                                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                      filter: ImageFilter.blur(
+                                                        sigmaX: 10,
+                                                        sigmaY: 10,
+                                                      ),
                                                       child: Container(
-                                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                                        padding: const EdgeInsets.symmetric(
+                                                          vertical: 8,
+                                                        ),
                                                         decoration: BoxDecoration(
                                                           color: Colors.black.withOpacity(0.35),
                                                           borderRadius: BorderRadius.circular(10),
-                                                          border: Border.all(
-                                                            color: Colors.white.withOpacity(0.15),
-                                                            width: 1,
-                                                          ),
                                                         ),
                                                         child: Center(
                                                           child: Text(
@@ -314,7 +323,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 SizedBox(height: 16),
                 Text(
                   Locales.current.loading,
-                  style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(.5)),
+                  style: TextStyle(fontSize: 16, color: context.iosSecondaryLabel),
                 ),
               ],
             ),
@@ -334,7 +343,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 const SizedBox(height: 16),
                 Text(
                   Locales.current.error_occurred,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: context.iosLabel),
                 ),
                 const SizedBox(height: 8),
                 Padding(
@@ -342,7 +351,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: Text(
                     state.message,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: CupertinoColors.secondaryLabel),
+                    style: TextStyle(color: context.iosSecondaryLabel),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -366,15 +375,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  CupertinoIcons.photo,
-                  size: 80,
-                  color: CupertinoColors.systemGrey.resolveFrom(context),
-                ),
+                // Icon(
+                //   CupertinoIcons.photo,
+                //   size: 80,
+                //   color: CupertinoColors.systemGrey.resolveFrom(context),
+                // ),
+                Image.asset(width: 70, 'assets/images/gallery_icon.png'),
                 const SizedBox(height: 24),
                 Text(
                   Locales.current.clean_your_gallery,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: context.iosLabel),
                 ),
                 const SizedBox(height: 12),
                 Padding(
@@ -382,7 +392,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: Text(
                     Locales.current.find_and_delete_unnecessary_photos,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.5)),
+                    style: TextStyle(fontSize: 16, color: context.iosSecondaryLabel),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -406,6 +416,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (state.photoDuplicatesCount > 0) currentCategories.add(PhotoCategory.series);
     if (state.screenshotsCount > 0) currentCategories.add(PhotoCategory.screenshots);
     if (state.blurryCount > 0) currentCategories.add(PhotoCategory.blurry);
+    if (state.livePhotosCount > 0) currentCategories.add(PhotoCategory.livePhotos);
 
     final Map<PhotoCategory, (int, int)> categoryCounts = {
       PhotoCategory.similar: (
@@ -427,12 +438,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         state.screenshots.where((f) => f.isSelected).length,
       ),
       PhotoCategory.blurry: (state.blurry.length, state.blurry.where((f) => f.isSelected).length),
+      PhotoCategory.livePhotos: (
+        state.livePhotos.length,
+        state.livePhotos.where((f) => f.isSelected).length,
+      ),
     };
-
-    final Set<PhotoCategory> newCategories = currentCategories.toSet().difference(
-      _previousPhotoCategories,
-    );
-    _previousPhotoCategories = currentCategories.toSet();
 
     if (currentCategories.isEmpty) {
       return Center(
@@ -447,12 +457,43 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             const SizedBox(height: 16),
             Text(
               Locales.current.no_issues_found,
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: context.iosLabel),
             ),
             const SizedBox(height: 8),
             Text(
               Locales.current.gallery_in_good_shape,
-              style: TextStyle(color: Colors.white.withOpacity(.5)),
+              style: TextStyle(color: context.iosSecondaryLabel),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: CupertinoButton(
+                color: context.iosSecondaryBackground,
+                borderRadius: BorderRadius.circular(12),
+                onPressed: isScanningInBackground
+                    ? null
+                    : () => context.read<MediaCleanerBloc>().add(ScanForProblematicFiles()),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      CupertinoIcons.refresh,
+                      color: isScanningInBackground
+                          ? context.iosSecondaryLabel.withOpacity(0.3)
+                          : CupertinoColors.activeBlue.resolveFrom(context),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      Locales.current.rescan,
+                      style: TextStyle(
+                        color: isScanningInBackground
+                            ? context.iosSecondaryLabel.withOpacity(0.3)
+                            : CupertinoColors.activeBlue.resolveFrom(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ).animate().fadeIn(duration: 500.ms).scale(),
@@ -462,6 +503,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return CustomScrollView(
       key: const PageStorageKey('photo_tab'),
       slivers: [
+        // iOS Storage Header Widget
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+            child: const IOSStorageHeader(),
+          ),
+        ),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -469,74 +517,85 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 Text(
                   Locales.current.problem_photos,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: context.iosLabel),
                 ),
                 if (lastScanTime != null && !isScanningInBackground)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
                       '${Locales.current.updated} ${DateFormat('dd.MM HH:mm').format(lastScanTime)}',
-                      style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.5)),
+                      style: TextStyle(fontSize: 13, color: context.iosSecondaryLabel),
                     ),
                   ),
               ],
             ),
           ),
         ),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              final category = currentCategories[index];
-              final (count, selectedCount) = categoryCounts[category]!;
-              final isNew = newCategories.contains(category);
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppColors.iosContainerRadius),
+              child: Column(
+                children: List.generate(currentCategories.length, (index) {
+                  final category = currentCategories[index];
+                  final (count, selectedCount) = categoryCounts[category]!;
 
-              // Проверяем премиум-статус для категории blurry
-              final bool isPremium = PremiumService().isPremium;
-              final bool isLocked = category == PhotoCategory.blurry && !isPremium;
+                  // Используем StreamBuilder для реактивного обновления замочка
+                  return StreamBuilder<bool>(
+                    stream: PremiumService().premiumStatusStream,
+                    initialData: PremiumService().isPremium,
+                    builder: (context, snapshot) {
+                      final bool isPremium = snapshot.data ?? false;
+                      // Dev mode отключает все ограничения
+                      final bool isLocked = category.requiresPremium && !isPremium && !VisionConfig.devModeUnlockAll;
 
-              return Padding(
-                padding: EdgeInsets.only(bottom: index < currentCategories.length - 1 ? 12 : 0),
-                child:
-                    PhotoCategoryCard(
-                          key: ValueKey('photo_${category.name}'),
-                          category: category,
-                          count: count,
-                          selectedCount: selectedCount,
-                          isLocked: isLocked,
-                          onTap: isScanningInBackground
-                              ? () {
-                                  IOSNotification.showInfo(
-                                    context,
-                                    title: Locales.current.please_wait,
-                                    message: 'Сканирование уже выполняется...',
-                                  );
-                                  return;
-                                }
-                              : isLocked
-                              ? () {
-                                  // Открываем paywall для заблокированной категории
-                                  context.router.push(const PaywallRoute());
-                                }
-                              : () => context.router.push(
-                                  CategoryRoute(categoryType: 'photo', categoryName: category.name),
-                                ),
-                        )
-                        .animate(key: ValueKey('anim_${category.name}'))
-                        .fadeIn(
-                          duration: 300.ms,
-                          delay: Duration(milliseconds: index * 50),
-                        )
-                        .slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOut),
-              );
-            }, childCount: currentCategories.length),
+                      return IOSCategoryCard(
+                        key: ValueKey('photo_${category.name}'),
+                        category: category,
+                        count: count,
+                        selectedCount: selectedCount,
+                        isLocked: isLocked,
+                        showSeparator: index < currentCategories.length - 1,
+                        onTap: isScanningInBackground
+                            ? () {
+                                IOSNotification.showInfo(
+                                  context,
+                                  title: Locales.current.please_wait,
+                                  message: Locales.current.scanning_already_in_progress,
+                                );
+                                return;
+                              }
+                            : isLocked
+                                ? () {
+                                    // Открываем paywall для заблокированной категории
+                                    context.router.push(const PaywallThreePlansRoute());
+                                  }
+                                : () => context.router.push(
+                                      CategoryRoute(
+                                        categoryType: 'photo',
+                                        categoryName: category.name,
+                                      ),
+                                    ),
+                      )
+                          .animate(key: ValueKey('anim_${category.name}'))
+                          .fadeIn(
+                            duration: 300.ms,
+                            delay: Duration(milliseconds: index * 50),
+                          )
+                          .slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOut);
+                    },
+                  );
+                }),
+              ),
+            ),
           ),
         ),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: CupertinoButton(
-              color: CupertinoColors.systemGrey6.resolveFrom(context),
+              color: context.iosSecondaryBackground,
               borderRadius: BorderRadius.circular(12),
               onPressed: isScanningInBackground
                   ? null
@@ -588,7 +647,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 const SizedBox(height: 24),
                 Text(
                   Locales.current.clean_videos,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: context.iosLabel),
                 ),
                 const SizedBox(height: 12),
                 Padding(
@@ -596,7 +655,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: Text(
                     Locales.current.find_duplicate_and_unnecessary_videos,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: CupertinoColors.secondaryLabel),
+                    style: TextStyle(fontSize: 16, color: context.iosSecondaryLabel),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -619,6 +678,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (state.videoDuplicatesCount > 0) currentCategories.add(VideoCategory.duplicates);
     if (state.screenRecordingsCount > 0) currentCategories.add(VideoCategory.screenRecordings);
     if (state.shortVideosCount > 0) currentCategories.add(VideoCategory.shortVideos);
+    if (state.largeVideosCount > 0) currentCategories.add(VideoCategory.largeVideos);
 
     final Map<VideoCategory, (int, int)> categoryCounts = {
       VideoCategory.duplicates: (
@@ -636,12 +696,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         state.shortVideos.length,
         state.shortVideos.where((f) => f.isSelected).length,
       ),
+      VideoCategory.largeVideos: (
+        state.largeVideos.length,
+        state.largeVideos.where((f) => f.isSelected).length,
+      ),
     };
-
-    final Set<VideoCategory> newCategories = currentCategories.toSet().difference(
-      _previousVideoCategories,
-    );
-    _previousVideoCategories = currentCategories.toSet();
 
     if (currentCategories.isEmpty) {
       return Center(
@@ -656,12 +715,42 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             const SizedBox(height: 16),
             Text(
               Locales.current.no_video_issues_yet,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: context.iosLabel),
             ),
             const SizedBox(height: 8),
             Text(
               Locales.current.all_videos_ok,
-              style: TextStyle(color: Colors.white.withOpacity(0.5)),
+              style: TextStyle(color: context.iosSecondaryLabel),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: CupertinoButton(
+                color: context.iosSecondaryBackground,
+                borderRadius: BorderRadius.circular(12),
+                onPressed: isScanningInBackground
+                    ? null
+                    : () => context.read<MediaCleanerBloc>().add(ScanForProblematicFiles()),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      CupertinoIcons.refresh,
+                      color: isScanningInBackground
+                          ? context.iosSecondaryLabel.withOpacity(0.3)
+                          : CupertinoColors.activeBlue.resolveFrom(context),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      Locales.current.rescan,
+                      style: TextStyle(
+                        color: isScanningInBackground
+                            ? context.iosSecondaryLabel.withOpacity(0.3)
+                            : CupertinoColors.activeBlue.resolveFrom(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ).animate().fadeIn(duration: 500.ms).scale(),
@@ -678,14 +767,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 Text(
                   Locales.current.problem_videos,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: context.iosLabel),
                 ),
                 if (lastScanTime != null && !isScanningInBackground)
                   Padding(
                     padding: EdgeInsets.only(top: 8),
                     child: Text(
                       '${Locales.current.updated}  ${DateFormat('dd.MM HH:mm').format(lastScanTime)}',
-                      style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.5)),
+                      style: TextStyle(fontSize: 13, color: context.iosSecondaryLabel),
                     ),
                   ),
               ],
@@ -699,33 +788,50 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               final category = currentCategories[index];
               final (count, selectedCount) = categoryCounts[category]!;
 
-              return Padding(
-                padding: EdgeInsets.only(bottom: index < currentCategories.length - 1 ? 12 : 0),
-                child:
-                    VideoCategoryCard(
-                          key: ValueKey('video_${category.name}'),
-                          category: category,
-                          count: count,
-                          selectedCount: selectedCount,
-                          onTap: isScanningInBackground
-                              ? () {
-                                  IOSNotification.showInfo(
-                                    context,
-                                    title: Locales.current.please_wait,
-                                    message: 'Сканирование уже выполняется...',
-                                  );
-                                  return;
-                                }
-                              : () => context.router.push(
-                                  CategoryRoute(categoryType: 'video', categoryName: category.name),
-                                ),
-                        )
-                        .animate(key: ValueKey('anim_${category.name}'))
-                        .fadeIn(
-                          duration: 300.ms,
-                          delay: Duration(milliseconds: index * 50),
-                        )
-                        .slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOut),
+              // Используем StreamBuilder для реактивного обновления замочка
+              return StreamBuilder<bool>(
+                stream: PremiumService().premiumStatusStream,
+                initialData: PremiumService().isPremium,
+                builder: (context, snapshot) {
+                  final bool isPremium = snapshot.data ?? false;
+                  // Dev mode отключает все ограничения
+                  final bool isLocked = category.requiresPremium && !isPremium && !VisionConfig.devModeUnlockAll;
+
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: index < currentCategories.length - 1 ? 12 : 0),
+                    child:
+                        VideoCategoryCard(
+                              key: ValueKey('video_${category.name}'),
+                              category: category,
+                              count: count,
+                              selectedCount: selectedCount,
+                              isLocked: isLocked,
+                              onTap: isScanningInBackground
+                                  ? () {
+                                      IOSNotification.showInfo(
+                                        context,
+                                        title: Locales.current.please_wait,
+                                        message: Locales.current.scanning_already_in_progress,
+                                      );
+                                      return;
+                                    }
+                                  : isLocked
+                                  ? () {
+                                      // Открываем paywall для заблокированной категории
+                                      context.router.push(const PaywallThreePlansRoute());
+                                    }
+                                  : () => context.router.push(
+                                      CategoryRoute(categoryType: 'video', categoryName: category.name),
+                                    ),
+                            )
+                            .animate(key: ValueKey('anim_${category.name}'))
+                            .fadeIn(
+                              duration: 300.ms,
+                              delay: Duration(milliseconds: index * 50),
+                            )
+                            .slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOut),
+                  );
+                },
               );
             }, childCount: currentCategories.length),
           ),
@@ -734,7 +840,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: CupertinoButton(
-              color: CupertinoColors.systemGrey6.resolveFrom(context),
+              color: context.iosSecondaryBackground,
               borderRadius: BorderRadius.circular(12),
               onPressed: isScanningInBackground
                   ? null

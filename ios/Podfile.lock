@@ -1,10 +1,24 @@
 PODS:
   - app_links (0.0.2):
     - Flutter
+  - app_tracking_transparency (0.0.1):
+    - Flutter
+  - apphud (2.7.4):
+    - ApphudSDK (= 3.6.2)
+    - Flutter
+  - ApphudSDK (3.6.2)
   - appinio_social_share (0.0.1):
     - FBSDKCoreKit (= 17.0.2)
     - FBSDKShareKit (= 17.0.2)
     - Flutter
+  - appsflyer_sdk (6.17.7):
+    - appsflyer_sdk/Core (= 6.17.7)
+  - appsflyer_sdk/Core (6.17.7):
+    - AppsFlyerFramework (= 6.17.7)
+    - Flutter
+  - AppsFlyerFramework (6.17.7):
+    - AppsFlyerFramework/Main (= 6.17.7)
+  - AppsFlyerFramework/Main (6.17.7)
   - FBAEMKit (17.0.2):
     - FBSDKCoreKit_Basics (= 17.0.2)
   - FBSDKCoreKit (17.0.2):
@@ -15,6 +29,8 @@ PODS:
     - FBSDKCoreKit (= 17.0.2)
   - Flutter (1.0.0)
   - flutter_native_splash (2.4.3):
+    - Flutter
+  - flutter_secure_storage (6.0.0):
     - Flutter
   - in_app_purchase_storekit (0.0.1):
     - Flutter
@@ -28,7 +44,7 @@ PODS:
     - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
-  - photo_manager (2.0.0):
+  - photo_manager (3.7.1):
     - Flutter
     - FlutterMacOS
   - share_plus (0.0.1):
@@ -44,9 +60,13 @@ PODS:
 
 DEPENDENCIES:
   - app_links (from `.symlinks/plugins/app_links/ios`)
+  - app_tracking_transparency (from `.symlinks/plugins/app_tracking_transparency/ios`)
+  - apphud (from `.symlinks/plugins/apphud/ios`)
   - appinio_social_share (from `.symlinks/plugins/appinio_social_share/ios`)
+  - appsflyer_sdk (from `.symlinks/plugins/appsflyer_sdk/ios`)
   - Flutter (from `Flutter`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
+  - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - in_app_purchase_storekit (from `.symlinks/plugins/in_app_purchase_storekit/darwin`)
   - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
@@ -60,6 +80,8 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - ApphudSDK
+    - AppsFlyerFramework
     - FBAEMKit
     - FBSDKCoreKit
     - FBSDKCoreKit_Basics
@@ -68,12 +90,20 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   app_links:
     :path: ".symlinks/plugins/app_links/ios"
+  app_tracking_transparency:
+    :path: ".symlinks/plugins/app_tracking_transparency/ios"
+  apphud:
+    :path: ".symlinks/plugins/apphud/ios"
   appinio_social_share:
     :path: ".symlinks/plugins/appinio_social_share/ios"
+  appsflyer_sdk:
+    :path: ".symlinks/plugins/appsflyer_sdk/ios"
   Flutter:
     :path: Flutter
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
+  flutter_secure_storage:
+    :path: ".symlinks/plugins/flutter_secure_storage/ios"
   in_app_purchase_storekit:
     :path: ".symlinks/plugins/in_app_purchase_storekit/darwin"
   in_app_review:
@@ -97,24 +127,30 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   app_links: 76b66b60cc809390ca1ad69bfd66b998d2387ac7
+  app_tracking_transparency: 3d84f147f67ca82d3c15355c36b1fa6b66ca7c92
+  apphud: a7a8e61480b886ec89e28cd5cc35b5438d7a1cc8
+  ApphudSDK: 787b3f4f41427a07f4f8d02590470f31f567cfdf
   appinio_social_share: 25605b916b5a35606a7f2ba8153d0218a4c0282e
+  appsflyer_sdk: 01d0cd834fe2fffd7f2372ab38690f7483587720
+  AppsFlyerFramework: ae7caf1688348f2d7a742037bd4fc6966d39d362
   FBAEMKit: 619f96ea65427e8afca240d5b0f4703738dfdf5c
   FBSDKCoreKit: a5f384db2e9ee84e98494fed8f983d2bd79accff
   FBSDKCoreKit_Basics: d35c775aaf243a2d731dfae7be3a74b1987285ab
   FBSDKShareKit: e7ec3bed8e82dabc04e56f3cf44ef99a1864309e
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_native_splash: 6cad9122ea0fad137d23137dd14b937f3e90b145
+  flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
   in_app_purchase_storekit: 22cca7d08eebca9babdf4d07d0baccb73325d3c8
   in_app_review: 7dd1ea365263f834b8464673f9df72c80c17c937
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
-  photo_manager: d2fbcc0f2d82458700ee6256a15018210a81d413
+  photo_manager: 1d80ae07a89a67dfbcae95953a1e5a24af7c3e62
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
   video_player_avfoundation: 2cef49524dd1f16c5300b9cd6efd9611ce03639b
 
-PODFILE CHECKSUM: 93573d7b697fdb7e679e02158f1564e99d595e31
+PODFILE CHECKSUM: 98128497df4e355d3dcd6d43877e2d924c0e4837
 
 COCOAPODS: 1.16.2

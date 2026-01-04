@@ -93,7 +93,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     try {
       // Создаем mailto ссылку
       final mailtoLink = Mailto(
-        to: ['petrfalkovsky@yandex.ru'],
+        to: ['clarapadilla184@outlook.com'],
         subject: 'AI Cleaner Feedback from ${_nameController.text}',
         body:
             '''
@@ -167,13 +167,13 @@ ${_messageController.text}
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  Locales.current.send_us_your_feedback,
-                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
+                // const SizedBox(height: 8),
+                // Text(
+                //   Locales.current.send_us_your_feedback,
+                //   style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 16),
+                //   textAlign: TextAlign.center,
+                // ),
+                const SizedBox(height: 20),
 
                 // Имя
                 _buildInputField(

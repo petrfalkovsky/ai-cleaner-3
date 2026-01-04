@@ -1,0 +1,52 @@
+# This file configures Codemagic builds
+# To use this file, set build configuration to "codemagic.yaml" in app settings
+
+workflows:
+  ios-workflow:
+    name: iOS Workflow
+    max_build_duration: 120
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: '*'
+          include: true
+    environment:
+      groups:
+        # Add your environment variable groups here if needed
+      vars:
+        COCOAPODS_DISABLE_STATS: "true"
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Set up Flutter
+        script: |
+          flutter doctor
+          flutter pub get
+
+      - name: Clean CocoaPods cache and update repos
+        script: |
+          echo "Cleaning CocoaPods cache..."
+          rm -rf ~/.cocoapods/repos
+          rm -rf ~/Library/Caches/CocoaPods
+          echo "Updating CocoaPods repositories..."
+          pod repo update --verbose
+
+      - name: Clean and install iOS dependencies
+        script: |
+          cd ios
+          echo "Removing old Pods and Podfile.lock..."
+          rm -rf Pods
+          rm -rf Podfile.lock
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          echo "Installing pods with repo update..."
+          pod install --repo-update --verbose
+
+      - name: Build iOS
+        script: |
+          flutter build ios --release --no-codesign
+
+    artifacts:
+      - build/ios/iphoneos/*.app

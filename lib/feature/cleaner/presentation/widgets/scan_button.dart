@@ -8,10 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'dart:math' as math;
 import '../bloc/media_cleaner_bloc.dart';
-import 'scan_progress.dart';
 
 class ScanButton extends StatefulWidget {
-  const ScanButton({Key? key}) : super(key: key);
+  const ScanButton({super.key});
 
   @override
   State<ScanButton> createState() => _ScanButtonState();
@@ -118,19 +117,19 @@ class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateM
                             blur: 5,
                             ambientStrength: 1.0,
                             lightAngle: 0.25 * math.pi,
-                            glassColor: CupertinoColors.activeBlue.withOpacity(0.3),
+                            glassColor: Colors.white.withOpacity(0.3),
                             thickness: 25,
                           ),
                           shape: LiquidRoundedSuperellipse(borderRadius: const Radius.circular(25)),
                           glassContainsChild: false,
                           child: Container(
-                            width: 280,
                             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 4,
                               children: [
                                 Icon(CupertinoIcons.sparkles, color: Colors.white, size: 24),
-                                SizedBox(width: 12),
                                 Text(
                                   Locales.current.start_scan,
                                   style: TextStyle(

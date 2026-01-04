@@ -42,7 +42,7 @@ class AppRouter extends RootStackRouter {
         CustomRoute(page: FeedbackRoute.page, transitionsBuilder: fadeTransition),
         CustomRoute(page: FeedbackSuccessRoute.page, transitionsBuilder: fadeTransition),
         CustomRoute(
-          page: PaywallRoute.page,
+          page: PaywallThreePlansRoute.page,
           transitionsBuilder: fadeTransition,
           fullscreenDialog: true,
         ),

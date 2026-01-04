@@ -1,0 +1,40 @@
+{
+  "data": {
+    "results": [
+      {
+        "id": "pro_paywall",
+        "json": null,
+        "name": "Main Paywall",
+        "identifier": "pro_paywall",
+        "default": true,
+        "experiment_id": null,
+        "experiment_name": null,
+        "from_paywall": null,
+        "variation_identifier": null,
+        "variation_name": null,
+        "items": [
+          {
+            "id": "week_product",
+            "name": "Weekly Subscription",
+            "product_id": "id_week",
+            "store": "app_store"
+          },
+          {
+            "id": "year_product",
+            "name": "Yearly Subscription",
+            "product_id": "id_year",
+            "store": "app_store"
+          },
+          {
+            "id": "lifetime_product",
+            "name": "Lifetime Purchase",
+            "product_id": "id_lifetime",
+            "store": "app_store"
+          }
+        ]
+      }
+    ],
+    "meta": null
+  },
+  "errors": null
+}

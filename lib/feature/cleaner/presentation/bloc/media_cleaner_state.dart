@@ -63,7 +63,7 @@ class MediaCleanerScanning extends MediaCleanerReady {
     required super.videoFiles,
     super.selectedFiles = const [],
     this.scanProgress = 0.0,
-    this.scanMessage = "Сканирование медиафайлов...",
+    this.scanMessage = "",
     this.processedFiles,
     this.totalFiles,
     super.similarGroups = const [],
@@ -73,6 +73,9 @@ class MediaCleanerScanning extends MediaCleanerReady {
     super.videoDuplicateGroups = const [],
     super.screenRecordings = const [],
     super.shortVideos = const [],
+    super.livePhotos = const [],
+    super.largeVideos = const [],
+    super.appMediaGroups = const {},
     super.lastScanTime,
     super.isScanningInBackground = true,
     super.scanError,
@@ -105,6 +108,9 @@ class MediaCleanerScanning extends MediaCleanerReady {
     List<MediaGroup>? videoDuplicateGroups,
     List<MediaFile>? screenRecordings,
     List<MediaFile>? shortVideos,
+    List<MediaFile>? livePhotos,
+    List<MediaFile>? largeVideos,
+    Map<String, List<MediaFile>>? appMediaGroups,
     DateTime? lastScanTime,
     bool? isScanningInBackground,
     String? scanError,
@@ -126,6 +132,9 @@ class MediaCleanerScanning extends MediaCleanerReady {
       videoDuplicateGroups: videoDuplicateGroups ?? this.videoDuplicateGroups,
       screenRecordings: screenRecordings ?? this.screenRecordings,
       shortVideos: shortVideos ?? this.shortVideos,
+      livePhotos: livePhotos ?? this.livePhotos,
+      largeVideos: largeVideos ?? this.largeVideos,
+      appMediaGroups: appMediaGroups ?? this.appMediaGroups,
       lastScanTime: lastScanTime ?? this.lastScanTime,
       isScanningInBackground: isScanningInBackground ?? this.isScanningInBackground,
       scanError: scanError ?? this.scanError,
@@ -142,6 +151,9 @@ class MediaCleanerReady extends MediaCleanerLoaded {
   final List<MediaGroup> videoDuplicateGroups;
   final List<MediaFile> shortVideos;
   final List<MediaFile> screenRecordings;
+  final List<MediaFile> livePhotos;
+  final List<MediaFile> largeVideos;
+  final Map<String, List<MediaFile>> appMediaGroups;
   final DateTime? lastScanTime;
 
   const MediaCleanerReady({
@@ -156,6 +168,9 @@ class MediaCleanerReady extends MediaCleanerLoaded {
     this.videoDuplicateGroups = const [],
     this.shortVideos = const [],
     this.screenRecordings = const [],
+    this.livePhotos = const [],
+    this.largeVideos = const [],
+    this.appMediaGroups = const {},
     this.lastScanTime,
     super.isScanningInBackground = false,
     super.scanError,
@@ -171,6 +186,9 @@ class MediaCleanerReady extends MediaCleanerLoaded {
     videoDuplicateGroups,
     shortVideos,
     screenRecordings,
+    livePhotos,
+    largeVideos,
+    appMediaGroups,
     if (lastScanTime != null) lastScanTime!,
   ];
 
@@ -187,6 +205,9 @@ class MediaCleanerReady extends MediaCleanerLoaded {
     List<MediaGroup>? videoDuplicateGroups,
     List<MediaFile>? shortVideos,
     List<MediaFile>? screenRecordings,
+    List<MediaFile>? livePhotos,
+    List<MediaFile>? largeVideos,
+    Map<String, List<MediaFile>>? appMediaGroups,
     DateTime? lastScanTime,
     bool? isScanningInBackground,
     String? scanError,
@@ -203,6 +224,9 @@ class MediaCleanerReady extends MediaCleanerLoaded {
       videoDuplicateGroups: videoDuplicateGroups ?? this.videoDuplicateGroups,
       shortVideos: shortVideos ?? this.shortVideos,
       screenRecordings: screenRecordings ?? this.screenRecordings,
+      livePhotos: livePhotos ?? this.livePhotos,
+      largeVideos: largeVideos ?? this.largeVideos,
+      appMediaGroups: appMediaGroups ?? this.appMediaGroups,
       lastScanTime: lastScanTime ?? this.lastScanTime,
       isScanningInBackground: isScanningInBackground ?? this.isScanningInBackground,
       scanError: scanError ?? this.scanError,
@@ -219,4 +243,7 @@ class MediaCleanerReady extends MediaCleanerLoaded {
       videoDuplicateGroups.fold<int>(0, (sum, group) => sum + group.files.length);
   int get shortVideosCount => shortVideos.length;
   int get screenRecordingsCount => screenRecordings.length;
+  int get livePhotosCount => livePhotos.length;
+  int get largeVideosCount => largeVideos.length;
+  int get appMediaCount => appMediaGroups.values.fold<int>(0, (sum, files) => sum + files.length);
 }

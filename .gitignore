@@ -43,7 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-ios/Config.xcconfig
 
 # .env
 /upload.sh
@@ -51,3 +50,8 @@ ios/Config.xcconfig
 /android/build
 /ios/build/ios/XCBuildData
 android/.kotlin/sessions/kotlin-compiler-14855157112420240639.salive
+# Ignore all ephemeral files
+linux/flutter/ephemeral/
+macos/Flutter/ephemeral/
+/linux/flutter/ephemeral/.plugin_symlinks
+ios/Podfile.lock

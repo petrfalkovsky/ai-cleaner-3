@@ -43,9 +43,12 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("All videos are fine!"),
         "analyzing_videos_processed":
             MessageLookupByLibrary.simpleMessage("Analyzing videos (processed"),
+        "app_media": MessageLookupByLibrary.simpleMessage("From Apps"),
         "are_you_sure_delete": MessageLookupByLibrary.simpleMessage(
             "Are you sure you want to delete"),
         "back_to_home": MessageLookupByLibrary.simpleMessage("Back to Home"),
+        "best_value": MessageLookupByLibrary.simpleMessage("BEST VALUE"),
+        "billed_weekly": MessageLookupByLibrary.simpleMessage("Billed weekly"),
         "blurry": MessageLookupByLibrary.simpleMessage("Blurry"),
         "blurry_not_clear_photos":
             MessageLookupByLibrary.simpleMessage("Blurry and unclear photos"),
@@ -57,6 +60,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "close": MessageLookupByLibrary.simpleMessage("Close"),
         "contact_and_feedback":
             MessageLookupByLibrary.simpleMessage("Contact & Feedback"),
+        "continue_action": MessageLookupByLibrary.simpleMessage("Continue"),
         "delete": MessageLookupByLibrary.simpleMessage("Delete"),
         "delete_files": MessageLookupByLibrary.simpleMessage("Delete files"),
         "device_screen_recordings":
@@ -86,6 +90,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Your feedback has been sent successfully. We\'ll get back to you soon!"),
         "file": MessageLookupByLibrary.simpleMessage("Файл"),
         "files": MessageLookupByLibrary.simpleMessage("Файлов"),
+        "files_from_apps":
+            MessageLookupByLibrary.simpleMessage("Files from apps"),
         "files_load_error":
             MessageLookupByLibrary.simpleMessage("Files load error"),
         "find_and_delete_unnecessary_photos":
@@ -95,6 +101,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage(
                 "Find duplicate and unnecessary videos"),
         "found": MessageLookupByLibrary.simpleMessage("Found"),
+        "free": MessageLookupByLibrary.simpleMessage("free"),
         "freed": MessageLookupByLibrary.simpleMessage("freed"),
         "from": MessageLookupByLibrary.simpleMessage("from"),
         "gallery_in_good_shape": MessageLookupByLibrary.simpleMessage(
@@ -107,11 +114,25 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Identical video files"),
         "image_load_error":
             MessageLookupByLibrary.simpleMessage("Image load error"),
+        "instagram_media":
+            MessageLookupByLibrary.simpleMessage("Instagram Media"),
+        "iphone_storage_full":
+            MessageLookupByLibrary.simpleMessage("iPhone Storage Full"),
         "keep": MessageLookupByLibrary.simpleMessage("Keep"),
+        "large_videos": MessageLookupByLibrary.simpleMessage("Large Videos"),
+        "large_videos_description":
+            MessageLookupByLibrary.simpleMessage("Videos larger than 180 MB"),
+        "lifetime": MessageLookupByLibrary.simpleMessage("Lifetime"),
+        "live_photos": MessageLookupByLibrary.simpleMessage("Live Photos"),
+        "live_photos_description": MessageLookupByLibrary.simpleMessage(
+            "Photos with Live Photo video effect"),
         "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
         "loading_videos":
             MessageLookupByLibrary.simpleMessage("Loading videos..."),
         "message": MessageLookupByLibrary.simpleMessage("Message"),
+        "messenger_media":
+            MessageLookupByLibrary.simpleMessage("Messenger Media"),
+        "most_popular": MessageLookupByLibrary.simpleMessage("MOST POPULAR"),
         "name": MessageLookupByLibrary.simpleMessage("Name"),
         "new_word": MessageLookupByLibrary.simpleMessage("New"),
         "no_files_in_category":
@@ -123,7 +144,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "no_video_issues_yet":
             MessageLookupByLibrary.simpleMessage("No issues found yet"),
         "not_found": MessageLookupByLibrary.simpleMessage("Not found"),
+        "of_1": MessageLookupByLibrary.simpleMessage("of"),
         "on": MessageLookupByLibrary.simpleMessage("on"),
+        "one_time_purchase": MessageLookupByLibrary.simpleMessage("one-time"),
+        "per_week": MessageLookupByLibrary.simpleMessage("/week"),
+        "per_year": MessageLookupByLibrary.simpleMessage("/year"),
         "photo_bursts": MessageLookupByLibrary.simpleMessage("Photo bursts"),
         "photo_series": MessageLookupByLibrary.simpleMessage("Photo series"),
         "photos": MessageLookupByLibrary.simpleMessage("Photos"),
@@ -136,17 +161,31 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Preparing for scan..."),
         "privacy_policy":
             MessageLookupByLibrary.simpleMessage("Privacy Policy"),
+        "pro": MessageLookupByLibrary.simpleMessage("Pro"),
         "problem_photos":
             MessageLookupByLibrary.simpleMessage("Problem photos"),
         "problem_videos":
             MessageLookupByLibrary.simpleMessage("Problem videos"),
+        "products_not_loaded": MessageLookupByLibrary.simpleMessage(
+            "Products are not loaded yet. Please try again in a moment."),
+        "purchased": MessageLookupByLibrary.simpleMessage("Purchased"),
         "rate_app": MessageLookupByLibrary.simpleMessage("Rate app"),
         "rescan": MessageLookupByLibrary.simpleMessage("Rescan"),
         "restore_purchases":
             MessageLookupByLibrary.simpleMessage("Restore purchases"),
+        "save_vs_weekly":
+            MessageLookupByLibrary.simpleMessage("Save 35% vs weekly"),
+        "scan_completed":
+            MessageLookupByLibrary.simpleMessage("Scan completed"),
+        "scan_completed_exclamation":
+            MessageLookupByLibrary.simpleMessage("Scan completed!"),
         "scan_warning": MessageLookupByLibrary.simpleMessage(
             "Please wait until the scan is complete for stable app performance.\nYour device may heat up. You can pause the scan for charging or cooling (feature in development)."),
         "scanning": MessageLookupByLibrary.simpleMessage("Scanning..."),
+        "scanning_already_in_progress": MessageLookupByLibrary.simpleMessage(
+            "Scanning already in progress..."),
+        "scanning_media_files":
+            MessageLookupByLibrary.simpleMessage("Scanning media files..."),
         "screen_recordings":
             MessageLookupByLibrary.simpleMessage("Screen recordings"),
         "screen_recordings_2":
@@ -154,14 +193,21 @@ class MessageLookup extends MessageLookupByLibrary {
         "screenshots": MessageLookupByLibrary.simpleMessage("Screenshots"),
         "screenshots_count":
             MessageLookupByLibrary.simpleMessage("Screenshots"),
+        "searching_app_media":
+            MessageLookupByLibrary.simpleMessage("Searching for app media..."),
         "searching_duplicate_photos_processed":
             MessageLookupByLibrary.simpleMessage(
                 "Searching duplicate photos (processed"),
+        "searching_large_videos": MessageLookupByLibrary.simpleMessage(
+            "Searching for large videos (>180MB)..."),
+        "searching_live_photos": MessageLookupByLibrary.simpleMessage(
+            "Searching for Live Photos..."),
         "searching_similar_photos_processed":
             MessageLookupByLibrary.simpleMessage(
                 "Searching similar photos (processed"),
         "select": MessageLookupByLibrary.simpleMessage("Select"),
         "select_all": MessageLookupByLibrary.simpleMessage("Select all"),
+        "selected": MessageLookupByLibrary.simpleMessage("Selected"),
         "send_feedback": MessageLookupByLibrary.simpleMessage("Send Feedback"),
         "send_us_your_feedback": MessageLookupByLibrary.simpleMessage(
             "Send us your feedback or questions"),
@@ -179,6 +225,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Groups of similar photos"),
         "similar_photos":
             MessageLookupByLibrary.simpleMessage("Similar photos"),
+        "snapchat_media":
+            MessageLookupByLibrary.simpleMessage("Snapchat Media"),
         "start_scan": MessageLookupByLibrary.simpleMessage("Start scan"),
         "start_trial": MessageLookupByLibrary.simpleMessage("Start Free Trial"),
         "storage": MessageLookupByLibrary.simpleMessage("Storage"),
@@ -187,6 +235,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "success": MessageLookupByLibrary.simpleMessage("Success"),
         "swipe_hint": MessageLookupByLibrary.simpleMessage(
             "Delete or keep files with a simple swipe"),
+        "telegram_media":
+            MessageLookupByLibrary.simpleMessage("Telegram Media"),
         "terms_and_privacy":
             MessageLookupByLibrary.simpleMessage("Terms & Privacy"),
         "thank_you": MessageLookupByLibrary.simpleMessage("Thank You!"),
@@ -198,16 +248,21 @@ class MessageLookup extends MessageLookupByLibrary {
         "try_again": MessageLookupByLibrary.simpleMessage("Tra again"),
         "try_swipe_mode":
             MessageLookupByLibrary.simpleMessage("Try swipe mode"),
-        "unlock_premium":
-            MessageLookupByLibrary.simpleMessage("Unlock Premium"),
+        "unlock_forever":
+            MessageLookupByLibrary.simpleMessage("Unlock forever"),
         "unnamed_file": MessageLookupByLibrary.simpleMessage("Unnamed file"),
         "updated": MessageLookupByLibrary.simpleMessage("Updated:"),
+        "used": MessageLookupByLibrary.simpleMessage("used"),
         "version": MessageLookupByLibrary.simpleMessage("Version"),
         "video_load_error":
             MessageLookupByLibrary.simpleMessage("Video load error"),
         "videos": MessageLookupByLibrary.simpleMessage("Videos"),
         "view": MessageLookupByLibrary.simpleMessage("View"),
-        "we_love_to_hear_from_you":
-            MessageLookupByLibrary.simpleMessage("We\'d love to hear from you!")
+        "we_love_to_hear_from_you": MessageLookupByLibrary.simpleMessage(
+            "We\'d love to hear from you!"),
+        "weekly": MessageLookupByLibrary.simpleMessage("Weekly"),
+        "whatsapp_media":
+            MessageLookupByLibrary.simpleMessage("WhatsApp Media"),
+        "yearly": MessageLookupByLibrary.simpleMessage("Yearly")
       };
 }

@@ -4,7 +4,7 @@ class BlurIndicator extends StatelessWidget {
   final double blurScore; // 0.0 - 1.0, где 1.0 - максимально размыто
   final double size;
 
-  const BlurIndicator({Key? key, required this.blurScore, this.size = 24.0}) : super(key: key);
+  const BlurIndicator({super.key, required this.blurScore, this.size = 24.0});
 
   @override
   Widget build(BuildContext context) {

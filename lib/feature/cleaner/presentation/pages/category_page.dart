@@ -13,20 +13,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 import '../bloc/media_cleaner_bloc.dart';
+import '../../../../core/services/first_launch_tracker.dart';
 
 @RoutePage()
-class CategoryPage extends StatelessWidget {
+class CategoryPage extends StatefulWidget {
   final String categoryType; // 'photo' или 'video'
   final String categoryName;
 
   const CategoryPage({super.key, required this.categoryType, required this.categoryName});
 
+  @override
+  State<CategoryPage> createState() => _CategoryPageState();
+}
+
+class _CategoryPageState extends State<CategoryPage> {
+  bool _showFirstLaunchLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Проверяем, нужно ли показать loading при первом запуске
+    if (FirstLaunchTracker.instance.shouldShowFirstCategoryLoading()) {
+      _showFirstLaunchLoading = true;
+
+      // Через 1 секунду убираем loading и отмечаем что категория открылась
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          setState(() {
+            _showFirstLaunchLoading = false;
+          });
+          FirstLaunchTracker.instance.markCategoryOpened();
+        }
+      });
+    }
+  }
+
   // Получить PhotoCategory из строки
   PhotoCategory? get photoCategory {
-    if (categoryType != 'photo') return null;
+    if (widget.categoryType != 'photo') return null;
     try {
-      return PhotoCategory.values.firstWhere((e) => e.name == categoryName);
+      return PhotoCategory.values.firstWhere((e) => e.name == widget.categoryName);
     } catch (e) {
       return null;
     }
@@ -34,9 +63,9 @@ class CategoryPage extends StatelessWidget {
 
   // Получить VideoCategory из строки
   VideoCategory? get videoCategory {
-    if (categoryType != 'video') return null;
+    if (widget.categoryType != 'video') return null;
     try {
-      return VideoCategory.values.firstWhere((e) => e.name == categoryName);
+      return VideoCategory.values.firstWhere((e) => e.name == widget.categoryName);
     } catch (e) {
       return null;
     }
@@ -44,12 +73,12 @@ class CategoryPage extends StatelessWidget {
 
   // Получить локализованное название категории
   String get localizedCategoryName {
-    if (categoryType == 'photo' && photoCategory != null) {
+    if (widget.categoryType == 'photo' && photoCategory != null) {
       return photoCategory!.title;
-    } else if (categoryType == 'video' && videoCategory != null) {
+    } else if (widget.categoryType == 'video' && videoCategory != null) {
       return videoCategory!.title;
     }
-    return categoryName; // fallback
+    return widget.categoryName; // fallback
   }
 
   @override
@@ -80,7 +109,7 @@ class CategoryPage extends StatelessWidget {
               final allSelected = selectedCount == categoryIds.length && categoryIds.isNotEmpty;
 
               return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
+                padding: const EdgeInsets.only(right: 16),
                 child: GestureDetector(
                   onTap: () {
                     if (allSelected) {
@@ -121,50 +150,72 @@ class CategoryPage extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
-        builder: (context, state) {
-          if (state is! MediaCleanerReady) {
-            return const Center(child: CupertinoActivityIndicator());
-          }
+      body: Stack(
+        children: [
+          // Основной контент
+          BlocBuilder<MediaCleanerBloc, MediaCleanerState>(
+            builder: (context, state) {
+              if (state is! MediaCleanerReady) {
+                return const Center(child: CupertinoActivityIndicator());
+              }
 
-          final List<MediaFile> categoryFiles = _getCategoryFiles(state);
+              final List<MediaFile> categoryFiles = _getCategoryFiles(state);
 
-          if (categoryFiles.isEmpty) {
-            return Center(
-              child: Text(
-                Locales.current.no_files_in_category,
-                style: TextStyle(color: Colors.white60),
+              if (categoryFiles.isEmpty) {
+                return Center(
+                  child: Text(
+                    Locales.current.no_files_in_category,
+                    style: TextStyle(color: Colors.white60),
+                  ),
+                );
+              }
+
+              return Stack(
+                children: [
+                  // Градиентный фон для похожих фото
+                  if ((photoCategory == PhotoCategory.similar || photoCategory == PhotoCategory.series))
+                    const Positioned.fill(child: AnimatedBackground()),
+
+                  // Полноэкранный grid
+                  _buildCategoryContent(context, state),
+
+                  // Floating banner сверху
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: SafeArea(bottom: false, child: _buildSwipeBanner(context, categoryFiles)),
+                  ),
+
+                  // Floating bottom bar
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: SafeArea(top: false, child: _buildBottomBar(context, state, categoryFiles)),
+                  ),
+                ],
+              );
+            },
+          ),
+
+          // First launch loading overlay с блюром
+          if (_showFirstLaunchLoading)
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  color: Colors.black.withOpacity(0.3),
+                  child: const Center(
+                    child: CupertinoActivityIndicator(
+                      radius: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
-            );
-          }
-
-          return Stack(
-            children: [
-              // Градиентный фон для похожих фото
-              if ((photoCategory == PhotoCategory.similar || photoCategory == PhotoCategory.series))
-                const Positioned.fill(child: AnimatedBackground()),
-
-              // Полноэкранный grid
-              _buildCategoryContent(context, state),
-
-              // Floating banner сверху
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: SafeArea(bottom: false, child: _buildSwipeBanner(context, categoryFiles)),
-              ),
-
-              // Floating bottom bar
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: SafeArea(top: false, child: _buildBottomBar(context, state, categoryFiles)),
-              ),
-            ],
-          );
-        },
+            ),
+        ],
       ),
     );
   }
@@ -317,7 +368,7 @@ class CategoryPage extends StatelessWidget {
 
   // Получает файлы для выбранной категории
   List<MediaFile> _getCategoryFiles(MediaCleanerReady state) {
-    if (categoryType == 'photo' && photoCategory != null) {
+    if (widget.categoryType == 'photo' && photoCategory != null) {
       switch (photoCategory!) {
         case PhotoCategory.similar:
           return state.similarGroups.expand((group) => group.files).toList();
@@ -327,8 +378,10 @@ class CategoryPage extends StatelessWidget {
           return state.screenshots;
         case PhotoCategory.blurry:
           return state.blurry;
+        case PhotoCategory.livePhotos:
+          return state.livePhotos;
       }
-    } else if (categoryType == 'video' && videoCategory != null) {
+    } else if (widget.categoryType == 'video' && videoCategory != null) {
       switch (videoCategory!) {
         case VideoCategory.duplicates:
           return state.videoDuplicateGroups.expand((group) => group.files).toList();
@@ -336,6 +389,8 @@ class CategoryPage extends StatelessWidget {
           return state.screenRecordings;
         case VideoCategory.shortVideos:
           return state.shortVideos;
+        case VideoCategory.largeVideos:
+          return state.largeVideos;
       }
     }
     return [];
@@ -353,18 +408,24 @@ class CategoryPage extends StatelessWidget {
           crossAxisSpacing: 1.0,
           mainAxisSpacing: 1.0,
         ),
+        // Оптимизация производительности
+        cacheExtent: 1000.0, // Предзагрузка ~3 экранов контента
+        addAutomaticKeepAlives: true, // Сохранение состояния при прокрутке
+        addRepaintBoundaries: true, // Изоляция перерисовки элементов
         itemCount: blurryFiles.length,
         itemBuilder: (context, index) {
-          return BlurryMediaGridItem(
-            file: blurryFiles[index],
-            onTap: () {
-              context.read<MediaCleanerBloc>().add(
-                ToggleFileSelection(blurryFiles[index].entity.id),
-              );
-            },
-            onPreview: () {
-              _showMediaPreview(context, blurryFiles[index]);
-            },
+          return RepaintBoundary(
+            child: BlurryMediaGridItem(
+              file: blurryFiles[index],
+              onTap: () {
+                context.read<MediaCleanerBloc>().add(
+                  ToggleFileSelection(blurryFiles[index].entity.id),
+                );
+              },
+              onPreview: () {
+                _showMediaPreview(context, blurryFiles[index]);
+              },
+            ),
           );
         },
       );
@@ -391,19 +452,25 @@ class CategoryPage extends StatelessWidget {
 
       return ListView.builder(
         padding: const EdgeInsets.only(top: 180, bottom: 100), // Баннер (~90px) + 40px отступ
+        // Оптимизация производительности
+        cacheExtent: 1000.0, // Предзагрузка ~2-3 групп заранее
+        addAutomaticKeepAlives: true, // Сохранение состояния при прокрутке
+        addRepaintBoundaries: true, // Изоляция перерисовки элементов
         itemCount: groups.length,
         itemBuilder: (context, index) {
-          return SimilarMediaGroup(
-            group: groups[index],
-            onFileSelected: (fileId) {
-              context.read<MediaCleanerBloc>().add(ToggleFileSelection(fileId));
-            },
-            onPreviewFile: (file) {
-              _showMediaPreview(context, file);
-            },
-            onSelectAllInGroup: (fileIds) {
-              context.read<MediaCleanerBloc>().add(SelectAllInGroup(groups[index].id));
-            },
+          return RepaintBoundary(
+            child: SimilarMediaGroup(
+              group: groups[index],
+              onFileSelected: (fileId) {
+                context.read<MediaCleanerBloc>().add(ToggleFileSelection(fileId));
+              },
+              onPreviewFile: (file) {
+                _showMediaPreview(context, file);
+              },
+              onSelectAllInGroup: (fileIds) {
+                context.read<MediaCleanerBloc>().add(SelectAllInGroup(groups[index].id));
+              },
+            ),
           );
         },
       );
@@ -419,16 +486,22 @@ class CategoryPage extends StatelessWidget {
         crossAxisSpacing: 1.0,
         mainAxisSpacing: 1.0,
       ),
+      // Оптимизация производительности
+      cacheExtent: 1000.0, // Предзагрузка ~3 экранов контента
+      addAutomaticKeepAlives: true, // Сохранение состояния при прокрутке
+      addRepaintBoundaries: true, // Изоляция перерисовки элементов
       itemCount: files.length,
       itemBuilder: (context, index) {
-        return MediaGridItem(
-          file: files[index],
-          onTap: () {
-            context.read<MediaCleanerBloc>().add(ToggleFileSelection(files[index].entity.id));
-          },
-          onPreview: () {
-            _showMediaPreview(context, files[index]);
-          },
+        return RepaintBoundary(
+          child: MediaGridItem(
+            file: files[index],
+            onTap: () {
+              context.read<MediaCleanerBloc>().add(ToggleFileSelection(files[index].entity.id));
+            },
+            onPreview: () {
+              _showMediaPreview(context, files[index]);
+            },
+          ),
         );
       },
     );

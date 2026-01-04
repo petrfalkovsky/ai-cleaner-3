@@ -43,9 +43,13 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Все видео в порядке!"),
         "analyzing_videos_processed":
             MessageLookupByLibrary.simpleMessage("Анализ видео (обработано"),
+        "app_media": MessageLookupByLibrary.simpleMessage("Из приложений"),
         "are_you_sure_delete": MessageLookupByLibrary.simpleMessage(
             "Вы уверены, что хотите удалить"),
         "back_to_home": MessageLookupByLibrary.simpleMessage("На главную"),
+        "best_value": MessageLookupByLibrary.simpleMessage("ВЫГОДНО"),
+        "billed_weekly":
+            MessageLookupByLibrary.simpleMessage("Списывается еженедельно"),
         "blurry": MessageLookupByLibrary.simpleMessage("Размытые"),
         "blurry_not_clear_photos": MessageLookupByLibrary.simpleMessage(
             "Нечеткие и размытые фотографии"),
@@ -57,6 +61,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "close": MessageLookupByLibrary.simpleMessage("Закрыть"),
         "contact_and_feedback":
             MessageLookupByLibrary.simpleMessage("Контакты и обратная связь"),
+        "continue_action": MessageLookupByLibrary.simpleMessage("Продолжить"),
         "delete": MessageLookupByLibrary.simpleMessage("Удалить"),
         "delete_files": MessageLookupByLibrary.simpleMessage("Удалить файлы"),
         "device_screen_recordings":
@@ -86,6 +91,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Ваш отзыв успешно отправлен. Мы свяжемся с вами в ближайшее время!"),
         "file": MessageLookupByLibrary.simpleMessage("Файл"),
         "files": MessageLookupByLibrary.simpleMessage("Файлов"),
+        "files_from_apps":
+            MessageLookupByLibrary.simpleMessage("Файлов из приложений"),
         "files_load_error":
             MessageLookupByLibrary.simpleMessage("Ошибка загрузки файлов"),
         "find_and_delete_unnecessary_photos":
@@ -95,6 +102,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage(
                 "Найдите дубликаты и ненужные видео"),
         "found": MessageLookupByLibrary.simpleMessage("Найдено"),
+        "free": MessageLookupByLibrary.simpleMessage("свободно"),
         "freed": MessageLookupByLibrary.simpleMessage("освобождено"),
         "from": MessageLookupByLibrary.simpleMessage("из"),
         "gallery_in_good_shape": MessageLookupByLibrary.simpleMessage(
@@ -107,11 +115,25 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Идентичные видеофайлы"),
         "image_load_error":
             MessageLookupByLibrary.simpleMessage("Ошибка загрузки изображения"),
+        "instagram_media":
+            MessageLookupByLibrary.simpleMessage("Медиа из Instagram"),
+        "iphone_storage_full":
+            MessageLookupByLibrary.simpleMessage("Память iPhone заполнена"),
         "keep": MessageLookupByLibrary.simpleMessage("Оставить"),
+        "large_videos": MessageLookupByLibrary.simpleMessage("Большие видео"),
+        "large_videos_description":
+            MessageLookupByLibrary.simpleMessage("Видео размером более 180 МБ"),
+        "lifetime": MessageLookupByLibrary.simpleMessage("Пожизненно"),
+        "live_photos": MessageLookupByLibrary.simpleMessage("Live Photos"),
+        "live_photos_description": MessageLookupByLibrary.simpleMessage(
+            "Фотографии с видео-эффектом Live Photo"),
         "loading": MessageLookupByLibrary.simpleMessage("Загрузка..."),
         "loading_videos":
             MessageLookupByLibrary.simpleMessage("Загрузка видео..."),
         "message": MessageLookupByLibrary.simpleMessage("Сообщение"),
+        "messenger_media":
+            MessageLookupByLibrary.simpleMessage("Медиа из Messenger"),
+        "most_popular": MessageLookupByLibrary.simpleMessage("ПОПУЛЯРНО"),
         "name": MessageLookupByLibrary.simpleMessage("Имя"),
         "new_word": MessageLookupByLibrary.simpleMessage("Новых"),
         "no_files_in_category":
@@ -123,7 +145,12 @@ class MessageLookup extends MessageLookupByLibrary {
         "no_video_issues_yet":
             MessageLookupByLibrary.simpleMessage("Проблем пока не найдено"),
         "not_found": MessageLookupByLibrary.simpleMessage("Не найдены"),
+        "of_1": MessageLookupByLibrary.simpleMessage("из"),
         "on": MessageLookupByLibrary.simpleMessage("в"),
+        "one_time_purchase":
+            MessageLookupByLibrary.simpleMessage("единовременно"),
+        "per_week": MessageLookupByLibrary.simpleMessage("/нед"),
+        "per_year": MessageLookupByLibrary.simpleMessage("/год"),
         "photo_bursts": MessageLookupByLibrary.simpleMessage("Серии снимков"),
         "photo_series": MessageLookupByLibrary.simpleMessage("Серии фото"),
         "photos": MessageLookupByLibrary.simpleMessage("Фото"),
@@ -136,32 +163,53 @@ class MessageLookup extends MessageLookupByLibrary {
             "Подготовка к сканированию..."),
         "privacy_policy":
             MessageLookupByLibrary.simpleMessage("Политика конфиденциальности"),
+        "pro": MessageLookupByLibrary.simpleMessage("Pro"),
         "problem_photos":
             MessageLookupByLibrary.simpleMessage("Проблемные фото"),
         "problem_videos":
             MessageLookupByLibrary.simpleMessage("Проблемные видео"),
+        "products_not_loaded": MessageLookupByLibrary.simpleMessage(
+            "Продукты еще не загружены. Пожалуйста, попробуйте через мгновение."),
+        "purchased": MessageLookupByLibrary.simpleMessage("Подписка активна"),
         "rate_app": MessageLookupByLibrary.simpleMessage("Оценить приложение"),
         "rescan":
             MessageLookupByLibrary.simpleMessage("Повторить сканирование"),
         "restore_purchases":
             MessageLookupByLibrary.simpleMessage("Восстановить покупки"),
+        "save_vs_weekly": MessageLookupByLibrary.simpleMessage(
+            "Экономия 35% по сравнению с неделей"),
+        "scan_completed":
+            MessageLookupByLibrary.simpleMessage("Сканирование завершено"),
+        "scan_completed_exclamation":
+            MessageLookupByLibrary.simpleMessage("Сканирование завершено!"),
         "scan_warning": MessageLookupByLibrary.simpleMessage(
             "Дождитесь окончания сканирования для стабильной работы приложения.\nУстройство может нагреться. Вы можете приостановить сканирование для зарядки или охлаждения устройства (функция в разработке)."),
         "scanning": MessageLookupByLibrary.simpleMessage("Сканирование..."),
+        "scanning_already_in_progress": MessageLookupByLibrary.simpleMessage(
+            "Сканирование уже выполняется..."),
+        "scanning_media_files":
+            MessageLookupByLibrary.simpleMessage("Сканирование медиафайлов..."),
         "screen_recordings":
             MessageLookupByLibrary.simpleMessage("Записи экрана"),
         "screen_recordings_2":
             MessageLookupByLibrary.simpleMessage("Записей экрана"),
         "screenshots": MessageLookupByLibrary.simpleMessage("Снимки экрана"),
         "screenshots_count": MessageLookupByLibrary.simpleMessage("Скриншотов"),
+        "searching_app_media": MessageLookupByLibrary.simpleMessage(
+            "Поиск медиа из приложений..."),
         "searching_duplicate_photos_processed":
             MessageLookupByLibrary.simpleMessage(
                 "Поиск дубликатов фото (обработано"),
+        "searching_large_videos": MessageLookupByLibrary.simpleMessage(
+            "Поиск больших видео (>180MB)..."),
+        "searching_live_photos":
+            MessageLookupByLibrary.simpleMessage("Поиск Live Photos..."),
         "searching_similar_photos_processed":
             MessageLookupByLibrary.simpleMessage(
                 "Поиск похожих фото (обработано"),
         "select": MessageLookupByLibrary.simpleMessage("Выбрать"),
         "select_all": MessageLookupByLibrary.simpleMessage("Выбрать все"),
+        "selected": MessageLookupByLibrary.simpleMessage("Выбрано"),
         "send_feedback":
             MessageLookupByLibrary.simpleMessage("Отправить отзыв"),
         "send_us_your_feedback": MessageLookupByLibrary.simpleMessage(
@@ -179,6 +227,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Групп похожих фото"),
         "similar_photos":
             MessageLookupByLibrary.simpleMessage("Похожие фотографии"),
+        "snapchat_media":
+            MessageLookupByLibrary.simpleMessage("Медиа из Snapchat"),
         "start_scan":
             MessageLookupByLibrary.simpleMessage("Начать сканирование"),
         "start_trial":
@@ -189,6 +239,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "success": MessageLookupByLibrary.simpleMessage("Успех"),
         "swipe_hint": MessageLookupByLibrary.simpleMessage(
             "Удаляйте или сохраняйте файлы простым свайпом"),
+        "telegram_media":
+            MessageLookupByLibrary.simpleMessage("Медиа из Telegram"),
         "terms_and_privacy": MessageLookupByLibrary.simpleMessage(
             "Условия и конфиденциальность"),
         "thank_you": MessageLookupByLibrary.simpleMessage("Спасибо!"),
@@ -200,16 +252,21 @@ class MessageLookup extends MessageLookupByLibrary {
         "try_again": MessageLookupByLibrary.simpleMessage("Попробовать снова"),
         "try_swipe_mode":
             MessageLookupByLibrary.simpleMessage("Попробуйте режим смахивания"),
-        "unlock_premium":
-            MessageLookupByLibrary.simpleMessage("Разблокировать Premium"),
+        "unlock_forever":
+            MessageLookupByLibrary.simpleMessage("Доступ навсегда"),
         "unnamed_file": MessageLookupByLibrary.simpleMessage("Файл без имени"),
         "updated": MessageLookupByLibrary.simpleMessage("Обновлено:"),
+        "used": MessageLookupByLibrary.simpleMessage("занято"),
         "version": MessageLookupByLibrary.simpleMessage("Версия"),
         "video_load_error":
             MessageLookupByLibrary.simpleMessage("Ошибка загрузки видео"),
         "videos": MessageLookupByLibrary.simpleMessage("Видео"),
         "view": MessageLookupByLibrary.simpleMessage("Просмотр"),
         "we_love_to_hear_from_you":
-            MessageLookupByLibrary.simpleMessage("Мы рады услышать от вас!")
+            MessageLookupByLibrary.simpleMessage("Мы рады услышать от вас!"),
+        "weekly": MessageLookupByLibrary.simpleMessage("Еженедельно"),
+        "whatsapp_media":
+            MessageLookupByLibrary.simpleMessage("Медиа из WhatsApp"),
+        "yearly": MessageLookupByLibrary.simpleMessage("Ежегодно")
       };
 }

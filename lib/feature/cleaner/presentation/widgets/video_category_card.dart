@@ -11,6 +11,7 @@ class VideoCategoryCard extends StatefulWidget {
   final int count;
   final int selectedCount;
   final VoidCallback onTap;
+  final bool isLocked;
 
   const VideoCategoryCard({
     super.key,
@@ -18,6 +19,7 @@ class VideoCategoryCard extends StatefulWidget {
     required this.count,
     required this.selectedCount,
     required this.onTap,
+    this.isLocked = false,
   });
 
   @override
@@ -61,11 +63,26 @@ class _VideoCategoryCardState extends State<VideoCategoryCard> {
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
-                        // Иконка
+                        // Иконка с замочком для заблокированных категорий
                         SizedBox(
                           width: 56,
                           height: 56,
-                          child: Icon(widget.category.icon, color: Colors.white, size: 28),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Icon(widget.category.icon, color: Colors.white, size: 28),
+                              if (widget.isLocked)
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: const Icon(
+                                    CupertinoIcons.lock_circle,
+                                    size: 20,
+                                    color: Color(0xFFFFD700),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
 
                         const SizedBox(width: 16),
