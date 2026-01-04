@@ -38,11 +38,24 @@ class iOS26ReferenceViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupNavigationBar()
         setupUI()
         setupConstraints()
     }
 
     // MARK: - Setup
+
+    private func setupNavigationBar() {
+        title = "iOS 26 Reference"
+
+        // Кнопка закрытия
+        let closeButton = UIBarButtonItem(
+            barButtonSystemItem: .close,
+            target: self,
+            action: #selector(closeTapped)
+        )
+        navigationItem.leftBarButtonItem = closeButton
+    }
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
@@ -173,6 +186,10 @@ class iOS26ReferenceViewController: UIViewController {
     }
 
     // MARK: - Actions
+
+    @objc private func closeTapped() {
+        dismiss(animated: true, completion: nil)
+    }
 
     private func handleTabChange(_ index: Int) {
         selectedTabIndex = index

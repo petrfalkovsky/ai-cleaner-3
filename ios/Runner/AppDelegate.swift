@@ -191,12 +191,30 @@ class NativeSegmentedControlView: NSObject, FlutterPlatformView {
       withId: "ios_tab_view"
     )
 
-    // Регистрируем iOS 26 Reference Screen (точная копия NewTabView из примера)
-    let ios26ReferenceFactory = iOS26ReferenceViewFactory(messenger: controller.binaryMessenger)
-    registrar(forPlugin: "iOS26Reference")?.register(
-      ios26ReferenceFactory,
-      withId: "ios26_reference_view"
+    // Method Channel для открытия iOS 26 Reference Screen (полностью нативный модуль)
+    let ios26ReferenceChannel = FlutterMethodChannel(
+      name: "ios26_reference_channel",
+      binaryMessenger: controller.binaryMessenger
     )
+
+    ios26ReferenceChannel.setMethodCallHandler { [weak controller] (call, result) in
+      guard let controller = controller else {
+        result(FlutterError(code: "UNAVAILABLE", message: "Controller not available", details: nil))
+        return
+      }
+
+      switch call.method {
+      case "openNativeScreen":
+        // Открываем нативный iOS 26 экран модально
+        let nativeVC = iOS26ReferenceViewController()
+        let navController = UINavigationController(rootViewController: nativeVC)
+        navController.modalPresentationStyle = .fullScreen
+        controller.present(navController, animated: true)
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
 
     // Настраиваем Method Channel для передачи метаданных медиафайлов
     let metadataChannel = FlutterMethodChannel(

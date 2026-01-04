@@ -22,7 +22,6 @@
 		9DA1B1121EF1DC5600515810 /* iOS26ReferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DA1B1111EF1DC5600515810 /* iOS26ReferenceViewController.swift */; };
 		9DA1B1141EF1DC5600515810 /* iOS26TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DA1B1131EF1DC5600515810 /* iOS26TabBar.swift */; };
 		9DA1B1161EF1DC5600515810 /* iOS26BottomAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DA1B1151EF1DC5600515810 /* iOS26BottomAccessory.swift */; };
-		9DA1B1181EF1DC5600515810 /* iOS26ReferenceViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DA1B1171EF1DC5600515810 /* iOS26ReferenceViewFactory.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -77,7 +76,6 @@
 		9DA1B1111EF1DC5600515810 /* iOS26ReferenceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOS26ReferenceViewController.swift; sourceTree = "<group>"; };
 		9DA1B1131EF1DC5600515810 /* iOS26TabBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOS26TabBar.swift; sourceTree = "<group>"; };
 		9DA1B1151EF1DC5600515810 /* iOS26BottomAccessory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOS26BottomAccessory.swift; sourceTree = "<group>"; };
-		9DA1B1171EF1DC5600515810 /* iOS26ReferenceViewFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOS26ReferenceViewFactory.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		87098DD593780668BF99B37E /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		93AE8DFA066919D0FC88098C /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
@@ -188,7 +186,6 @@
 				9DA1B1111EF1DC5600515810 /* iOS26ReferenceViewController.swift */,
 				9DA1B1131EF1DC5600515810 /* iOS26TabBar.swift */,
 				9DA1B1151EF1DC5600515810 /* iOS26BottomAccessory.swift */,
-				9DA1B1171EF1DC5600515810 /* iOS26ReferenceViewFactory.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
@@ -446,7 +443,6 @@
 				9DA1B1121EF1DC5600515810 /* iOS26ReferenceViewController.swift in Sources */,
 				9DA1B1141EF1DC5600515810 /* iOS26TabBar.swift in Sources */,
 				9DA1B1161EF1DC5600515810 /* iOS26BottomAccessory.swift in Sources */,
-				9DA1B1181EF1DC5600515810 /* iOS26ReferenceViewFactory.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
