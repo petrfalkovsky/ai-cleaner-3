@@ -74,6 +74,14 @@ class IOSTabViewWrapper: NSObject, FlutterPlatformView {
         tabViewController.onTabChanged = { [weak self] index in
             self?.channel.invokeMethod("onTabChanged", arguments: index)
         }
+
+        // Callback для открытия категории
+        tabViewController.onCategoryTapped = { [weak self] tabType, categoryName in
+            self?.channel.invokeMethod("onCategoryTapped", arguments: [
+                "tabType": tabType,
+                "categoryName": categoryName
+            ])
+        }
     }
 
     private func setupMethodChannel() {
@@ -99,6 +107,22 @@ class IOSTabViewWrapper: NSObject, FlutterPlatformView {
                     result(nil)
                 } else {
                     result(FlutterError(code: "INVALID_ARGS", message: "Invalid scroll offset", details: nil))
+                }
+
+            case "updatePhotoCategories":
+                if let categories = call.arguments as? [[String: Any]] {
+                    self.tabViewController.updatePhotoCategories(categories)
+                    result(nil)
+                } else {
+                    result(FlutterError(code: "INVALID_ARGS", message: "Invalid categories", details: nil))
+                }
+
+            case "updateVideoCategories":
+                if let categories = call.arguments as? [[String: Any]] {
+                    self.tabViewController.updateVideoCategories(categories)
+                    result(nil)
+                } else {
+                    result(FlutterError(code: "INVALID_ARGS", message: "Invalid categories", details: nil))
                 }
 
             default:

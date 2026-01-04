@@ -15,6 +15,11 @@ class IOSTabViewController: UITabBarController {
     var onRescanTapped: (() -> Void)?
     var onSearchTextChanged: ((String) -> Void)?
     var onTabChanged: ((Int) -> Void)?
+    var onCategoryTapped: ((String, String) -> Void)?  // (tabType, categoryName)
+
+    // View controllers
+    private var summaryVC: SummaryListViewController?
+    private var sharingVC: SharingViewController?
 
     // MARK: - Lifecycle
 
@@ -51,25 +56,45 @@ class IOSTabViewController: UITabBarController {
     }
 
     private func setupViewControllers() {
-        // Summary Tab
-        let summaryVC = SummaryListViewController()
-        let summaryNav = UINavigationController(rootViewController: summaryVC)
+        // Summary Tab (Photos)
+        let summaryViewController = SummaryListViewController()
+        summaryViewController.onCategoryTapped = { [weak self] categoryName in
+            self?.onCategoryTapped?("photo", categoryName)
+        }
+        self.summaryVC = summaryViewController
+
+        let summaryNav = UINavigationController(rootViewController: summaryViewController)
         summaryNav.tabBarItem = UITabBarItem(
-            title: "Summary",
-            image: UIImage(systemName: "heart"),
-            selectedImage: UIImage(systemName: "heart.fill")
+            title: "Photos",
+            image: UIImage(systemName: "photo.stack"),
+            selectedImage: UIImage(systemName: "photo.stack.fill")
         )
 
-        // Sharing Tab
-        let sharingVC = SharingViewController()
-        let sharingNav = UINavigationController(rootViewController: sharingVC)
+        // Sharing Tab (Videos)
+        let sharingViewController = SharingViewController()
+        sharingViewController.onCategoryTapped = { [weak self] categoryName in
+            self?.onCategoryTapped?("video", categoryName)
+        }
+        self.sharingVC = sharingViewController
+
+        let sharingNav = UINavigationController(rootViewController: sharingViewController)
         sharingNav.tabBarItem = UITabBarItem(
-            title: "Sharing",
-            image: UIImage(systemName: "person.2"),
-            selectedImage: UIImage(systemName: "person.2.fill")
+            title: "Videos",
+            image: UIImage(systemName: "video.stack"),
+            selectedImage: UIImage(systemName: "video.stack.fill")
         )
 
         viewControllers = [summaryNav, sharingNav]
+    }
+
+    // MARK: - Public Methods
+
+    func updatePhotoCategories(_ categories: [[String: Any]]) {
+        summaryVC?.updateCategories(categories)
+    }
+
+    func updateVideoCategories(_ categories: [[String: Any]]) {
+        sharingVC?.updateCategories(categories)
     }
 
     private func setupBottomAccessory() {

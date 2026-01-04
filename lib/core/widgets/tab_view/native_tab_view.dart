@@ -7,14 +7,20 @@ class NativeTabView extends StatefulWidget {
   final VoidCallback? onRescanTapped;
   final ValueChanged<String>? onSearchTextChanged;
   final ValueChanged<int>? onTabChanged;
+  final Function(String tabType, String categoryName)? onCategoryTapped;
   final ScrollController? scrollController;
+  final List<Map<String, dynamic>>? photoCategories;
+  final List<Map<String, dynamic>>? videoCategories;
 
   const NativeTabView({
     super.key,
     this.onRescanTapped,
     this.onSearchTextChanged,
     this.onTabChanged,
+    this.onCategoryTapped,
     this.scrollController,
+    this.photoCategories,
+    this.videoCategories,
   });
 
   @override
@@ -50,6 +56,16 @@ class _NativeTabViewState extends State<NativeTabView> {
     }
   }
 
+  /// Обновить категории фото
+  Future<void> _updatePhotoCategories(List<Map<String, dynamic>> categories) async {
+    await _channel?.invokeMethod('updatePhotoCategories', categories);
+  }
+
+  /// Обновить категории видео
+  Future<void> _updateVideoCategories(List<Map<String, dynamic>> categories) async {
+    await _channel?.invokeMethod('updateVideoCategories', categories);
+  }
+
   @override
   Widget build(BuildContext context) {
     // Только для iOS
@@ -68,6 +84,16 @@ class _NativeTabViewState extends State<NativeTabView> {
   void _onPlatformViewCreated(int id) {
     _channel = MethodChannel('ios_tab_view_$id');
     _channel?.setMethodCallHandler(_handleMethodCall);
+
+    // Отправляем категории после создания view
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.photoCategories != null) {
+        _updatePhotoCategories(widget.photoCategories!);
+      }
+      if (widget.videoCategories != null) {
+        _updateVideoCategories(widget.videoCategories!);
+      }
+    });
   }
 
   Future<dynamic> _handleMethodCall(MethodCall call) async {
@@ -84,6 +110,13 @@ class _NativeTabViewState extends State<NativeTabView> {
       case 'onTabChanged':
         final int index = call.arguments as int;
         widget.onTabChanged?.call(index);
+        break;
+
+      case 'onCategoryTapped':
+        final Map<dynamic, dynamic> args = call.arguments as Map<dynamic, dynamic>;
+        final String tabType = args['tabType'] as String;
+        final String categoryName = args['categoryName'] as String;
+        widget.onCategoryTapped?.call(tabType, categoryName);
         break;
     }
   }

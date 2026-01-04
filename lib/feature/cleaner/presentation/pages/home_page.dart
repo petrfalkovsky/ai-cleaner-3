@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:ai_cleaner_2/core/config/vision_config.dart';
 import 'package:ai_cleaner_2/core/enums/media_category_enum.dart';
 import 'package:ai_cleaner_2/core/router/router.gr.dart';
 import 'package:ai_cleaner_2/core/theme/app_colors.dart';
 import 'package:ai_cleaner_2/core/widgets/ios_notification.dart';
 import 'package:ai_cleaner_2/core/widgets/native_segmented_control.dart';
+import 'package:ai_cleaner_2/core/widgets/tab_view/native_tab_view.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_button.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/scan_status_banner.dart';
 import 'package:ai_cleaner_2/feature/cleaner/presentation/widgets/selected_files_counter.dart';
@@ -152,7 +154,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         child: Center(
                           child: SizedBox(
                             height: 60,
-                            // width: 100,
+                            width: 200,
                             child: NativeSegmentedControl(
                               items: [
                                 Locales.current.photos,
@@ -193,6 +195,110 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         );
       },
     );
+  }
+
+  /// Подготовить данные категорий фото для нативного TabView
+  List<Map<String, dynamic>> _preparePhotoCategories(MediaCleanerReady state) {
+    final categories = <Map<String, dynamic>>[];
+
+    if (state.similarCount > 0) {
+      categories.add({
+        'name': 'similar',
+        'title': Locales.current.similar_photos,
+        'subtitle': '${state.similarGroups.fold<int>(0, (sum, group) => sum + group.files.length)} ${Locales.current.photos}',
+        'icon': 'rectangle.on.rectangle',
+        'count': state.similarCount,
+      });
+    }
+
+    if (state.photoDuplicatesCount > 0) {
+      categories.add({
+        'name': 'series',
+        'title': Locales.current.photo_series,
+        'subtitle': '${state.photoDuplicateGroups.fold<int>(0, (sum, group) => sum + group.files.length)} ${Locales.current.photos}',
+        'icon': 'photo.on.rectangle',
+        'count': state.photoDuplicatesCount,
+      });
+    }
+
+    if (state.screenshotsCount > 0) {
+      categories.add({
+        'name': 'screenshots',
+        'title': Locales.current.screenshots,
+        'subtitle': '${state.screenshots.length} ${Locales.current.files}',
+        'icon': 'camera.viewfinder',
+        'count': state.screenshotsCount,
+      });
+    }
+
+    if (state.blurryCount > 0) {
+      categories.add({
+        'name': 'blurry',
+        'title': Locales.current.blurry_photos,
+        'subtitle': '${state.blurry.length} ${Locales.current.photos}',
+        'icon': 'eye.slash',
+        'count': state.blurryCount,
+      });
+    }
+
+    if (state.livePhotosCount > 0) {
+      categories.add({
+        'name': 'livePhotos',
+        'title': Locales.current.live_photos,
+        'subtitle': '${state.livePhotos.length} ${Locales.current.photos}',
+        'icon': 'livephoto',
+        'count': state.livePhotosCount,
+      });
+    }
+
+    return categories;
+  }
+
+  /// Подготовить данные категорий видео для нативного TabView
+  List<Map<String, dynamic>> _prepareVideoCategories(MediaCleanerReady state) {
+    final categories = <Map<String, dynamic>>[];
+
+    if (state.videoDuplicatesCount > 0) {
+      categories.add({
+        'name': 'duplicates',
+        'title': Locales.current.duplicates,
+        'subtitle': '${state.videoDuplicateGroups.fold<int>(0, (sum, group) => sum + group.files.length)} ${Locales.current.videos}',
+        'icon': 'square.on.square',
+        'count': state.videoDuplicatesCount,
+      });
+    }
+
+    if (state.screenRecordingsCount > 0) {
+      categories.add({
+        'name': 'screenRecordings',
+        'title': Locales.current.screen_recordings,
+        'subtitle': '${state.screenRecordings.length} ${Locales.current.videos}',
+        'icon': 'record.circle',
+        'count': state.screenRecordingsCount,
+      });
+    }
+
+    if (state.shortVideosCount > 0) {
+      categories.add({
+        'name': 'shortVideos',
+        'title': Locales.current.short_videos,
+        'subtitle': '${state.shortVideos.length} ${Locales.current.videos}',
+        'icon': 'timer',
+        'count': state.shortVideosCount,
+      });
+    }
+
+    if (state.largeVideosCount > 0) {
+      categories.add({
+        'name': 'largeVideos',
+        'title': Locales.current.large_videos,
+        'subtitle': '${state.largeVideos.length} ${Locales.current.videos}',
+        'icon': 'square.stack.3d.up',
+        'count': state.largeVideosCount,
+      });
+    }
+
+    return categories;
   }
 
   Widget _buildPhotoTab() {
