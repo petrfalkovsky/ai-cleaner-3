@@ -48,6 +48,8 @@ import 'package:ai_cleaner_2/feature/settings/presentation/pages/feedback_screen
     as _i10;
 import 'package:ai_cleaner_2/feature/settings/presentation/pages/feedback_success_screen.dart'
     as _i11;
+import 'package:ai_cleaner_2/feature/settings/presentation/pages/ios26_reference_page.dart'
+    as _i30;
 import 'package:ai_cleaner_2/feature/settings/presentation/pages/settings_screen.dart'
     as _i19;
 import 'package:ai_cleaner_2/feature/swipe/presentation/pages/swipe_screen.dart'
@@ -763,4 +765,20 @@ class VideoFullRouteArgs {
   String toString() {
     return 'VideoFullRouteArgs{key: $key, entity: $entity}';
   }
+}
+
+/// generated route for
+/// [_i30.iOS26ReferencePage]
+class iOS26ReferenceRoute extends _i24.PageRouteInfo<void> {
+  const iOS26ReferenceRoute({List<_i24.PageRouteInfo>? children})
+    : super(iOS26ReferenceRoute.name, initialChildren: children);
+
+  static const String name = 'iOS26ReferenceRoute';
+
+  static _i24.PageInfo page = _i24.PageInfo(
+    name,
+    builder: (data) {
+      return const _i30.iOS26ReferencePage();
+    },
+  );
 }
